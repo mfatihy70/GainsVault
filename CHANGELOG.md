@@ -1,17 +1,14 @@
-# Changelog PLACEHOLDER
+# Changelog
 
-## [v0.2.1] - 2025-02-16
+## [v1.0.0] - 2025-03-16
 
 ### Added
-- Deployment of backend on the cloud and integration with the github page
-
-### Fixed
-- Error when trying to add products to cart
-- Login error due to localhost address when deployed
+- Website logos and icons under `frontend/src/assets`
+- Packages React-Bootstrap, Bootstrap, Sequelize, PG
 
 ### Changed
-- All page headers have same margins
+- Tab icon
+- Simplified `index.css` and `App.css`
 
 ### Removed
-- Unnecessary logs
-- Flag icons package using pngs instead
+- `public` folder with its contents
