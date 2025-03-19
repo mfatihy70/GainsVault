@@ -1,10 +1,11 @@
 import './App.css'
+import {Container, Button} from 'react-bootstrap'
 
 function App() {
   return (
-    <>
-      <h1>Hello World</h1>
-    </>
+    <Container>
+      <Button variant="primary">Primary</Button>
+    </Container>
   )
 }
 

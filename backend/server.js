@@ -1,11 +1,16 @@
-import express from "express";
-const app = express();
-const port = 3000;
+import express from "express"
+import connectDB from "./config/db.js"
+const port = 5050
+
+connectDB()
+const app = express()
+
+app.use(express.json())
 
 app.get("/", (req, res) => {
-  res.send("Hello W!");
-});
+  res.send("Hello W!")
+})
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}!`);
-});
+  console.log(`Example app listening on port ${port}!`)
+})

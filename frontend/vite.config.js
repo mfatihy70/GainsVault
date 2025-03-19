@@ -10,7 +10,6 @@ export default defineConfig({
   build: {
     outDir: 'dist',
   },
-  base: '/gains-vault/',
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
