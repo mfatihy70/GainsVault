@@ -1,5 +1,6 @@
 import express from "express"
 import cors from "cors"
+import dotenv from "dotenv"
 import connectDB from "./config/db.js"
 import logger from "./middlewares/logger.js"
 import errorHandler from "./middlewares/error.js"
@@ -7,7 +8,7 @@ import notFound from "./middlewares/notFound.js"
 import auth from "./middlewares/auth.js"
 dotenv.config()
 
-const PORT = 5050
+const PORT = process.env.BACKEND_PORT || 5050
 
 connectDB()
 const app = express()

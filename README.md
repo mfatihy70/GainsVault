@@ -14,6 +14,7 @@ To set up the project locally, follow these steps:
 
 2. Create a `.env` file in the `backend` directory and add the following entries:
     ```
+    # Required 
     JWT_TOKEN=
     DB_NAME=
     DB_HOST=
@@ -21,6 +22,9 @@ To set up the project locally, follow these steps:
     DB_PASSWORD=
     DB_SSLMODE=
     DB_PORT=
+
+    # Optional
+    BACKEND_PORT=
     ```
 
 3. Install dependencies and start the development servers:
