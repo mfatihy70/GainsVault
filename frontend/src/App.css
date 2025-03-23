@@ -4,3 +4,17 @@
   padding: 2rem;
   text-align: center;
 }
+
+/* Define how required labels field in a form should look */
+.required-label::after {
+  content: " *";
+  color: red;
+  margin-left: 0.2em;
+}
+
+.optional-label::after {
+  content: " (optional)";
+  color: lightgray;
+  font-size: x-small;
+  margin-left: 0.2em;
+}
