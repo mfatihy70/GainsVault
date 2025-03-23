@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 // TODO import custom navbar
-import { Navbar } from 'react-bootstrap'
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 
 // Define the main website layout
 export default function MainLayout() {
@@ -8,6 +9,7 @@ export default function MainLayout() {
         <>
             <Navbar />
             <Outlet />
+            <Footer/>
         </>
     )
 }
