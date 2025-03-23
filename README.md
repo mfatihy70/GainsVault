@@ -14,6 +14,7 @@ To set up the project locally, follow these steps:
 
 2. Create a `.env` file in the `backend` directory and add the following entries:
     ```
+    JWT_TOKEN=
     DB_NAME=
     DB_HOST=
     DB_USER=

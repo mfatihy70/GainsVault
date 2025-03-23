@@ -1,16 +1,20 @@
 import express from "express"
+import cors from "cors"
 import connectDB from "./config/db.js"
-const port = 5050
+import auth from "./middlewares/auth.js"
+dotenv.config()
+
+const PORT = 5050
 
 connectDB()
 const app = express()
 
+// Middlewares
+// Body parser middelware
 app.use(express.json())
+// Cors Middleware
+app.use(cors())
+// JWT Middleware
+app.use(auth)
 
-app.get("/", (req, res) => {
-  res.send("Hello W!")
-})
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}!`)
-})
+app.listen(PORT, () => { console.log(`Backend listening on PORT ${PORT}!`) })
