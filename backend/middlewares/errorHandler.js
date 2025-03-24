@@ -1,9 +1,14 @@
 const errorHandler = (err, req, res, next) => {
-    console.error(err.stack);
+    console.log(err.stack);
     if (err.status) {
         return res.status(err.status).json({ msg: err.message });
     }
-    res.status(404).json({ msg: err.message || "Something went wrong" });
+    // Server Error
+    res.status(500).json({
+        status: 500,
+        message: "Something went wrong",
+        error: err.message
+    });
 }
 
 export default errorHandler;
