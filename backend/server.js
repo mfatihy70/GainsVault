@@ -4,8 +4,8 @@ import dotenv from "dotenv"
 import connectDB from "./config/db.js"
 
 // Routes
-import users from "./routes/users.js"
-import auth from "./routes/auth.js"
+import usersRouter from "./routes/users.routes.js"
+import authRouter from "./routes/auth.routes.js"
 
 // Middlewares
 import logger from "./middlewares/logger.js"
@@ -30,8 +30,8 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cors())
 
 // Routes
-app.use('/api/users', users)
-app.use('/api/auth', auth)
+app.use('/api/users', usersRouter)
+app.use('/api/auth', authRouter)
 
 // Logger Middleware
 app.use(logger)
