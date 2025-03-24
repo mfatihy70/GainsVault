@@ -1,15 +1,14 @@
-import React from 'react';
-import { Navbar, Nav } from 'react-bootstrap';
-import CustomNavLink from './NavLink';
-import logo from '../../assets/logo.png'; // Pfad zum Logo
+import React from "react"
+import { Navbar, Nav, NavLink } from "react-bootstrap"
+import logo from "@/assets/gainsvault.png" // Pfad zum Logo
 
 const CustomNavbar = () => (
   <Navbar bg="dark" variant="dark" expand="lg">
     <Navbar.Brand href="/">
       <img
         src={logo}
-        width="30"
-        height="30"
+        width="200"
+        height="200"
         className="d-inline-block align-top"
         alt="Logo"
       />
@@ -17,13 +16,13 @@ const CustomNavbar = () => (
     <Navbar.Toggle aria-controls="basic-navbar-nav" />
     <Navbar.Collapse id="basic-navbar-nav">
       <Nav className="mr-auto">
-        <CustomNavLink to="/">Home</CustomNavLink>
-        <CustomNavLink to="/exercises">Exercises</CustomNavLink>
-        <CustomNavLink to="/splits">Splits</CustomNavLink>
-        <CustomNavLink to="/profile">Profile</CustomNavLink>
+        <NavLink to="/">Home</NavLink>
+        <NavLink to="/exercises">Exercises</NavLink>
+        <NavLink to="/splits">Splits</NavLink>
+        <NavLink to="/profile">Profile</NavLink>
       </Nav>
     </Navbar.Collapse>
   </Navbar>
-);
+)
 
-export default CustomNavbar;
+export default CustomNavbar

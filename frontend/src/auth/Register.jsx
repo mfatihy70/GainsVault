@@ -23,7 +23,7 @@ const Register = () => {
       <Row>
         <Col>
           <Card
-            className="bg-white mx-auto"
+            className="bg-dark mx-auto"
             style={{ borderRadius: "1rem", maxWidth: "500px" }}
           >
             <Card.Body className="p-5 w-100 d-flex flex-column">
@@ -94,7 +94,7 @@ const Register = () => {
                   />
                 </Form.Group>
                 <Button
-                  variant="primary"
+                  variant="warning"
                   size="lg"
                   className="w-100 mb-4"
                   onClick={handleRegisterClick}
