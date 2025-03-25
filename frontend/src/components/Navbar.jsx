@@ -1,18 +1,12 @@
-import React from "react"
 import { Navbar, Nav } from "react-bootstrap"
 import { NavLink } from "react-router-dom"
 import logo from "@/assets/gainsvault-tr.png"
+import "@/styles/navbar.css" // Import the CSS file
 
 const CustomNavbar = () => (
-  <Navbar bg="dark" variant="dark" expand="lg">
+  <Navbar bg="dark" variant="dark" expand="lg" className="navbar mb-5">
     <Navbar.Brand href="/">
-      <img
-        src={logo}
-        width="200"
-        height="200"
-        className="d-inline-block align-top"
-        alt="Logo"
-      />
+      <img src={logo} className="navbar-logo" alt="Logo" />
     </Navbar.Brand>
     <Navbar.Toggle aria-controls="basic-navbar-nav" />
     <Navbar.Collapse id="basic-navbar-nav">

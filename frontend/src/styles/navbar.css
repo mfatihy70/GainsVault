@@ -1,16 +1,11 @@
 .navbar {
-  background-color: #343a40;
+  background-color: rgb(287, 187, 39);
+  height: 150px; /* Set a fixed height for the navbar */
+  display: flex;
+  align-items: center; /* Center content vertically */
+  padding: 0 1rem; /* Add horizontal padding */
 }
 
-.nav-link {
-  color: #ffffff;
-  transition: color 0.3s ease;
+.navbar-logo {
+  height: 150px; /* Adjust the logo height */
 }
-
-.nav-link:hover {
-  color: #cccccc;
-}
-
-.active {
-  font-weight: bold;
-} 
