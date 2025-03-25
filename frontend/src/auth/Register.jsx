@@ -19,11 +19,11 @@ const Register = () => {
   }
 
   return (
-    <Container fluid className="d-flex flex-column min-vh-100 p-0">
+    <Container fluid className="d-flex flex-column min-vh-100 my-5">
       <Row>
         <Col>
           <Card
-            className="bg-white mx-auto"
+            className="bg-dark mx-auto"
             style={{ borderRadius: "1rem", maxWidth: "500px" }}
           >
             <Card.Body className="p-5 w-100 d-flex flex-column">
@@ -94,7 +94,7 @@ const Register = () => {
                   />
                 </Form.Group>
                 <Button
-                  variant="primary"
+                  variant="warning"
                   size="lg"
                   className="w-100 mb-4"
                   onClick={handleRegisterClick}
