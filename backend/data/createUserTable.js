@@ -2,7 +2,7 @@ import { sequelize } from '../config/db.js';
 
 const createUserTable = async () => {
     const query = `
-        CREATE TABLE users (
+        CREATE TABLE if not exists users (
           id SERIAL PRIMARY KEY,
           name VARCHAR(255) NOT NULL,
           email VARCHAR(255) NOT NULL,

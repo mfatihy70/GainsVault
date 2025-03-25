@@ -15,7 +15,7 @@ const Login = () => {
 
   return (
     // This className is for sending the footer to the bottom of the page
-    <Container fluid className="d-flex flex-column min-vh-100 p-0">
+    <Container fluid className="d-flex flex-column min-vh-100 my-5">
       <Row>
         <Col>
           <Card
