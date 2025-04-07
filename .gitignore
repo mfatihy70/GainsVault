@@ -24,3 +24,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+compose.yml
+.dockerignore
+.gitignore
+jsconfig.json
