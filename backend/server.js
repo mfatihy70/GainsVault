@@ -6,6 +6,7 @@ import connectDB from "./config/db.js"
 // Routes
 import usersRouter from "./routes/users.routes.js"
 import authRouter from "./routes/auth.routes.js"
+import profileRouter from "./routes/profile.routes.js"
 
 // Middlewares
 import logger from "./middlewares/logger.js"
@@ -32,6 +33,7 @@ app.use(cors())
 // Routes
 app.use('/api/users', usersRouter)
 app.use('/api/auth', authRouter)
+app.use('/api/profile', profileRouter)
 
 // Logger Middleware
 app.use(logger)

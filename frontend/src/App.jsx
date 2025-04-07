@@ -13,6 +13,7 @@ import Footer from "./components/Footer"
 import HomePage from "./pages/Home"
 import LoginForm from "./auth/Login"
 import RegisterForm from "./auth/Register"
+import ProfilePage from "./pages/Profile"
 import Imprint from "./pages/Imprint"
 import NotFoundPage from "./pages/NotFound"
 
@@ -25,6 +26,7 @@ function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/imprint" element={<Imprint />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
