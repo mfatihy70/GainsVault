@@ -1,16 +1,17 @@
 import { useState } from "react"
-import { Link, useParams, useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap"
+import { handleLogin } from "../utils/login" // Import the handleLogin function
 
 const Login = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const navigate = useNavigate()
 
-  const handleLoginClick = () => {
+  const handleLoginClick = async () => {
     // This function handles the login and will be imported from utils/login.js
-    //handleLogin(email, password, setError, navigate, lang)
-    alert("Login clicked, in development")
+    handleLogin(email, password, setError, navigate)
   }
 
   return (

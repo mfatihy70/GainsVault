@@ -1,6 +1,7 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap"
+import { handleSignup } from "../utils/signup" // Import the handleRegister function
 
 const Register = () => {
   const [name, setName] = useState("")
@@ -11,11 +12,11 @@ const Register = () => {
   const [address, setAddress] = useState("")
   const [phone, setPhone] = useState("")
   const [error, setError] = useState("")
+  const navigate = useNavigate()
 
-  const handleRegisterClick = () => {
+  const handleRegisterClick = async () => {
     // This function handles the register and will be imported from utils/register.js
-    // handleRegister(name, surname, email, password, confirmPassword, address, phone, setError)
-    alert("Register clicked, in development")
+    handleSignup(name, surname, email, password, confirmPassword, address, phone, setError, navigate)
   }
 
   return (

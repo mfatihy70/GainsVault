@@ -1,37 +1,69 @@
-import { Navbar, Nav } from "react-bootstrap"
-import { NavLink } from "react-router-dom"
-import logo from "@/assets/gainsvault-tr.png"
-import "@/styles/navbar.css" // Import the CSS file
+import { Navbar, Nav, Button } from "react-bootstrap";
+import { NavLink, useNavigate } from "react-router-dom";
+import logo from "@/assets/gainsvault-tr.png";
+import "@/styles/navbar.css";
+import { isLoggedIn, handleLogout } from "../utils/login";
 
-const CustomNavbar = () => (
-  <Navbar bg="dark" variant="dark" expand="lg" className="navbar mb-5">
-    <Navbar.Brand href="/">
-      <img src={logo} className="navbar-logo" alt="Logo" />
-    </Navbar.Brand>
-    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-    <Navbar.Collapse id="basic-navbar-nav">
-      <Nav>
-        <NavLink to="/" className="nav-link">
-          Home
-        </NavLink>
-      </Nav>
-      <Nav>
-        <NavLink to="/exercises" className="nav-link">
-          Exercises
-        </NavLink>
-      </Nav>
-      <Nav>
-        <NavLink to="/splits" className="nav-link">
-          Splits
-        </NavLink>
-      </Nav>
-      <Nav>
-        <NavLink to="/profile" className="nav-link">
-          Profile
-        </NavLink>
-      </Nav>
-    </Navbar.Collapse>
-  </Navbar>
-)
+const CustomNavbar = () => {
+  const navigate = useNavigate(); // React Router hook for navigation
 
-export default CustomNavbar
+  const handleLogoutClick = () => {
+    handleLogout(navigate); // Call the handleLogout function
+  };
+
+  return (
+    <Navbar bg="dark" variant="dark" expand="lg" className="navbar mb-5">
+      <Navbar.Brand href="/">
+        <img src={logo} className="navbar-logo" alt="Logo" />
+      </Navbar.Brand>
+      <Navbar.Toggle aria-controls="basic-navbar-nav" />
+      <Navbar.Collapse id="basic-navbar-nav">
+        <Nav className="me-auto">
+          <NavLink to="/" className="nav-link">
+            Home
+          </NavLink>
+          <NavLink to="/exercises" className="nav-link">
+            Exercises
+          </NavLink>
+          <NavLink to="/splits" className="nav-link">
+            Splits
+          </NavLink>
+          {isLoggedIn() && (
+            <NavLink to="/profile" className="nav-link">
+              Profile
+            </NavLink>
+          )}
+        </Nav>
+        <Nav className="ms-auto">
+          {!isLoggedIn() ? (
+            <>
+              {/* Login Button */}
+              <NavLink to="/login" className="nav-link">
+                <Button variant="outline-light" className="me-2">
+                  Login
+                </Button>
+              </NavLink>
+              {/* Signup Button */}
+              <NavLink to="/register" className="nav-link">
+                <Button variant="light">Signup</Button>
+              </NavLink>
+            </>
+          ) : (
+            <>
+              {/* Logout Button */}
+              <Button
+                variant="outline-light"
+                className="me-2"
+                onClick={handleLogoutClick}
+              >
+                Logout
+              </Button>
+            </>
+          )}
+        </Nav>
+      </Navbar.Collapse>
+    </Navbar>
+  );
+};
+
+export default CustomNavbar;
