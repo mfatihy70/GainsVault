@@ -17,7 +17,7 @@ export const getProfile = async (req, res) => {
 }
 export const updateProfile = async (req, res) => {
     try {
-        const { name, email, location, bio } = req.body;
+        const { name, email, address, bio } = req.body;
 
         const user = await User.findByPk(req.user.id);
 
@@ -27,7 +27,7 @@ export const updateProfile = async (req, res) => {
 
         user.name = name || user.name;
         user.email = email || user.email;
-        user.location = location || user.location;
+        user.address = address || user.address;
         user.bio = bio || user.bio;
 
         await user.save();
