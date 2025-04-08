@@ -15,6 +15,8 @@ import LoginForm from "./auth/Login"
 import RegisterForm from "./auth/Register"
 import Imprint from "./pages/Imprint"
 import NotFoundPage from "./pages/NotFound"
+import SplitsPage from './pages/SplitsPage';
+
 
 function App() {
   return (
@@ -26,6 +28,7 @@ function App() {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/imprint" element={<Imprint />} />
+        <Route path='/splits' element={<SplitsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Footer />
