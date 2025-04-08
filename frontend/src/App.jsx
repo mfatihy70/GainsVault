@@ -1,8 +1,4 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import "./App.css"
 
 // Layout and common components
@@ -13,6 +9,7 @@ import Footer from "./components/Footer"
 import HomePage from "./pages/Home"
 import LoginForm from "./auth/Login"
 import RegisterForm from "./auth/Register"
+import SplitsPage from "./pages/Splits"
 import Imprint from "./pages/Imprint"
 import NotFoundPage from "./pages/NotFound"
 
@@ -26,6 +23,7 @@ function App() {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/imprint" element={<Imprint />} />
+        <Route path="/splits" element={<SplitsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Footer />

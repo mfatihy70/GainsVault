@@ -4,7 +4,7 @@ import logo from "@/assets/gainsvault-tr.png"
 import "@/styles/navbar.css" // Import the CSS file
 
 const CustomNavbar = () => (
-  <Navbar bg="dark" variant="dark" expand="lg" className="navbar mb-5">
+  <Navbar bg="dark" variant="dark" expand="sm" className="navbar mb-5 p-3">
     <Navbar.Brand href="/">
       <img src={logo} className="navbar-logo" alt="Logo" />
     </Navbar.Brand>
