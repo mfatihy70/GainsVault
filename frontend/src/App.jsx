@@ -10,6 +10,7 @@ import HomePage from "./pages/Home"
 import LoginForm from "./auth/Login"
 import RegisterForm from "./auth/Register"
 import SplitsPage from "./pages/Splits"
+import ExercisesPage from "./pages/Exercises"
 import Imprint from "./pages/Imprint"
 import NotFoundPage from "./pages/NotFound"
 
@@ -24,6 +25,7 @@ function App() {
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/imprint" element={<Imprint />} />
         <Route path="/splits" element={<SplitsPage />} />
+        <Route path="/exercises" element={<ExercisesPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Footer />
