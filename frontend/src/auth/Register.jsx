@@ -28,7 +28,7 @@ const Register = () => {
             style={{ borderRadius: "1rem", maxWidth: "500px" }}
           >
             <Card.Body className="p-5 w-100 d-flex flex-column">
-              <h3 className="mb-5 text-center">Register</h3>
+              <h3 className="mb-5 text-white">Register</h3>
               {error && <p className="text-danger text-center">{error}</p>}
               <Form>
                 <Form.Group className="mb-4" controlId="formName">
@@ -102,7 +102,7 @@ const Register = () => {
                 >
                   Register
                 </Button>
-                <p className="text-center">or</p>
+                <p className="text-white">or</p>
                 <Link to={`/login`}>
                   <Button variant="secondary" size="lg" className="w-100">
                     Login

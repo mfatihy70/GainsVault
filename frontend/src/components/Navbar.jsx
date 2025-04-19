@@ -1,18 +1,18 @@
-import { Navbar, Nav, Button } from "react-bootstrap";
-import { NavLink, useNavigate } from "react-router-dom";
-import logo from "@/assets/gainsvault-tr.png";
-import "@/styles/navbar.css";
-import { isLoggedIn, handleLogout } from "../utils/login";
+import { Navbar, Nav, Button } from "react-bootstrap"
+import { NavLink, useNavigate } from "react-router-dom"
+import logo from "@/assets/gainsvault-tr.png"
+import "@/styles/navbar.css"
+import { isLoggedIn, handleLogout } from "../utils/login"
 
 const CustomNavbar = () => {
-  const navigate = useNavigate(); // React Router hook for navigation
+  const navigate = useNavigate() // React Router hook for navigation
 
   const handleLogoutClick = () => {
-    handleLogout(navigate); // Call the handleLogout function
-  };
+    handleLogout(navigate) // Call the handleLogout function
+  }
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" className="navbar mb-5">
+    <Navbar bg="dark" variant="dark" expand="sm" className="navbar mb-5">
       <Navbar.Brand href="/">
         <img src={logo} className="navbar-logo" alt="Logo" />
       </Navbar.Brand>
@@ -39,9 +39,7 @@ const CustomNavbar = () => {
             <>
               {/* Login Button */}
               <NavLink to="/login" className="nav-link">
-                <Button variant="outline-light" className="me-2">
-                  Login
-                </Button>
+                <Button variant="outline-light">Login</Button>
               </NavLink>
               {/* Signup Button */}
               <NavLink to="/register" className="nav-link">
@@ -51,11 +49,7 @@ const CustomNavbar = () => {
           ) : (
             <>
               {/* Logout Button */}
-              <Button
-                variant="outline-light"
-                className="me-2"
-                onClick={handleLogoutClick}
-              >
+              <Button variant="outline-light" onClick={handleLogoutClick}>
                 Logout
               </Button>
             </>
@@ -63,7 +57,7 @@ const CustomNavbar = () => {
         </Nav>
       </Navbar.Collapse>
     </Navbar>
-  );
-};
+  )
+}
 
-export default CustomNavbar;
+export default CustomNavbar

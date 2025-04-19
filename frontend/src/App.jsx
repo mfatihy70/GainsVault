@@ -1,8 +1,4 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import "./App.css"
 
 // Layout and common components
@@ -13,9 +9,13 @@ import Footer from "./components/Footer"
 import HomePage from "./pages/Home"
 import LoginForm from "./auth/Login"
 import RegisterForm from "./auth/Register"
-import ProfilePage from "./pages/Profile"
+import Profile from "./pages/Profile"
 import Imprint from "./pages/Imprint"
-import NotFoundPage from "./pages/NotFound"
+import Exercises from "./exercises/Exercises"
+import Splits from "./splits/SplitsPage"
+import AboutUs from "./pages/AboutUs"
+import Help from "./pages/Help"
+import NotFound from "./pages/NotFound"
 
 function App() {
   return (
@@ -26,9 +26,13 @@ function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
-        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/imprint" element={<Imprint />} />
-        <Route path="*" element={<NotFoundPage />} />
+        <Route path="/splits" element={<Splits />} />
+        <Route path="/exercises" element={<Exercises />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/help" element={<Help />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
     </Router>
