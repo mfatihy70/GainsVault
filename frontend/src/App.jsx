@@ -9,10 +9,12 @@ import Footer from "./components/Footer"
 import HomePage from "./pages/Home"
 import LoginForm from "./auth/Login"
 import RegisterForm from "./auth/Register"
-import SplitsPage from "./pages/Splits"
+import Splitsy from "./pages/Splits"
 import ExercisesPage from "./pages/Exercises"
 import Imprint from "./pages/Imprint"
 import NotFoundPage from "./pages/NotFound"
+import SplitsPage from './pages/SplitsPage';
+
 
 function App() {
   return (
