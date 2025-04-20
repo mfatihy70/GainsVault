@@ -1,13 +1,20 @@
-import express from 'express';
-import { getUsers, getUserById, createUser, updateUser, deleteUser } from '../controllers/user.controller.js';
-import authMiddleware from '../middlewares/auth.middleware.js';
+import express from "express"
+import {
+  getUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+  registerUser,
+  loginUser,
+} from "../controllers/user.controller.js"
 
-const router = express.Router();
+const router = express.Router()
 
-router.get('/', authMiddleware, getUsers);
-router.get('/:id', authMiddleware, getUserById);
-router.post('/', authMiddleware, createUser);
-router.put('/:id', authMiddleware, updateUser);
-router.delete('/:id', authMiddleware, deleteUser);
+router.get("/", getUsers)
+router.get("/:id", getUserById)
+router.post("/register", registerUser)
+router.post("/login", loginUser)
+router.put("/:id", updateUser)
+router.delete("/:id", deleteUser)
 
-export default router;
+export default router
