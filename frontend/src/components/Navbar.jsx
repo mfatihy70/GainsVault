@@ -2,13 +2,13 @@ import { Navbar, Nav, Button } from "react-bootstrap"
 import { NavLink, useNavigate } from "react-router-dom"
 import logo from "@/assets/gainsvault-tr.png"
 import "@/styles/navbar.css"
-import { isLoggedIn, handleLogout } from "../utils/login"
+import { isLoggedIn, logout } from "../utils/login"
 
 const CustomNavbar = () => {
   const navigate = useNavigate() // React Router hook for navigation
 
-  const handleLogoutClick = () => {
-    handleLogout(navigate) // Call the handleLogout function
+  const handleLogout = () => {
+    logout(navigate) // Call the handleLogout function
   }
 
   return (
@@ -49,7 +49,7 @@ const CustomNavbar = () => {
           ) : (
             <>
               {/* Logout Button */}
-              <Button variant="outline-light" onClick={handleLogoutClick}>
+              <Button variant="outline-light" onClick={handleLogout}>
                 Logout
               </Button>
             </>

@@ -4,8 +4,7 @@ import dotenv from "dotenv"
 import connectDB from "./config/db.js"
 
 // Routes
-import usersRouter from "./routes/users.routes.js"
-import profileRouter from "./routes/profile.routes.js"
+import usersRouter from "./routes/user.routes.js"
 
 dotenv.config()
 const PORT = process.env.BACKEND_PORT || 5050
@@ -17,9 +16,9 @@ app.use(express.json())
 app.use(cors())
 
 // Routes
-app.use("/api/users", usersRouter)
-app.use("/api/profile", profileRouter)
+app.use("/api/user", usersRouter)
 
 app.listen(PORT, () => {
   console.log(`Backend listening on PORT ${PORT}!`)
 })
+

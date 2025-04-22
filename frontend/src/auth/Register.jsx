@@ -1,22 +1,30 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap"
-import { handleSignup } from "../utils/signup" // Import the handleRegister function
+import { handleRegister } from "../utils/register"
 
 const Register = () => {
   const [name, setName] = useState("")
-  const [surname, setSurname] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [address, setAddress] = useState("")
-  const [phone, setPhone] = useState("")
+  const [location, setLocation] = useState("")
+  const [bio, setBio] = useState("")
   const [error, setError] = useState("")
   const navigate = useNavigate()
 
   const handleRegisterClick = async () => {
     // This function handles the register and will be imported from utils/register.js
-    handleSignup(name, surname, email, password, confirmPassword, address, phone, setError, navigate)
+    handleRegister(
+      name,
+      email,
+      password,
+      confirmPassword,
+      location,
+      bio,
+      setError,
+      navigate
+    )
   }
 
   return (
@@ -38,15 +46,6 @@ const Register = () => {
                     size="lg"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                  />
-                </Form.Group>
-                <Form.Group className="mb-4" controlId="formSurname">
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter your surname"
-                    size="lg"
-                    value={surname}
-                    onChange={(e) => setSurname(e.target.value)}
                   />
                 </Form.Group>
                 <Form.Group className="mb-4" controlId="formEmail">
@@ -76,22 +75,23 @@ const Register = () => {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                 </Form.Group>
-                <Form.Group className="mb-4" controlId="formAddress">
+                <Form.Group className="mb-4" controlId="formLocation">
                   <Form.Control
                     type="text"
-                    placeholder="Enter your address"
+                    placeholder="Enter your location"
                     size="lg"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
                   />
                 </Form.Group>
-                <Form.Group className="mb-4" controlId="formPhone">
+                <Form.Group className="mb-4" controlId="formBio">
                   <Form.Control
-                    type="text"
-                    placeholder="Enter your phone number"
+                    as="textarea"
+                    rows={3}
+                    placeholder="Tell us about yourself"
                     size="lg"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
                   />
                 </Form.Group>
                 <Button
