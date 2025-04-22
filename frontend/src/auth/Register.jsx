@@ -14,7 +14,6 @@ const Register = () => {
   const navigate = useNavigate()
 
   const handleRegisterClick = async () => {
-    // This function handles the register and will be imported from utils/register.js
     handleRegister(
       name,
       email,

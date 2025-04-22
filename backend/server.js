@@ -21,4 +21,3 @@ app.use("/api/user", usersRouter)
 app.listen(PORT, () => {
   console.log(`Backend listening on PORT ${PORT}!`)
 })
-

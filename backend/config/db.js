@@ -37,8 +37,6 @@ const startServer = async () => {
     .sync({ alter: true }) // `alter: true` will adjust the schema safely
     .then(() => console.log("✅ All models synced with DB"))
     .catch((err) => console.error("❌ Error syncing models:", err))
-
-  // ...your Express app logic (e.g., app.listen)
 }
 
 startServer()

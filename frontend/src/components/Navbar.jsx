@@ -1,6 +1,6 @@
 import { Navbar, Nav, Button } from "react-bootstrap"
 import { NavLink, useNavigate } from "react-router-dom"
-import logo from "@/assets/gainsvault-tr.png"
+import logo from "@/assets/icon/gainsvault-tr.png"
 import "@/styles/navbar.css"
 import { isLoggedIn, logout } from "../utils/login"
 
@@ -8,7 +8,7 @@ const CustomNavbar = () => {
   const navigate = useNavigate() // React Router hook for navigation
 
   const handleLogout = () => {
-    logout(navigate) // Call the handleLogout function
+    logout(navigate)
   }
 
   return (

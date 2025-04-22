@@ -9,7 +9,7 @@ import {
   Image,
   Form,
 } from "react-bootstrap"
-import logo from "@/assets/gainsvault.png"
+import logo from "@/assets/icon/gainsvault.png"
 import { getUserById, editUser } from "../utils/user"
 
 const ProfilePage = () => {
@@ -61,7 +61,7 @@ const ProfilePage = () => {
 
   return (
     <Container fluid className="d-flex flex-column min-vh-100 my-5">
-      <Card>
+      <Card className="bg-dark border border-warning text-light">
         <Card.Body>
           <Row>
             <Col md={4} className="text-center">
@@ -99,8 +99,8 @@ const ProfilePage = () => {
                     <Form.Label>Location</Form.Label>
                     <Form.Control
                       type="text"
-                      name="address"
-                      value={updatedUser.address || user.address || ""}
+                      name="location"
+                      value={updatedUser.loaction || user.location || ""}
                       onChange={handleChange}
                     />
                   </Form.Group>
@@ -128,9 +128,9 @@ const ProfilePage = () => {
               ) : (
                 <>
                   <h3>{user.name}</h3>
-                  <p className="text-muted">{user.email}</p>
+                  <p className="text-white">{user.email}</p>
                   <p>
-                    <strong>Location:</strong> {user.address || "N/A"}
+                    <strong>Location:</strong> {user.location || "N/A"}
                   </p>
                   <p>
                     <strong>Bio:</strong> {user.bio || "No bio yet."}
