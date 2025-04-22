@@ -16,16 +16,16 @@ const Exercises = sequelize.define('exercises', {
         type: DataTypes.TEXT,
         allowNull: true,
     },
-    category: {
+    primary_muscle: {
         type: DataTypes.STRING,
         allowNull: false,
+    },
+    secondary_muscle: {
+        type: DataTypes.STRING,
+        allowNull: true,
     },
     equipment: {
         type: DataTypes.STRING,
-        allowNull: false,
-    },
-    is_bodyweight: {
-        type: DataTypes.BOOLEAN,
         allowNull: false,
     },
 }, {

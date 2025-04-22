@@ -3,7 +3,7 @@ const Footer = () => {
     <footer className="bg-dark text-white py-3">
       <div className="container text-center">
         <p>
-          GainsVault, Wien | Telefon: +43 123 456 789 | Email:{" "}
+          GainsVault, Vienna | Telefon: +43 123 456 789 | Email:{" "}
           <a href="mailto:gainsvault@support.com" className="text-white">
             gainsvault@support.com
           </a>
