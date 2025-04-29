@@ -1,11 +1,17 @@
 .navbar {
   background-color: rgb(287, 187, 39);
-  height: 150px; /* Set a fixed height for the navbar */
+  height: auto; /* Allow the height to adjust dynamically */
   display: flex;
-  align-items: center; /* Center content vertically */
-  padding: 0 1rem; /* Add horizontal padding */
+  align-items: center;
+  padding: 0 1rem;
+  position: relative; /* Remove sticky behavior */
+  z-index: 1000;
 }
 
 .navbar-logo {
   height: 150px; /* Adjust the logo height */
+}
+
+.navbar-collapse {
+  transition: height 0.3s ease;
 }

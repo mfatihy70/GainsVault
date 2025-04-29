@@ -1,16 +1,16 @@
 import { useState } from "react"
-import { Link, useParams, useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap"
+import { handleLogin } from "../utils/login"
 
 const Login = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const navigate = useNavigate()
 
-  const handleLoginClick = () => {
-    // This function handles the login and will be imported from utils/login.js
-    //handleLogin(email, password, setError, navigate, lang)
-    alert("Login clicked, in development")
+  const handleLoginClick = async () => {
+    handleLogin(email, password, setError, navigate)
   }
 
   return (
@@ -23,7 +23,7 @@ const Login = () => {
             style={{ borderRadius: "1rem", maxWidth: "500px" }}
           >
             <Card.Body className="p-5 w-100 d-flex flex-column">
-              <h3 className="mb-5 text-center">Login</h3>
+              <h3 className="mb-5 text-white">Login</h3>
               {error && <p className="text-danger text-center">{error}</p>}
               <Form>
                 <Form.Group className="mb-4" controlId="formEmail">
@@ -35,7 +35,6 @@ const Login = () => {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </Form.Group>
-
                 <Form.Group className="mb-4" controlId="formPassword">
                   <Form.Control
                     type="password"
@@ -45,7 +44,6 @@ const Login = () => {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </Form.Group>
-
                 <Button
                   variant="warning"
                   size="lg"
@@ -54,7 +52,7 @@ const Login = () => {
                 >
                   Login
                 </Button>
-                <p className="text-center">or</p>
+                <p className="text-white">or</p>
                 <Link to={`/register`}>
                   <Button variant="secondary" size="lg" className="w-100">
                     Register

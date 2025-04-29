@@ -3,11 +3,10 @@ import { Form, Row, Col } from 'react-bootstrap';
 
 const FilterBar = ({ onFilterChange }) => {
   const [frequency, setFrequency] = useState('');
+  const [splitCount, setSplitCount] = useState('');
 
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setFrequency(value);
-    onFilterChange({ frequency: value });
+  const handleChange = () => {
+    onFilterChange({ frequency, splitCount });
   };
 
   return (
@@ -15,12 +14,29 @@ const FilterBar = ({ onFilterChange }) => {
       <Row>
         <Col md={4}>
           <Form.Group controlId='frequency'>
-            <Form.Label>Häufigkeit (pro Woche)</Form.Label>
+            <Form.Label>Frequency (per week)</Form.Label>
             <Form.Control
               type='number'
-              placeholder='z. B. 3'
+              placeholder='e.g., 3'
               value={frequency}
-              onChange={handleChange}
+              onChange={(e) => {
+                setFrequency(e.target.value);
+                handleChange();
+              }}
+            />
+          </Form.Group>
+        </Col>
+        <Col md={4}>
+          <Form.Group controlId='splitCount'>
+            <Form.Label>Split Count</Form.Label>
+            <Form.Control
+              type='number'
+              placeholder='e.g., 5'
+              value={splitCount}
+              onChange={(e) => {
+                setSplitCount(e.target.value);
+                handleChange();
+              }}
             />
           </Form.Group>
         </Col>

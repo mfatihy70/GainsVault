@@ -1,21 +1,29 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap"
+import { handleRegister } from "../utils/register"
 
 const Register = () => {
   const [name, setName] = useState("")
-  const [surname, setSurname] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [address, setAddress] = useState("")
-  const [phone, setPhone] = useState("")
+  const [location, setLocation] = useState("")
+  const [bio, setBio] = useState("")
   const [error, setError] = useState("")
+  const navigate = useNavigate()
 
-  const handleRegisterClick = () => {
-    // This function handles the register and will be imported from utils/register.js
-    // handleRegister(name, surname, email, password, confirmPassword, address, phone, setError)
-    alert("Register clicked, in development")
+  const handleRegisterClick = async () => {
+    handleRegister(
+      name,
+      email,
+      password,
+      confirmPassword,
+      location,
+      bio,
+      setError,
+      navigate
+    )
   }
 
   return (
@@ -27,7 +35,7 @@ const Register = () => {
             style={{ borderRadius: "1rem", maxWidth: "500px" }}
           >
             <Card.Body className="p-5 w-100 d-flex flex-column">
-              <h3 className="mb-5 text-center">Register</h3>
+              <h3 className="mb-5 text-white">Register</h3>
               {error && <p className="text-danger text-center">{error}</p>}
               <Form>
                 <Form.Group className="mb-4" controlId="formName">
@@ -37,15 +45,6 @@ const Register = () => {
                     size="lg"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                  />
-                </Form.Group>
-                <Form.Group className="mb-4" controlId="formSurname">
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter your surname"
-                    size="lg"
-                    value={surname}
-                    onChange={(e) => setSurname(e.target.value)}
                   />
                 </Form.Group>
                 <Form.Group className="mb-4" controlId="formEmail">
@@ -75,22 +74,23 @@ const Register = () => {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                 </Form.Group>
-                <Form.Group className="mb-4" controlId="formAddress">
+                <Form.Group className="mb-4" controlId="formLocation">
                   <Form.Control
                     type="text"
-                    placeholder="Enter your address"
+                    placeholder="Enter your location"
                     size="lg"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
                   />
                 </Form.Group>
-                <Form.Group className="mb-4" controlId="formPhone">
+                <Form.Group className="mb-4" controlId="formBio">
                   <Form.Control
-                    type="text"
-                    placeholder="Enter your phone number"
+                    as="textarea"
+                    rows={3}
+                    placeholder="Tell us about yourself"
                     size="lg"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
                   />
                 </Form.Group>
                 <Button
@@ -101,7 +101,7 @@ const Register = () => {
                 >
                   Register
                 </Button>
-                <p className="text-center">or</p>
+                <p className="text-white">or</p>
                 <Link to={`/login`}>
                   <Button variant="secondary" size="lg" className="w-100">
                     Login
