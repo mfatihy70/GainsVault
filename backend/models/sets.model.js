@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../config/db.js';
-import Entries from './entries.model.js';
+import Entries from './entries.model.js'; // Import the Entries model
 
 const Sets = sequelize.define('sets', {
     id: {
@@ -18,7 +18,7 @@ const Sets = sequelize.define('sets', {
     },
     weight_kg: {
         type: DataTypes.DECIMAL,
-        allowNull: false,
+        allowNull: true,
     },
     reps: {
         type: DataTypes.INTEGER,
@@ -37,8 +37,12 @@ const Sets = sequelize.define('sets', {
         allowNull: true,
     },
 },
-    {
-        comment: "Table for storing workout sets for each entry of an exercise",
-    });
+{
+    comment: "Table for storing workout sets for each entry of an exercise",
+});
+
+// Define the relationship
+Sets.belongsTo(Entries, { foreignKey: 'entry_id' });
+Entries.hasMany(Sets, { foreignKey: 'entry_id', onDelete: 'CASCADE' });
 
 export default Sets;

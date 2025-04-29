@@ -44,3 +44,11 @@ startServer()
 
 export default connectDB;
 export { sequelize };
+
+// Environment variables
+process.env.DB_NAME = "your_database_name";
+process.env.DB_USER = "your_database_user";
+process.env.DB_PASSWORD = "your_database_password";
+process.env.DB_HOST = "your_database_host";
+process.env.DB_PORT = "your_database_port";
+process.env.JWT_SECRET = "your_jwt_secret";

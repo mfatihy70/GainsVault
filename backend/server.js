@@ -5,6 +5,7 @@ import connectDB from "./config/db.js"
 
 // Routes
 import usersRouter from "./routes/user.routes.js"
+import splitsRouter from "./routes/splits.routes.js"
 
 dotenv.config()
 const PORT = process.env.BACKEND_PORT || 5050
@@ -17,6 +18,7 @@ app.use(cors())
 
 // Routes
 app.use("/api/user", usersRouter)
+app.use("/api/splits", splitsRouter)
 
 app.listen(PORT, () => {
   console.log(`Backend listening on PORT ${PORT}!`)

@@ -45,4 +45,19 @@ const FilterBar = ({ onFilterChange }) => {
   );
 };
 
+export const getSplits = async (req, res) => {
+  try {
+    const { frequency, splitCount } = req.query;
+
+    const filters = {};
+    if (frequency) filters.frequency = frequency;
+    if (splitCount) filters.splitCount = splitCount;
+
+    const splits = await Splits.findAll({ where: filters });
+    res.json(splits);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export default FilterBar;
