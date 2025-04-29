@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap"
-import { handleLogin } from "../utils/login" // Import the handleLogin function
+import { handleLogin } from "../utils/login"
 
 const Login = () => {
   const [email, setEmail] = useState("")
@@ -10,7 +10,6 @@ const Login = () => {
   const navigate = useNavigate()
 
   const handleLoginClick = async () => {
-    // This function handles the login and will be imported from utils/login.js
     handleLogin(email, password, setError, navigate)
   }
 
@@ -36,7 +35,6 @@ const Login = () => {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </Form.Group>
-
                 <Form.Group className="mb-4" controlId="formPassword">
                   <Form.Control
                     type="password"
@@ -46,7 +44,6 @@ const Login = () => {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </Form.Group>
-
                 <Button
                   variant="warning"
                   size="lg"

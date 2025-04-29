@@ -1,49 +1,39 @@
-export const handleLogin = async (email, password, setError, navigate, lang) => {
-    const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-    });
-
-    const data = await res.json();
-    localStorage.setItem('token', data.token); // Save token
-    console.log('Token:', data.token);
-    console.log('Login response:', data);
-
-    if (res.ok) {
-        // Redirect to profile page
-        navigate('/profile');
-    }
-    setError(null);
-
-    try {
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-        });
-
-        if (!response.ok) {
-            throw new Error('Login failed');
-        }
-
-        const data = await response.json();
-        localStorage.setItem('token', data.token);
-        // Redirect or perform any other action after successful login
-    } catch (error) {
-        setError(error.message);
-    }
-};
+import axiosInstance from "./axios"
 
 export const isLoggedIn = () => {
-    const token = localStorage.getItem('token');
-    return token !== null;
+  return !!localStorage.getItem("token")
 }
-export const handleLogout = (navigate) => {
-    localStorage.removeItem('token');
-    navigate('/login');
+
+export const logout = (navigate) => {
+  localStorage.removeItem("token")
+  localStorage.removeItem("role")
+  localStorage.removeItem("userId")
+  if (navigate) navigate("/login")
+}
+
+export const handleLogin = async (email, password, setError, navigate) => {
+  try {
+    // Clear previous session
+    logout()
+
+    // Login request
+    const res = await axiosInstance.post("/user/login", { email, password })
+
+    // Store login info
+    alert(res.data.msg)
+    localStorage.setItem("token", res.data.token)
+    localStorage.setItem("role", JSON.stringify(res.data.role))
+    localStorage.setItem("userId", res.data.userId)
+
+    // Redirect based on role
+    if (res.data.role =="admin") {
+      navigate("/admin")
+    } else {
+      navigate("/profile")
+    }
+  } catch (err) {
+    setError(
+      err.response?.data?.message || "Something went wrong: " + err.message
+    )
+  }
 }

@@ -9,29 +9,38 @@ import {
   Image,
   Form,
 } from "react-bootstrap"
-import logo from "@/assets/gainsvault.png"
-import { fetchProfile, saveProfile, updateProfile } from "../utils/profile"
+import logo from "@/assets/icon/gainsvault.png"
+import { getUserById, editUser } from "../utils/user"
 
 const ProfilePage = () => {
+  const userId = localStorage.getItem("userId")
   const [user, setUser] = useState(null)
+  const [updatedUser, setUpdatedUser] = useState({})
   const [loading, setLoading] = useState(true)
-  const [editing, setEditing] = useState(false) // Track if the user is editing their profile
-  const [updatedUser, setUpdatedUser] = useState({}) // Store updated user data
-  const [saving, setSaving] = useState(false) // Track save operation
+  const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
 
-  // Fetch user profile data once
   useEffect(() => {
-    fetchProfile(setLoading, setUser, setUpdatedUser)
-  }, [])
+    getUserById(userId, setUser, setError, setLoading)
+  }, [userId])
 
-  // Handle input changes in the edit form
   const handleChange = (e) => {
-    updateProfile(e, updatedUser, setUpdatedUser)
+    const { name, value } = e.target
+    setUpdatedUser((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
   }
 
-  // Save updated profile data using Axios
   const handleSave = async () => {
-    saveProfile(updatedUser, setSaving, setUser, setEditing)
+    setSaving(true)
+    await editUser(userId, updatedUser, setError, setSaving)
+    setUser((prev) => ({
+      ...prev,
+      ...updatedUser,
+    }))
+    setEditing(false)
   }
 
   if (loading) {
@@ -42,17 +51,17 @@ const ProfilePage = () => {
     )
   }
 
-  if (!user) {
+  if (error || !user) {
     return (
       <Container className="text-center mt-5">
-        <p>Failed to load user data.</p>
+        <p>{error || "Failed to load user data."}</p>
       </Container>
     )
   }
 
   return (
-    <Container className="mt-5">
-      <Card>
+    <Container fluid className="d-flex flex-column min-vh-100 my-5">
+      <Card className="bg-dark border border-warning text-light">
         <Card.Body>
           <Row>
             <Col md={4} className="text-center">
@@ -72,7 +81,7 @@ const ProfilePage = () => {
                     <Form.Control
                       type="text"
                       name="name"
-                      value={updatedUser.name}
+                      value={updatedUser.name || user.name}
                       onChange={handleChange}
                     />
                   </Form.Group>
@@ -81,17 +90,17 @@ const ProfilePage = () => {
                     <Form.Control
                       type="email"
                       name="email"
-                      value={updatedUser.email}
+                      value={updatedUser.email || user.email}
                       onChange={handleChange}
-                      disabled // Email is usually not editable
+                      disabled
                     />
                   </Form.Group>
                   <Form.Group className="mb-3">
                     <Form.Label>Location</Form.Label>
                     <Form.Control
                       type="text"
-                      name="address"
-                      value={updatedUser.address || ""}
+                      name="location"
+                      value={updatedUser.loaction || user.location || ""}
                       onChange={handleChange}
                     />
                   </Form.Group>
@@ -101,11 +110,10 @@ const ProfilePage = () => {
                       as="textarea"
                       rows={3}
                       name="bio"
-                      value={updatedUser.bio || ""}
+                      value={updatedUser.bio || user.bio || ""}
                       onChange={handleChange}
                     />
                   </Form.Group>
-                  {/* Save and Cancel Buttons */}
                   <Button
                     variant="success"
                     onClick={handleSave}
@@ -119,11 +127,10 @@ const ProfilePage = () => {
                 </Form>
               ) : (
                 <>
-                  {/* Display Profile Information */}
                   <h3>{user.name}</h3>
-                  <p className="text-muted">{user.email}</p>
+                  <p className="text-white">{user.email}</p>
                   <p>
-                    <strong>Location:</strong> {user.address || "N/A"}
+                    <strong>Location:</strong> {user.location || "N/A"}
                   </p>
                   <p>
                     <strong>Bio:</strong> {user.bio || "No bio yet."}
@@ -132,8 +139,6 @@ const ProfilePage = () => {
                     <strong>Joined:</strong>{" "}
                     {new Date(user.createdAt).toLocaleDateString()}
                   </p>
-
-                  {/* Edit Profile Button */}
                   <Button
                     variant="primary"
                     className="mt-3"

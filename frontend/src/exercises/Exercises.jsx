@@ -81,7 +81,7 @@ const ExercisePage = () => {
           <Row>
             {exercises.map((exercise, index) => (
               <Col md={6} key={index} className="mb-4">
-                <ListGroup.Item className="rounded-3 border border-warning p-2">
+                <ListGroup.Item className="rounded-3 bg-dark border border-warning p-2">
                   <h4 className="mb-3 ">{exercise.name}</h4>
                   <p className="mb-2">
                     <strong>Primary Muscles:</strong> {exercise.primaryMuscles}
