@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../config/db.js';
-import Sessions from './sessions.model.js';
+import Sessions from './session.model.js';
 import Exercises from './exercises.model.js';
 
 const Entries = sequelize.define('entries', {

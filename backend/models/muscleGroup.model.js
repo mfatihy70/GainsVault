@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../config/db.js';
 import Exercises from './exercises.model.js';
-import Muscles from './muscles.model.js';
+import Muscles from './muscle.model.js';
 
 const MuscleGroups = sequelize.define('MuscleGroups', {
     exercise_id: {
