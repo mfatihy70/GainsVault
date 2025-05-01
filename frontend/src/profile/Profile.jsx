@@ -74,14 +74,15 @@ const ProfilePage = () => {
         <Card.Body>
           <Row>
             <Col md={4} className="d-flex flex-column align-items-center">
-              <Col md={4} className="d-flex justify-content-center">
+              <Col md={4} className="d-flex justify-content-center" style={{ height: "150px", width: "150px" }}>
                 <Image
                   src={user.avatar || logo}
                   roundedCircle
-                  //fluid
+                  fluid={false}
                   className="border border-warning"
                   width={150}
                   height={150}
+                  alt="User Avatar"
                 />
               </Col>
               {editing ? (
@@ -187,8 +188,8 @@ const ProfilePage = () => {
             <GainsChart />
           </Col>
         </Row>
-        <Col className="d-flex justify-content-center">
-          <MuscleRadarChart />
+        <Col md={12} className="d-flex justify-content-center align-items-center text-center col mb-3">
+          <MuscleRadarChart  width={500} height={500}/>
         </Col>
       </Card>
     </Container>
