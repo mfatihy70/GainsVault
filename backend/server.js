@@ -10,6 +10,14 @@ dotenv.config()
 const PORT = process.env.BACKEND_PORT || 5050
 connectDB()
 
+const DB_MIGRATION = process.env.DB_MIGRATION === "true" || false
+// Only run migration if DB_MIGRATION is set to true
+if(DB_MIGRATION) {
+  import("./data/migration.js").then(({ migration }) => {
+    migration()
+  })
+}
+
 const app = express()
 
 app.use(express.json())
