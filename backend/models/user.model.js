@@ -41,6 +41,10 @@ const User = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: true,
     },
+    avatar: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   }
 )
 

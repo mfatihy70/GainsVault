@@ -15,7 +15,6 @@ import WeigthChart from "./WeightChart"
 import GainsChart from "./GainsChart"
 import MuscleRadarChart from "./MuscleRadarChart"
 
-
 const ProfilePage = () => {
   const userId = localStorage.getItem("userId")
   const [user, setUser] = useState(null)
@@ -74,7 +73,11 @@ const ProfilePage = () => {
         <Card.Body>
           <Row>
             <Col md={4} className="d-flex flex-column align-items-center">
-              <Col md={4} className="d-flex justify-content-center" style={{ height: "150px", width: "150px" }}>
+              <Col
+                md={4}
+                className="d-flex justify-content-center"
+                style={{ height: "150px", width: "150px" }}
+              >
                 <Image
                   src={user.avatar || logo}
                   roundedCircle
@@ -91,7 +94,11 @@ const ProfilePage = () => {
                   <Form.Control
                     type="text"
                     name="avatar"
-                    value={updatedUser.avatar !== undefined ? updatedUser.avatar : user.avatar}
+                    value={
+                      updatedUser.avatar !== undefined
+                        ? updatedUser.avatar
+                        : user.avatar
+                    }
                     onChange={handleChange}
                   />
                 </Form.Group>
@@ -188,8 +195,11 @@ const ProfilePage = () => {
             <GainsChart />
           </Col>
         </Row>
-        <Col md={12} className="d-flex justify-content-center align-items-center text-center col mb-3">
-          <MuscleRadarChart  width={500} height={500}/>
+        <Col
+          md={12}
+          className="d-flex justify-content-center align-items-center text-center col mb-3"
+        >
+          <MuscleRadarChart width={500} height={500} />
         </Col>
       </Card>
     </Container>

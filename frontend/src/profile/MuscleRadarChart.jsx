@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"
 import {
   Chart as ChartJS,
   RadialLinearScale,
@@ -8,11 +8,19 @@ import {
   Tooltip,
   Legend,
   Title,
-} from "chart.js";
-import { Radar } from "react-chartjs-2";
+} from "chart.js"
+import { Radar } from "react-chartjs-2"
 
 // Register required components
-ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend, Title);
+ChartJS.register(
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+  Title
+)
 
 // Muscle groups
 const labels = [
@@ -26,10 +34,9 @@ const labels = [
   "Quads",
   "Hamstrings",
   "Calves",
-];
+]
 
 const MuscleRadarChart = ({ width = 400, height = 400 }) => {
-
   // Example intensity per group (scale of 0-10)
   const data = {
     labels,
@@ -49,7 +56,7 @@ const MuscleRadarChart = ({ width = 400, height = 400 }) => {
         pointBackgroundColor: "rgba(54, 162, 235, 1)",
       },
     ],
-  };
+  }
 
   const options = {
     responsive: true,
@@ -70,13 +77,13 @@ const MuscleRadarChart = ({ width = 400, height = 400 }) => {
         max: 10,
       },
     },
-  };
+  }
 
   return (
     <div style={{ width: `${width}px`, height: `${height}px` }}>
       <Radar data={data} options={options} width={width} height={height} />
     </div>
-  );
-};
+  )
+}
 
-export default MuscleRadarChart;
+export default MuscleRadarChart
