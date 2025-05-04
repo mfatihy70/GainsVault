@@ -1,5 +1,7 @@
+// config/db.js
 import { Sequelize } from "sequelize"
 import dotenv from "dotenv"
+
 dotenv.config()
 
 const sequelize = new Sequelize(
@@ -13,34 +15,21 @@ const sequelize = new Sequelize(
     dialectOptions: {
       ssl: {
         require: true,
-        rejectUnauthorized: false, // This is required for some cloud providers
+        rejectUnauthorized: false,
       },
     },
-    logging: false, // Set to console.log if you want to debug queries
+    logging: false,
   }
 )
 
 const connectDB = async () => {
   try {
     await sequelize.authenticate()
-    console.log("Database connection established successfully.")
-  } catch (error) {
-    console.error("Unable to connect to the database:", error)
+    console.log("✅ Database connected")
+  } catch (err) {
+    console.error("❌ DB connection failed:", err)
   }
 }
 
-const startServer = async () => {
-  await connectDB()
-
-  // Sync models with the database
-  sequelize
-    .sync({ alter: true }) // `alter: true` will adjust the schema safely
-    .then(() => console.log("✅ All models synced with DB"))
-    .catch((err) => console.error("❌ Error syncing models:", err))
-}
-
-startServer()
-
-
-export default connectDB;
-export { sequelize };
+export { sequelize }
+export default connectDB
