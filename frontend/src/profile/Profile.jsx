@@ -11,6 +11,10 @@ import {
 } from "react-bootstrap"
 import logo from "@/assets/icon/gainsvault.png"
 import { getUserById, editUser } from "../utils/user"
+import WeigthChart from "./WeightChart"
+import GainsChart from "./GainsChart"
+import MuscleRadarChart from "./MuscleRadarChart"
+
 
 const ProfilePage = () => {
   const userId = localStorage.getItem("userId")
@@ -43,6 +47,11 @@ const ProfilePage = () => {
     setEditing(false)
   }
 
+  const handleCancel = () => {
+    setEditing(false)
+    setUpdatedUser({})
+  }
+
   if (loading) {
     return (
       <Container className="text-center mt-5">
@@ -64,14 +73,31 @@ const ProfilePage = () => {
       <Card className="bg-dark border border-warning text-light">
         <Card.Body>
           <Row>
-            <Col md={4} className="text-center">
-              <Image
-                src={user.avatar || logo}
-                roundedCircle
-                fluid
-                width={150}
-                height={150}
-              />
+            <Col md={4} className="d-flex flex-column align-items-center">
+              <Col md={4} className="d-flex justify-content-center" style={{ height: "150px", width: "150px" }}>
+                <Image
+                  src={user.avatar || logo}
+                  roundedCircle
+                  fluid={false}
+                  className="border border-warning"
+                  width={150}
+                  height={150}
+                  alt="User Avatar"
+                />
+              </Col>
+              {editing ? (
+                <Form.Group className="mb-3 mt-3">
+                  <Form.Label>Avatar URL</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="avatar"
+                    value={updatedUser.avatar !== undefined ? updatedUser.avatar : user.avatar}
+                    onChange={handleChange}
+                  />
+                </Form.Group>
+              ) : (
+                <p className="mb-3 mt-3">Avatar</p>
+              )}
             </Col>
             <Col md={8}>
               {editing ? (
@@ -100,7 +126,7 @@ const ProfilePage = () => {
                     <Form.Control
                       type="text"
                       name="location"
-                      value={updatedUser.loaction || user.location || ""}
+                      value={updatedUser.location || user.location || ""}
                       onChange={handleChange}
                     />
                   </Form.Group>
@@ -121,7 +147,7 @@ const ProfilePage = () => {
                   >
                     {saving ? "Saving..." : "Save Changes"}
                   </Button>{" "}
-                  <Button variant="secondary" onClick={() => setEditing(false)}>
+                  <Button variant="secondary" onClick={handleCancel}>
                     Cancel
                   </Button>
                 </Form>
@@ -151,6 +177,20 @@ const ProfilePage = () => {
             </Col>
           </Row>
         </Card.Body>
+      </Card>
+      <Card className="bg-dark border border-warning text-light mt-4 p-3">
+        <h1 className="text-center">Progress Stats</h1>
+        <Row>
+          <Col md={6}>
+            <WeigthChart />
+          </Col>
+          <Col md={6}>
+            <GainsChart />
+          </Col>
+        </Row>
+        <Col md={12} className="d-flex justify-content-center align-items-center text-center col mb-3">
+          <MuscleRadarChart  width={500} height={500}/>
+        </Col>
       </Card>
     </Container>
   )
