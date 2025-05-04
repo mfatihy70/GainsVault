@@ -12,11 +12,11 @@ app.use(cors())
 
 connectDB().then(async () => {
   // Load and register all models and their associations
-  await import("./models/index.js")
+  await import("./models/sync.js")
 
-  /* Sync the models uncomment when you want to create tables or alter them*/
-  // await sequelize.sync({ alter: true }) // or { force: true } in dev
-  // console.log("✅ All models synced with database")
+  /* Sync the models - Uncomment when you want to create tables or alter them*/
+  await sequelize.sync({ alter: true })
+  console.log("✅ All models synced with database")
 
   // Import and mount routes AFTER sync
   const { default: usersRouter } = await import("./routes/user.routes.js")
