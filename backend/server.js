@@ -20,7 +20,30 @@ connectDB().then(async () => {
 
   // Import and mount routes AFTER sync
   const { default: usersRouter } = await import("./routes/user.routes.js")
-  app.use("/api/user", usersRouter)
+  const { default: exerciseRouter } = await import(
+    "./routes/core/exercise.routes.js"
+  )
+  const { default: splitsRouter } = await import(
+    "./routes/core/split.routes.js"
+  )
+  const { default: workoutsRouter } = await import(
+    "./routes/core/workout.routes.js"
+  )
+  const { default: workoutExerciseRouter } = await import(
+    "./routes/core/workout_exercise.routes.js"
+  )
+
+  // Mount all routes
+  app.use("/api/users", usersRouter)
+  app.use("/api/exercises", exerciseRouter)
+  app.use("/api/splits", splitsRouter)
+  app.use("/api/workouts", workoutsRouter)
+  app.use("/api/workout-exercise", workoutExerciseRouter)
+
+  // 404 handler for undefined routes
+  app.use((req, res) => {
+    res.status(404).json({ message: "Route not found" })
+  })
 
   app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`)
