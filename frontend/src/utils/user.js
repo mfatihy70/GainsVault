@@ -42,9 +42,33 @@ export const deleteUser = async (id, setError, setLoading) => {
   }
 }
 
-export const trackWeight = async (id, weight, setError, setLoading) => {
+export const trackWeight = async (id, weight, setUser, setError, setLoading) => {
   try {
     await axiosInstance.post(`/user/${id}/weight`, { weight })
+    getUserById(id, setUser, setError, setLoading)
+  } catch (err) {
+    setError(err.message)
+  } finally {
+    setLoading(false)
+  }
+}
+
+export const getWeight = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/user/${id}/weight`)
+    return response.data
+  } catch (err) {
+    console.error("Error fetching weight:", err)
+    return []
+  }
+}
+
+export const deleteWeight = async (id, weightId, setUser, setError, setLoading) => {
+  try {
+    console.log("Deleting weight with ID:", weightId)
+    console.log("User ID:", id)
+    await axiosInstance.delete(`/user/${id}/weight/${weightId}`)
+    getUserById(id, setUser, setError, setLoading)
   } catch (err) {
     setError(err.message)
   } finally {

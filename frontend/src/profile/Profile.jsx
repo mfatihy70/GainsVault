@@ -8,16 +8,18 @@ import {
   Col,
   Image,
   Form,
+  Stack,
 } from "react-bootstrap"
 import logo from "@/assets/icon/gainsvault.png"
-import { getUserById, editUser } from "../utils/user"
-import WeigthChart from "./WeightChart"
+import { getUserById, editUser, trackWeight } from "../utils/user"
 import GainsChart from "./GainsChart"
 import MuscleRadarChart from "./MuscleRadarChart"
+import WeightTracker from "./WeightTracker"
 
 const ProfilePage = () => {
   const userId = localStorage.getItem("userId")
   const [user, setUser] = useState(null)
+  const [weight, setWeight] = useState(null)
   const [updatedUser, setUpdatedUser] = useState({})
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
@@ -103,7 +105,26 @@ const ProfilePage = () => {
                   />
                 </Form.Group>
               ) : (
-                <p className="mb-3 mt-3">Avatar</p>
+                <>
+                  <p className="mb-3 mt-3">Avatar</p>
+                  <Form.Group className="mb-3">
+                    <Stack direction="horizontal" gap={3} className="justify-items-center align-items-center">
+                      <Form.Control
+                        type="number"
+                        name="avatar"
+                        placeholder="Track Weight"
+                        onChange={(e) => setWeight(e.target.value)}
+                        onClick={(e) => { console.log(e.target.value) }}
+                      />
+                      <Button
+                        variant="primary"
+                        onClick={() => trackWeight(userId, weight, setUser, setError, setLoading)}
+                      >
+                        +
+                      </Button>
+                    </Stack>
+                  </Form.Group>
+                </>
               )}
             </Col>
             <Col md={8}>
@@ -188,8 +209,8 @@ const ProfilePage = () => {
       <Card className="bg-dark border border-warning text-light mt-4 p-3">
         <h1 className="text-center">Progress Stats</h1>
         <Row>
-          <Col md={6}>
-            <WeigthChart />
+          <Col md={6} style={{ height: "500px" }}>
+            <WeightTracker user={user} />
           </Col>
           <Col md={6}>
             <GainsChart />
