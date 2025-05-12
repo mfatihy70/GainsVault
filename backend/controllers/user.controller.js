@@ -148,3 +148,25 @@ export const getWeight = async (req, res, next) => {
     next(error)
   }
 }
+
+export const deleteWeight = async (req, res, next) => {
+  try {
+    const userId = req.params.id
+    const weightIndex = req.params.index
+
+    // Check if user exists
+    const user = await User.findByPk(userId)
+    if (!user) return res.status(404).json({ msg: "User not found" })
+
+    // remove weight from the existing array
+    const updatedWeights = user.weight.filter((_, index) => index !== parseInt(weightIndex))
+
+    await user.update({
+      weight: updatedWeights
+    });
+
+    res.status(200).json({ msg: "Weight deleted successfully" })
+  } catch (error) {
+    next(error)
+  }
+}
