@@ -41,3 +41,13 @@ export const deleteUser = async (id, setError, setLoading) => {
     setLoading(false)
   }
 }
+
+export const trackWeight = async (id, weight, setError, setLoading) => {
+  try {
+    await axiosInstance.post(`/user/${id}/weight`, { weight })
+  } catch (err) {
+    setError(err.message)
+  } finally {
+    setLoading(false)
+  }
+}

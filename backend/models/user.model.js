@@ -38,8 +38,9 @@ const User = sequelize.define(
       allowNull: true,
     },
     weight: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.JSON,
       allowNull: true,
+      defaultValue: [],
     },
     avatar: {
       type: DataTypes.STRING,

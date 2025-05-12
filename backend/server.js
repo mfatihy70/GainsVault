@@ -15,7 +15,7 @@ connectDB().then(async () => {
   await import("./models/sync.js")
 
   /* Sync the models - Uncomment when you want to create tables or alter them*/
-  await sequelize.sync({ alter: true })
+  await sequelize.sync({ alter: true, force: false })
   console.log("✅ All models synced with database")
 
   // Import and mount routes AFTER sync
