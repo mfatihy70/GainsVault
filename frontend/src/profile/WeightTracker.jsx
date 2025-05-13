@@ -37,7 +37,7 @@ const WeightTracker = ({ userId, width = "100%", height = "100%" }) => {
   return (
     <Container style={{ width: `${width}`, height: `${height}`, display: 'flex', flexDirection: 'column' }}>
       <h3>Track Your Weight</h3>
-      <p>Current Weigth: {userWeight || ''}kg</p>
+      <p className="text-secondary">Current Weigth: {userWeight || ''}kg</p>
       <WeigthChart weights={weights} />
       <InputGroup className="mb-3">
         <Form.Control

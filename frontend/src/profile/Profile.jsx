@@ -150,6 +150,15 @@ const ProfilePage = () => {
                       onChange={handleChange}
                     />
                   </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Height</Form.Label>
+                    <Form.Control
+                      type="number"
+                      name="height"
+                      value={updatedUser.height || user.height || ""}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
                   <Button
                     variant="success"
                     onClick={handleSave}
@@ -172,12 +181,12 @@ const ProfilePage = () => {
                     <strong>Bio:</strong> {user.bio || "No bio yet."}
                   </p>
                   <p>
-                    <strong>Joined:</strong>{" "}
-                    {new Date(user.createdAt).toLocaleDateString()}
-                  </p>
-                  <p>
                     <strong>Height:</strong>{" "}
                     {user.height ? user.height + "cm" : "Not specified"}
+                  </p>
+                  <p>
+                    <strong>Joined:</strong>{" "}
+                    {new Date(user.createdAt).toLocaleDateString()}
                   </p>
                   <Button
                     variant="primary"
