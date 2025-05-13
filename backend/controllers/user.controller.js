@@ -101,3 +101,72 @@ export const loginUser = async (req, res, next) => {
     next(error)
   }
 }
+
+//
+export const trackWeight = async (req, res, next) => {
+  try {
+    const { weight } = req.body
+    const userId = req.params.id
+
+    // Check if user exists
+    const user = await User.findByPk(userId)
+    if (!user) return res.status(404).json({ msg: "User not found" })
+
+    // create new weight object
+    const newWeight = {
+      value: weight,
+      date: new Date().toISOString(),
+    }
+
+    console.log("New Weight object:", newWeight)
+    // add new weight to the existing array
+    await user.update({
+      weight: [
+        ...(user.weight || []), newWeight
+      ]
+    });
+
+    res.status(200).json({ msg: "Weight updated successfully" })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getWeights = async (req, res, next) => {
+  try {
+    const userId = req.params.id
+
+    // Check if user exists
+    const user = await User.findByPk(userId)
+    if (!user) return res.status(404).json({ msg: "User not found" })
+
+    // get weight from the existing array
+    const weight = user.weight || []
+
+    res.status(200).json(weight)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const deleteWeight = async (req, res, next) => {
+  try {
+    const userId = req.params.id
+    const weightIndex = req.params.index
+
+    // Check if user exists
+    const user = await User.findByPk(userId)
+    if (!user) return res.status(404).json({ msg: "User not found" })
+
+    // remove weight from the existing array
+    const updatedWeights = user.weight.filter((_, index) => index !== parseInt(weightIndex))
+
+    await user.update({
+      weight: updatedWeights
+    });
+
+    res.status(200).json({ msg: "Weight deleted successfully" })
+  } catch (error) {
+    next(error)
+  }
+}

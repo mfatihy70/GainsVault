@@ -8,12 +8,13 @@ import {
   Col,
   Image,
   Form,
+  Stack,
 } from "react-bootstrap"
 import logo from "@/assets/icon/gainsvault.png"
 import { getUserById, editUser } from "../utils/user"
-import WeigthChart from "./WeightChart"
 import GainsChart from "./GainsChart"
 import MuscleRadarChart from "./MuscleRadarChart"
+import WeightTracker from "./WeightTracker"
 
 const ProfilePage = () => {
   const userId = localStorage.getItem("userId")
@@ -103,7 +104,9 @@ const ProfilePage = () => {
                   />
                 </Form.Group>
               ) : (
-                <p className="mb-3 mt-3">Avatar</p>
+                <>
+                  <p className="mb-3 mt-3">Avatar</p>
+                </>
               )}
             </Col>
             <Col md={8}>
@@ -147,6 +150,15 @@ const ProfilePage = () => {
                       onChange={handleChange}
                     />
                   </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Height</Form.Label>
+                    <Form.Control
+                      type="number"
+                      name="height"
+                      value={updatedUser.height || user.height || ""}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
                   <Button
                     variant="success"
                     onClick={handleSave}
@@ -169,6 +181,10 @@ const ProfilePage = () => {
                     <strong>Bio:</strong> {user.bio || "No bio yet."}
                   </p>
                   <p>
+                    <strong>Height:</strong>{" "}
+                    {user.height ? user.height + "cm" : "Not specified"}
+                  </p>
+                  <p>
                     <strong>Joined:</strong>{" "}
                     {new Date(user.createdAt).toLocaleDateString()}
                   </p>
@@ -188,8 +204,8 @@ const ProfilePage = () => {
       <Card className="bg-dark border border-warning text-light mt-4 p-3">
         <h1 className="text-center">Progress Stats</h1>
         <Row>
-          <Col md={6}>
-            <WeigthChart />
+          <Col md={6} style={{ height: "500px" }}>
+            <WeightTracker userId={userId} />
           </Col>
           <Col md={6}>
             <GainsChart />
