@@ -42,9 +42,15 @@ export const deleteUser = async (id, setError, setLoading) => {
   }
 }
 
-export const trackWeight = async (id, weight, setUser, setError, setLoading) => {
+export const trackWeight = async (
+  id,
+  weight,
+  setUser,
+  setError,
+  setLoading
+) => {
   try {
-    await axiosInstance.post(`/user/${id}/weight`, { weight })
+    await axiosInstance.post(`/users/${id}/weight`, { weight })
     getUserById(id, setUser, setError, setLoading)
   } catch (err) {
     setError(err.message)
@@ -55,7 +61,7 @@ export const trackWeight = async (id, weight, setUser, setError, setLoading) => 
 
 export const getWeights = async (id, setWeight, setError, setLoading) => {
   try {
-    const response = await axiosInstance.get(`/user/${id}/weight`)
+    const response = await axiosInstance.get(`/users/${id}/weight`)
     setWeight(response.data)
   } catch (err) {
     setError(err.message)
@@ -64,9 +70,14 @@ export const getWeights = async (id, setWeight, setError, setLoading) => {
   }
 }
 
-export const getCurrentWeight = async (id, setUserWeight, setError, setLoading) => {
+export const getCurrentWeight = async (
+  id,
+  setUserWeight,
+  setError,
+  setLoading
+) => {
   try {
-    const response = await axiosInstance.get(`/user/${id}/weight`)
+    const response = await axiosInstance.get(`/users/${id}/weight`)
     const weights = response.data
     if (weights.length > 0) {
       setUserWeight(weights[weights.length - 1].value)
@@ -78,11 +89,17 @@ export const getCurrentWeight = async (id, setUserWeight, setError, setLoading) 
   }
 }
 
-export const deleteWeight = async (id, weightId, setWeights, setError, setLoading) => {
+export const deleteWeight = async (
+  id,
+  weightId,
+  setWeights,
+  setError,
+  setLoading
+) => {
   try {
     console.log("Deleting weight with ID:", weightId)
     console.log("User ID:", id)
-    await axiosInstance.delete(`/user/${id}/weight/${weightId}`)
+    await axiosInstance.delete(`/users/${id}/weight/${weightId}`)
     getWeights(id, setWeights, setError, setLoading)
   } catch (err) {
     setError(err.message)
@@ -90,4 +107,3 @@ export const deleteWeight = async (id, weightId, setWeights, setError, setLoadin
     setLoading(false)
   }
 }
-

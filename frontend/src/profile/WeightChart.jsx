@@ -25,10 +25,10 @@ ChartJS.register(
   TimeScale
 )
 
-const WeightChart = ({ weights}) => {
+const WeightChart = ({ weights }) => {
   // Populate the axis data with the weight values
-  const yData = (weights).map(entry => entry.value)
-  const xData = weights.map(entry => new Date(entry.date).toISOString())
+  const yData = weights.map((entry) => entry.value)
+  const xData = weights.map((entry) => new Date(entry.date).toISOString())
 
   // Chart data
   const data = {

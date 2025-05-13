@@ -26,7 +26,7 @@ export const handleLogin = async (email, password, setError, navigate) => {
     localStorage.setItem("userId", res.data.userId)
 
     // Redirect based on role
-    if (res.data.role =="admin") {
+    if (res.data.role == "admin") {
       navigate("/admin")
     } else {
       navigate("/profile")
