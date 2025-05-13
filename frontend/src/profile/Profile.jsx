@@ -195,10 +195,7 @@ const ProfilePage = () => {
             <GainsChart />
           </Col>
         </Row>
-        <Col
-          md={12}
-          className="d-flex justify-content-center align-items-center text-center col mb-3"
-        >
+        <Col md={12} className="d-flex justify-content-center align-items-center text-center col mb-3">
           <MuscleRadarChart width={500} height={500} />
         </Col>
       </Card>
