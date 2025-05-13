@@ -28,6 +28,9 @@ const CustomNavbar = () => {
           <NavLink to="/splits" className="nav-link">
             Splits
           </NavLink>
+          <NavLink to="/workouts" className="nav-link">
+            Workouts
+          </NavLink>
           {isLoggedIn() && (
             <NavLink to="/profile" className="nav-link">
               Profile
