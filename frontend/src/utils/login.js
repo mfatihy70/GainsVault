@@ -17,7 +17,7 @@ export const handleLogin = async (email, password, setError, navigate) => {
     logout()
 
     // Login request
-    const res = await axiosInstance.post("/user/login", { email, password })
+    const res = await axiosInstance.post("/users/login", { email, password })
 
     // Store login info
     alert(res.data.msg)

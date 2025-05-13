@@ -22,7 +22,7 @@ const WorkoutExercise = sequelize.define(
       },
     },
     order: {
-      type: DataTypes.INTEGER, 
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   },

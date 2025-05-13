@@ -2,7 +2,7 @@ import axiosInstance from "./axios"
 
 export const getUserById = async (id, setUser, setError, setLoading) => {
   try {
-    const response = await axiosInstance.get(`/user/${id}`)
+    const response = await axiosInstance.get(`/users/${id}`)
     setUser(response.data)
   } catch (err) {
     setError(err.message)
@@ -13,7 +13,7 @@ export const getUserById = async (id, setUser, setError, setLoading) => {
 
 export const getUsers = async (setUsers, setLoading, setError) => {
   try {
-    const response = await axiosInstance.get("/user")
+    const response = await axiosInstance.get("/users")
     setUsers(response.data)
   } catch (err) {
     setError(err.message)
@@ -24,7 +24,7 @@ export const getUsers = async (setUsers, setLoading, setError) => {
 
 export const editUser = async (id, updatedUser, setError, setLoading) => {
   try {
-    await axiosInstance.put(`/user/${id}`, updatedUser)
+    await axiosInstance.put(`/users/${id}`, updatedUser)
   } catch (err) {
     setError(err.message)
   } finally {
@@ -34,7 +34,7 @@ export const editUser = async (id, updatedUser, setError, setLoading) => {
 
 export const deleteUser = async (id, setError, setLoading) => {
   try {
-    await axiosInstance.delete(`/user/${id}`)
+    await axiosInstance.delete(`/users/${id}`)
   } catch (err) {
     setError(err.message)
   } finally {

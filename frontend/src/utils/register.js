@@ -16,7 +16,7 @@ export const handleRegister = async (
   }
 
   try {
-    const res = await axiosInstance.post("/user/register", {
+    const res = await axiosInstance.post("/users/register", {
       name,
       email,
       password,
