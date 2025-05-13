@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Button, ListGroup, InputGroup, Container } from 'react-bootstrap';
-import { deleteWeight, trackWeight } from '../utils/user';
+import { deleteWeight, getCurrentWeight, getWeights, trackWeight } from '../utils/user';
 import WeigthChart from "./WeightChart"
 
-const WeightTracker = ({ user, width = "100%", height = "100%" }) => {
+const WeightTracker = ({ userId, width = "100%", height = "100%" }) => {
   const [weight, setWeight] = useState('');
-  const [weights, setWeights] = useState(user.weight || []);
+  const [userWeight, setUserWeight] = useState(null);
+  const [weights, setWeights] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -13,7 +14,7 @@ const WeightTracker = ({ user, width = "100%", height = "100%" }) => {
     if (!weight) return;
 
     // Optionally, update the user weight in the backend
-    trackWeight(user.id, weight, (data) => {
+    trackWeight(userId, weight, (data) => {
       setWeights(data.weight);
     }, setError, setLoading);
 
@@ -22,18 +23,27 @@ const WeightTracker = ({ user, width = "100%", height = "100%" }) => {
 
   const handleDeleteWeight = (index) => {
     // Optionally, delete the weight from the backend
-    deleteWeight(user.id, index, (data) => { setWeights(data.weight); }, setError, setLoading);
+    deleteWeight(userId, index, setWeights, setError, setLoading);
   };
+
+  useEffect(() => {
+    // Fetch user weight array from the backend
+    getWeights(userId, setWeights, setError, setLoading)
+    // Fetch current weight from the backend
+    getCurrentWeight(userId, setUserWeight, setError, setLoading)
+
+  }, [userId, weights, userWeight]);
 
   return (
     <Container style={{ width: `${width}`, height: `${height}`, display: 'flex', flexDirection: 'column' }}>
       <h3>Track Your Weight</h3>
+      <p>Current Weigth: {userWeight || ''}kg</p>
       <WeigthChart weights={weights} />
       <InputGroup className="mb-3">
         <Form.Control
           type="number"
           value={weight}
-          onChange={(e) => setWeight(e.target.value)}
+          onChange={(e) => { setWeight(e.target.value) }} // Update user weight
           placeholder="Enter weight (kg)"
         />
         <Button onClick={handleAddWeight}>Add</Button>

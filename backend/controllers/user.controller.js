@@ -103,7 +103,7 @@ export const loginUser = async (req, res, next) => {
 }
 
 //
-export const trackWeight= async (req, res, next) => {
+export const trackWeight = async (req, res, next) => {
   try {
     const { weight } = req.body
     const userId = req.params.id
@@ -113,7 +113,7 @@ export const trackWeight= async (req, res, next) => {
     if (!user) return res.status(404).json({ msg: "User not found" })
 
     // create new weight object
-    const newWeight= {
+    const newWeight = {
       value: weight,
       date: new Date().toISOString(),
     }
@@ -132,7 +132,7 @@ export const trackWeight= async (req, res, next) => {
   }
 }
 
-export const getWeight = async (req, res, next) => {
+export const getWeights = async (req, res, next) => {
   try {
     const userId = req.params.id
 

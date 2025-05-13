@@ -53,25 +53,41 @@ export const trackWeight = async (id, weight, setUser, setError, setLoading) => 
   }
 }
 
-export const getWeight = async (id) => {
+export const getWeights = async (id, setWeight, setError, setLoading) => {
   try {
     const response = await axiosInstance.get(`/user/${id}/weight`)
-    return response.data
-  } catch (err) {
-    console.error("Error fetching weight:", err)
-    return []
-  }
-}
-
-export const deleteWeight = async (id, weightId, setUser, setError, setLoading) => {
-  try {
-    console.log("Deleting weight with ID:", weightId)
-    console.log("User ID:", id)
-    await axiosInstance.delete(`/user/${id}/weight/${weightId}`)
-    getUserById(id, setUser, setError, setLoading)
+    setWeight(response.data)
   } catch (err) {
     setError(err.message)
   } finally {
     setLoading(false)
   }
 }
+
+export const getCurrentWeight = async (id, setUserWeight, setError, setLoading) => {
+  try {
+    const response = await axiosInstance.get(`/user/${id}/weight`)
+    const weights = response.data
+    if (weights.length > 0) {
+      setUserWeight(weights[weights.length - 1].value)
+    }
+  } catch (err) {
+    setError(err.message)
+  } finally {
+    setLoading(false)
+  }
+}
+
+export const deleteWeight = async (id, weightId, setWeights, setError, setLoading) => {
+  try {
+    console.log("Deleting weight with ID:", weightId)
+    console.log("User ID:", id)
+    await axiosInstance.delete(`/user/${id}/weight/${weightId}`)
+    getWeights(id, setWeights, setError, setLoading)
+  } catch (err) {
+    setError(err.message)
+  } finally {
+    setLoading(false)
+  }
+}
+

@@ -7,7 +7,7 @@ import {
   registerUser,
   loginUser,
   trackWeight,
-  getWeight,
+  getWeights,
   deleteWeight,
 } from "../controllers/user.controller.js"
 
@@ -21,7 +21,7 @@ router.put("/:id", updateUser)
 router.delete("/:id", deleteUser)
 
 // Weight tracking routes
-router.get("/:id/weight", getWeight)
+router.get("/:id/weight", getWeights)
 router.post("/:id/weight", trackWeight)
 router.delete("/:id/weight/:index", deleteWeight)
 
