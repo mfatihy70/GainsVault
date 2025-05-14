@@ -1,12 +1,10 @@
 import React, { useState } from "react"
 import { Container, Row, Col, Card, Button, Form } from "react-bootstrap"
 import { motion } from "framer-motion"
-import "../styles/Workouts.css"
 
 const Workouts = () => {
   const [selectedMuscle, setSelectedMuscle] = useState("all")
 
-  // Beispiel-Workouts (später durch API-Daten ersetzen)
   const workouts = [
     {
       id: 1,
@@ -16,7 +14,7 @@ const Workouts = () => {
       difficulty: "Intermediate",
       duration: "60 min",
       image:
-        "https://images.unsplash.com/photo-1549476464-37392f717541?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1549476464-37392f717541?q=80&w=1887&auto=format&fit=crop",
     },
     {
       id: 2,
@@ -26,7 +24,7 @@ const Workouts = () => {
       difficulty: "Intermediate",
       duration: "60 min",
       image:
-        "https://images.unsplash.com/photo-1581009137042-c552e485697a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+        "https://images.unsplash.com/photo-1581009137042-c552e485697a?ixlib=rb-1.2.1&auto=format&fit=crop",
     },
     {
       id: 3,
@@ -36,7 +34,7 @@ const Workouts = () => {
       difficulty: "Advanced",
       duration: "75 min",
       image:
-        "https://images.unsplash.com/photo-1596357395217-80de13130e92?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1596357395217-80de13130e92?q=80&w=2071&auto=format&fit=crop",
     },
   ]
 
@@ -53,57 +51,66 @@ const Workouts = () => {
   const filteredWorkouts =
     selectedMuscle === "all"
       ? workouts
-      : workouts.filter((workout) => workout.targetMuscle === selectedMuscle)
+      : workouts.filter((w) => w.targetMuscle === selectedMuscle)
 
   return (
-    <Container className="workouts-container bg-dark text-light">
+    <Container className="py-5 bg-dark text-light">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="workouts-title text-warning">Workouts</h1>
+        <h1 className="text-center mb-4 text-warning">Workouts</h1>
 
-        {/* Filter Section */}
-        <Container className="filter-section bg-dark text-light p-3 mb-4">
-          <Form.Group controlId="muscleGroupFilter">
-            <Form.Label>Filter by Target Muscle</Form.Label>
-            <Form.Select
-              value={selectedMuscle}
-              onChange={(e) => setSelectedMuscle(e.target.value)}
-              className="muscle-filter bg-dark text-light border border-warning"
-            >
-              {muscleGroups.map((muscle) => (
-                <option key={muscle.value} value={muscle.value}>
-                  {muscle.label}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-        </Container>
+        {/* Filter */}
+        <Form.Group className="mb-5 text-center" controlId="muscleGroupFilter">
+          <Form.Label>Filter by Target Muscle</Form.Label>
+          <Form.Select
+            value={selectedMuscle}
+            onChange={(e) => setSelectedMuscle(e.target.value)}
+            className="mx-auto bg-dark text-light border border-warning"
+            style={{ maxWidth: "300px" }}
+          >
+            {muscleGroups.map((muscle) => (
+              <option key={muscle.value} value={muscle.value}>
+                {muscle.label}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
 
-        {/* Workouts Grid */}
-        <Row className="workouts-grid">
+        {/* Cards */}
+        <Row>
           {filteredWorkouts.map((workout, index) => (
             <Col key={workout.id} md={4} className="mb-4">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ y: -10 }}
+                transition={{ duration: 0.2 }}
               >
-                <Card className="workout-card bg-dark text-light border border-warning">
-                  <div className="workout-image-container">
+                <Card className="h-100 bg-dark text-light border border-warning shadow-sm">
+                  <div
+                    className="position-relative"
+                    style={{ height: "200px", overflow: "hidden" }}
+                  >
                     <Card.Img
                       variant="top"
                       src={workout.image}
                       alt={workout.name}
-                      className="workout-image"
+                      style={{
+                        height: "100%",
+                        width: "100%",
+                        objectFit: "cover",
+                        transition: "transform 0.3s ease",
+                      }}
+                      className="hover-zoom"
                     />
-                    <div className="workout-difficulty bg-warning text-dark">
+                    <span className="position-absolute top-0 end-0 m-2 px-3 py-1 bg-warning text-dark rounded-pill">
                       {workout.difficulty}
-                    </div>
+                    </span>
                   </div>
-                  <Card.Body>
+                  <Card.Body className="px-4">
                     <Card.Title className="text-warning">
                       {workout.name}
                     </Card.Title>
@@ -113,18 +120,15 @@ const Workouts = () => {
                     <Card.Text>
                       <strong>Duration:</strong> {workout.duration}
                     </Card.Text>
-                    <Card.Text>
+                    <Card.Text className="mb-1">
                       <strong>Exercises:</strong>
-                      <ul className="exercise-list">
-                        {workout.exercises.map((exercise, idx) => (
-                          <li key={idx}>{exercise}</li>
-                        ))}
-                      </ul>
                     </Card.Text>
-                    <Button
-                      variant="warning"
-                      className="workout-button text-dark"
-                    >
+                    <ul className="ps-3 mb-3">
+                      {workout.exercises.map((exercise, idx) => (
+                        <li key={idx}>{exercise}</li>
+                      ))}
+                    </ul>
+                    <Button variant="warning" className="w-100 fw-semibold">
                       View Details
                     </Button>
                   </Card.Body>
