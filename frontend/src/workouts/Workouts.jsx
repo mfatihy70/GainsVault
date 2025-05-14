@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
-import { motion } from 'framer-motion';
-import '../styles/Workouts.css';
+import React, { useState } from "react"
+import { Container, Row, Col, Card, Button, Form } from "react-bootstrap"
+import { motion } from "framer-motion"
+import "../styles/Workouts.css"
 
 const Workouts = () => {
-  const [selectedMuscle, setSelectedMuscle] = useState('all');
+  const [selectedMuscle, setSelectedMuscle] = useState("all")
 
   // Beispiel-Workouts (später durch API-Daten ersetzen)
   const workouts = [
@@ -15,7 +15,8 @@ const Workouts = () => {
       exercises: ["Bench Press", "Incline Dumbbell Press", "Tricep Pushdowns"],
       difficulty: "Intermediate",
       duration: "60 min",
-      image: "https://images.unsplash.com/photo-1549476464-37392f717541?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      image:
+        "https://images.unsplash.com/photo-1549476464-37392f717541?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       id: 2,
@@ -24,7 +25,8 @@ const Workouts = () => {
       exercises: ["Pull-ups", "Barbell Rows", "Bicep Curls"],
       difficulty: "Intermediate",
       duration: "60 min",
-      image: "https://images.unsplash.com/photo-1581009137042-c552e485697a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+      image:
+        "https://images.unsplash.com/photo-1581009137042-c552e485697a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
     },
     {
       id: 3,
@@ -33,50 +35,52 @@ const Workouts = () => {
       exercises: ["Squats", "Romanian Deadlifts", "Leg Press"],
       difficulty: "Advanced",
       duration: "75 min",
-      image: "https://images.unsplash.com/photo-1596357395217-80de13130e92?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-    }
-  ];
+      image:
+        "https://images.unsplash.com/photo-1596357395217-80de13130e92?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    },
+  ]
 
   const muscleGroups = [
-    { value: 'all', label: 'All Muscles' },
-    { value: 'Chest', label: 'Chest' },
-    { value: 'Back', label: 'Back' },
-    { value: 'Legs', label: 'Legs' },
-    { value: 'Shoulders', label: 'Shoulders' },
-    { value: 'Arms', label: 'Arms' },
-    { value: 'Core', label: 'Core' }
-  ];
+    { value: "all", label: "All Muscles" },
+    { value: "Chest", label: "Chest" },
+    { value: "Back", label: "Back" },
+    { value: "Legs", label: "Legs" },
+    { value: "Shoulders", label: "Shoulders" },
+    { value: "Arms", label: "Arms" },
+    { value: "Core", label: "Core" },
+  ]
 
-  const filteredWorkouts = selectedMuscle === 'all' 
-    ? workouts 
-    : workouts.filter(workout => workout.targetMuscle === selectedMuscle);
+  const filteredWorkouts =
+    selectedMuscle === "all"
+      ? workouts
+      : workouts.filter((workout) => workout.targetMuscle === selectedMuscle)
 
   return (
-    <Container className="workouts-container">
+    <Container className="workouts-container bg-dark text-light">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="workouts-title">Workouts</h1>
-        
+        <h1 className="workouts-title text-warning">Workouts</h1>
+
         {/* Filter Section */}
-        <div className="filter-section">
+        <Container className="filter-section bg-dark text-light p-3 mb-4">
           <Form.Group controlId="muscleGroupFilter">
             <Form.Label>Filter by Target Muscle</Form.Label>
-            <Form.Select 
+            <Form.Select
               value={selectedMuscle}
               onChange={(e) => setSelectedMuscle(e.target.value)}
-              className="muscle-filter"
+              className="muscle-filter bg-dark text-light border border-warning"
             >
-              {muscleGroups.map(muscle => (
+              {muscleGroups.map((muscle) => (
                 <option key={muscle.value} value={muscle.value}>
                   {muscle.label}
                 </option>
               ))}
             </Form.Select>
           </Form.Group>
-        </div>
+        </Container>
 
         {/* Workouts Grid */}
         <Row className="workouts-grid">
@@ -87,21 +91,23 @@ const Workouts = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card className="workout-card">
+                <Card className="workout-card bg-dark text-light border border-warning">
                   <div className="workout-image-container">
-                    <Card.Img 
-                      variant="top" 
-                      src={workout.image} 
+                    <Card.Img
+                      variant="top"
+                      src={workout.image}
                       alt={workout.name}
                       className="workout-image"
                     />
-                    <div className="workout-difficulty">
+                    <div className="workout-difficulty bg-warning text-dark">
                       {workout.difficulty}
                     </div>
                   </div>
                   <Card.Body>
-                    <Card.Title>{workout.name}</Card.Title>
-                    <Card.Subtitle className="mb-2 text-muted">
+                    <Card.Title className="text-warning">
+                      {workout.name}
+                    </Card.Title>
+                    <Card.Subtitle className="m-2">
                       Target: {workout.targetMuscle}
                     </Card.Subtitle>
                     <Card.Text>
@@ -115,7 +121,10 @@ const Workouts = () => {
                         ))}
                       </ul>
                     </Card.Text>
-                    <Button variant="primary" className="workout-button">
+                    <Button
+                      variant="warning"
+                      className="workout-button text-dark"
+                    >
                       View Details
                     </Button>
                   </Card.Body>
@@ -126,7 +135,7 @@ const Workouts = () => {
         </Row>
       </motion.div>
     </Container>
-  );
-};
+  )
+}
 
-export default Workouts; 
+export default Workouts

@@ -6,7 +6,7 @@ import Navbar from "./components/Navbar"
 import Footer from "./components/Footer"
 
 // Pages
-import Homepage from "./pages/Homepage"
+import Home from "./pages/Home"
 import LoginForm from "./auth/Login"
 import RegisterForm from "./auth/Register"
 import Profile from "./profile/Profile"
@@ -16,15 +16,15 @@ import Splits from "./splits/SplitsPage"
 import AboutUs from "./pages/AboutUs"
 import Help from "./pages/Help"
 import NotFound from "./pages/NotFound"
-import Workouts from "./pages/Workouts"
+import Workouts from "./workouts/Workouts"
 
 function App() {
   return (
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Homepage />} />
-        <Route path="/home" element={<Homepage />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/profile" element={<Profile />} />

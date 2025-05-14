@@ -1,5 +1,5 @@
+import axiosInstance from "../utils/axios"
 import React, { useEffect, useState } from "react"
-import { getSplits } from "../services/splitsService"
 import SplitList from "./SplitList"
 import FilterBar from "./FilterBar"
 
@@ -19,6 +19,14 @@ const SplitsPage = () => {
 
     fetchSplits()
   }, [filters])
+
+  const getSplits = async (filters) => {
+    const response = await axiosInstance.get("/splits", {
+      params: filters,
+    })
+    return response.data
+  }
+
 
   return (
     <div className="container mt-4">
