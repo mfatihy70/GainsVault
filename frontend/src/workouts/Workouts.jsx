@@ -81,7 +81,7 @@ const Workouts = () => {
 
         {/* Cards */}
         <Row>
-          {filteredWorkouts.map((workout, index) => (
+          {filteredWorkouts.map((workout) => (
             <Col key={workout.id} md={4} className="mb-4">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
