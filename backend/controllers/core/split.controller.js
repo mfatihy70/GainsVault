@@ -3,10 +3,24 @@ import Split from "../../models/core/split.model.js"
 // Fetch all splits
 export const getSplits = async (req, res) => {
   try {
-    const splits = await Split.findAll()
-    res.json(splits)
+    const { days, difficulty } = req.query;
+    const whereClause = {};
+
+    if (days && days !== '') {
+      whereClause.days = days;
+    }
+    if (difficulty && difficulty !== '') {
+      whereClause.difficulty = difficulty;
+    }
+    
+    const splits = await Split.findAll({
+      where: whereClause,
+      order: [['name', 'ASC']]
+    });
+    
+    res.json(splits);
   } catch (error) {
-    res.status(500).json({ message: error.message })
+    res.status(500).json({ message: error.message });
   }
 }
 
