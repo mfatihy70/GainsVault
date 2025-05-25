@@ -17,6 +17,8 @@ import AboutUs from "./pages/AboutUs"
 import Help from "./pages/Help"
 import NotFound from "./pages/NotFound"
 import Workouts from "./workouts/Workouts"
+import WorkoutSummary from "./workout/Summary"
+import WorkoutTrack from "./workout/Track"
 
 function App() {
   return (
@@ -34,6 +36,8 @@ function App() {
         <Route path="/workouts" element={<Workouts />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/help" element={<Help />} />
+        <Route path="/summary" element={<WorkoutSummary />} />
+        <Route path="/track" element={<WorkoutTrack/>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
