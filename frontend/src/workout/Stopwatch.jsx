@@ -17,17 +17,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-function formatTime(totalSeconds) {
-  const hrs = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-  const mins = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-  const secs = String(totalSeconds % 60).padStart(2, '0');
-  return `${hrs}:${mins}:${secs}`;
-}
 function formatDateTime(ms) {
   if (ms === 0) return "00:00:00"; // Handle case when no time is set
   const date = new Date(ms);
   return date.toTimeString().split(' ')[0]; // "HH:MM:SS"
 }
+function formatDuration(ms) {
+  const seconds = Math.floor(ms / 1000) % 60;
+  const minutes = Math.floor(ms / (1000 * 60)) % 60;
+  const hours = Math.floor(ms / (1000 * 60 * 60));
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
 function fromatToDateString(ms) {
   if (ms === 0) return "Today"; // Handle case when no time is set
 
@@ -51,9 +53,9 @@ function fromatToDateString(ms) {
 export function Stopwatch() {
   const [selection, setSelection] = useState("start");
   const [startTime, setStartTime] = useState(0);
+  const [endTime, setEndTime] = useState(0);
   const [startTimeMode, setStartTimeMode] = useState("automatic");
   const [endTimeMode, setEndTimeMode] = useState("automatic");
-  const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -66,7 +68,7 @@ export function Stopwatch() {
       if (!isRunning) {
         const timestamp = Date.now();
         setStartTime(timestamp);
-        setSeconds(0);
+        setEndTime(timestamp);
       }
     }
     setIsRunning(!isRunning);
@@ -75,7 +77,7 @@ export function Stopwatch() {
   useEffect(() => {
     if (isRunning) {
       intervalRef.current = setInterval(() => {
-        setSeconds(prev => prev + 1);
+        setEndTime(Date.now());
       }, 1000);
     } else {
       clearInterval(intervalRef.current);
@@ -85,8 +87,10 @@ export function Stopwatch() {
 
   const handleReset = () => {
     setIsRunning(false);
-    setSeconds(0);
     setStartTime(0)
+    setEndTime(0);
+    setStartTimeMode("automatic");
+    setEndTimeMode("automatic");
     setSelection("start");
   };
   const getStyle = (id) => ({
@@ -103,15 +107,14 @@ export function Stopwatch() {
     if (selection === "start") {
       setStartTime(time.getTime());
     } else {
-      const endTime = time.getTime();
-      setSeconds(Math.floor((endTime - startTime) / 1000));
+      setEndTime(time.getTime());
     }
   }
   const getSelectedDateTime = () => {
     if (selection === "start") {
       return new Date(startTime);
     } else {
-      return new Date(startTime + seconds * 1000);
+      return new Date(endTime);
     }
   }
   const handleGetSelectedTimeMode = () => {
@@ -132,7 +135,7 @@ export function Stopwatch() {
           <Card className="p-4 shadow rounded-3">
             <div className="row align-items-center">
               <Col className="me-auto">
-                <h1>{formatTime(seconds)}</h1>
+                <h1>{formatDuration(endTime - startTime)/*formatTime(seconds)*/}</h1>
               </Col>
               <Col className="ms-auto me-0">
                 <Button variant="secondary" className="btn-sm ms-auto me-0" onClick={handleShow}>
@@ -153,7 +156,7 @@ export function Stopwatch() {
       {/* Modal */}
       <Modal show={showModal} onHide={handleClose}>
         <Modal.Header closeButton className="bg-dark text-light border-warning">
-          <Modal.Title className="d-flex w-100"><span>Duration</span><span className="ms-auto text-warning">{formatTime(seconds)}</span></Modal.Title>
+          <Modal.Title className="d-flex w-100"><span>Duration</span><span className="ms-auto text-warning">{formatDuration(endTime - startTime)}</span></Modal.Title>
         </Modal.Header>
         <Modal.Body className="bg-dark text-light border-warning">
 
@@ -164,14 +167,14 @@ export function Stopwatch() {
             >
               <div> Start </div>
               <strong className="text-warning"> {formatDateTime(startTime)}</strong>
-              <div> {"Today"}</div>
+              <div> {fromatToDateString(startTime)}</div>
             </Col>
             <Col className="border border-warning rounded p-3 mb-3 d-flex justify-content-between align-items-center"
               onClick={() => setSelection("end")} style={getStyle("end")}
             >
               <div> End </div>
-              <strong className="text-warning"> {formatDateTime(startTime + seconds * 1000)}</strong>
-              <div> {fromatToDateString(startTime + seconds * 1000)}</div>
+              <strong className="text-warning"> {formatDateTime(endTime)}</strong>
+              <div> {fromatToDateString(endTime)}</div>
             </Col>
           </Row>
 
