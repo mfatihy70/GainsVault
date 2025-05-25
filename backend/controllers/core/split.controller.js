@@ -18,7 +18,8 @@ export const getSplits = async (req, res) => {
 
     const splits = await Split.findAll({
       where: whereClause,
-      order: [['name', 'ASC']]
+      order: [['name', 'ASC']],
+      raw: true
     });
     
     console.log(`Found ${splits.length} splits`);
