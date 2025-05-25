@@ -3,12 +3,15 @@ import React, { useEffect, useState } from "react"
 import SplitList from "./SplitList"
 import FilterBar from "./FilterBar"
 import { Container, Spinner } from "react-bootstrap"
+import SplitDetailsModal from './SplitDetailsModal';
 
 const SplitsPage = () => {
   const [splits, setSplits] = useState([])
   const [filters, setFilters] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showModal, setShowModal] = useState(false);
+  const [selectedSplit, setSelectedSplit] = useState(null);
 
   useEffect(() => {
     const fetchSplits = async () => {
@@ -35,6 +38,15 @@ const SplitsPage = () => {
     return response.data
   }
 
+  const handleShowModal = (split) => {
+    setSelectedSplit(split);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedSplit(null);
+  };
 
   return (
     <Container className="py-4">
@@ -58,8 +70,14 @@ const SplitsPage = () => {
           {error}
         </div>
       ) : (
-        <SplitList splits={splits} />
+        <SplitList splits={splits} onSplitClick={handleShowModal} />
       )}
+
+      <SplitDetailsModal
+        show={showModal}
+        handleClose={handleCloseModal}
+        split={selectedSplit}
+      />
     </Container>
   )
 }
