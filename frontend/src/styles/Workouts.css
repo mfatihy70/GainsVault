@@ -1,0 +1,4 @@
+/* Optional: image zoom effect */
+.hover-zoom:hover {
+  transform: scale(1.05);
+}

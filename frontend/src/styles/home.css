@@ -1,0 +1,14 @@
+@media (max-width: 768px) {
+  .carousel-caption {
+    padding: 0 2rem !important;
+    bottom: 20% !important;
+  }
+
+  .carousel-caption h2 {
+    font-size: 2.5rem !important;
+  }
+
+  .carousel-caption p {
+    font-size: 1.2rem !important;
+  }
+}
