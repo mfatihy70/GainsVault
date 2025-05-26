@@ -19,6 +19,8 @@ import NotFound from "./pages/NotFound"
 import Workouts from "./workouts/Workouts"
 import WorkoutSummary from "./workout/Summary"
 import WorkoutTrack from "./workout/Track"
+import WorkoutTrackNew from "./workout/TrackNew"
+
 
 function App() {
   return (
@@ -38,6 +40,7 @@ function App() {
         <Route path="/help" element={<Help />} />
         <Route path="/summary" element={<WorkoutSummary />} />
         <Route path="/track" element={<WorkoutTrack/>} />
+        <Route path="/track/:id" element={<WorkoutTrackNew/>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
