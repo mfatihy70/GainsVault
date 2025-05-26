@@ -14,13 +14,18 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getExercisesForWorkout, getWorkoutById } from "../utils/workout";
 import "./Track.css";
+import SearchableDropdown from "./SearchableDropdown";
+import { getExercises } from "../utils/exercise";
 
 const WorkoutTrackNew = () => {
   const { id } = useParams();
+
   const [exercises, setExercises] = useState([]);
   const [workout, setWorkout] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [allExercises, setAllExercises] = useState([]);
 
   const handleAddExercise = () => {
     const newExercise = {
@@ -126,10 +131,9 @@ const WorkoutTrackNew = () => {
           ))}
         </Stack>
 
-        <div className="text-end mb-4">
-          <Button variant="outline-light" onClick={handleAddExercise}>
-            + Add Exercise
-          </Button>
+        { /* Searchable Add exercise Button */}
+        <div className="d-flex text-center mb-4 justify-content-end">
+          <SearchableDropdown items={allExercises.map((exercise) => (exercise.name))} onSelect={handleSelect} />
         </div>
 
         <div className="text-center mt-5">
