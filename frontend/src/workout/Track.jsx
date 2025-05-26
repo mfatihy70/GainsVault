@@ -58,6 +58,7 @@ const WorkoutTrack = () => {
     getExercisesForWorkout(workoutId, setExercises, setError, setLoading)
   }
 
+
   return (
     <Container className="py-3 bg-dark text-light">
       <motion.div
@@ -70,7 +71,7 @@ const WorkoutTrack = () => {
           {/* Filter by Split */}
           <Form.Group className="text-center ms-3" controlId="splitFilter">
             <Form.Select
-              //value={selectedSplit?.id}
+              value={selectedSplit?.id}
               onChange={handleSelectSplit}
               className="mx-auto bg-dark text-light border border-warning"
               style={{ maxWidth: "300px" }}
@@ -85,10 +86,18 @@ const WorkoutTrack = () => {
           </Form.Group>
         </Col>
 
+        {/* No Split Selected */}
+        {selectedSplit == null && (
+          <Container className="text-center py-5 text-light">
+            <Spinner animation="border" variant="warning" />
+            <h3 className="mt-3">Please select a split to view workouts</h3>
+          </Container>
+        )}
+
         {/* Selected Split Details */}
         {selectedSplit && (
           <div>
-            <h4>{selectedSplit?.name} <span className="badge text-bg-secondary">{selectedSplit?.difficulty}</span></h4>
+            <h4>{selectedSplit?.name} <span className="badge text-bg-warning">{selectedSplit?.difficulty}</span></h4>
             <small className="text-secondary">{selectedSplit?.days} Day</small>
             <p className="text-secondary">{selectedSplit?.description}</p>
           </div>
