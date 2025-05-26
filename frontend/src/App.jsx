@@ -17,9 +17,9 @@ import AboutUs from "./pages/AboutUs"
 import Help from "./pages/Help"
 import NotFound from "./pages/NotFound"
 import Workouts from "./workouts/Workouts"
-import WorkoutSummary from "./workout/Summary"
-import WorkoutTrack from "./workout/Track"
-import WorkoutTrackNew from "./workout/TrackNew"
+import WorkoutSummary from "./track/Summary"
+import WorkoutTrack from "./track/Track"
+import WorkoutTrackNew from "./track/TrackNew"
 
 
 function App() {
@@ -39,8 +39,8 @@ function App() {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/help" element={<Help />} />
         <Route path="/summary" element={<WorkoutSummary />} />
-        <Route path="/track" element={<WorkoutTrack/>} />
-        <Route path="/track/:id" element={<WorkoutTrackNew/>} />
+        <Route path="/track" element={<WorkoutTrack />} />
+        <Route path="/track/:id" element={<WorkoutTrackNew />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
