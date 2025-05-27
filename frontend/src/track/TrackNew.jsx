@@ -8,10 +8,12 @@ import {
   Form,
   Stack,
   Alert,
+  OverlayTrigger,
+  Tooltip,
 } from "react-bootstrap";
 import { motion } from "framer-motion";
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getWorkoutById } from "../utils/workout";
 import { getExerciseFromWorkoutId } from "../utils/track";
 import "./Track.css";
@@ -20,9 +22,10 @@ import { getExercises } from "../utils/exercise";
 import { Stopwatch } from "./Stopwatch";
 
 const WorkoutTrackNew = () => {
+  const { state } = useLocation();
   const navigate = useNavigate();
   const { id: workoutId } = useParams();
-
+  const [times, setTimes] = useState({ startTime: 0, endTime: 0, duration: 0 });
   const [exercises, setExercises] = useState([]);
   const [workout, setWorkout] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -42,17 +45,31 @@ const WorkoutTrackNew = () => {
     };
     setExercises([...exercises, newExercise]);
   };
-  const handleExerciseChange = (index, field, value) => {
-    const updatedExercises = [...exercises];
-    updatedExercises[index][field] = value;
-    setExercises(updatedExercises);
-  };
   const handleRemoveExercise = (index) => {
     const updatedExercises = exercises.filter((_, i) => i !== index);
     setExercises(updatedExercises);
   };
+  const handleExerciseChange = (index, field, value) => {
+    const updatedExercises = [...exercises];
+    updatedExercises[index] = {
+      ...updatedExercises[index],
+      [field]: value,
+    };
+    setExercises(updatedExercises);
+  };
   const handleGoBack = () => {
     navigate('/track')
+  }
+  const handleFinishWorkout = () => {
+    navigate('/summary', {
+      state: {
+        workout,
+        exercises,
+        workoutId,
+        times,
+
+      },
+    });
   }
 
   useEffect(() => {
@@ -105,7 +122,7 @@ const WorkoutTrackNew = () => {
                 onChange={() => alert("This feature is not implemented yet!")}
               />
             </Form>
-            <Stopwatch />
+            <Stopwatch onTimeUpdate={setTimes} />
             <p className="text-center text-muted">{workout.description}</p>
           </Card.Body>
         </Card>
@@ -130,19 +147,24 @@ const WorkoutTrackNew = () => {
                   <Col md={4}>
                     <Form.Group controlId={`sets-${exercise.id}`}>
                       <Form.Label>Sets</Form.Label>
-                      <Form.Control type="number" placeholder="e.g. 3" />
+                      <Form.Control
+                        type="number"
+                        placeholder="e.g. 3"
+                        value={exercise.sets ?? ''}
+                        onChange={(e) => handleExerciseChange(index, 'sets', e.target.value)}
+                      />
                     </Form.Group>
                   </Col>
                   <Col md={4}>
                     <Form.Group controlId={`reps-${exercise.id}`}>
                       <Form.Label>Reps</Form.Label>
-                      <Form.Control type="number" placeholder="e.g. 12" />
+                      <Form.Control type="number" placeholder="e.g. 12" value={exercise.reps ?? ''} onChange={(e) => handleExerciseChange(index, 'reps', e.target.value)} />
                     </Form.Group>
                   </Col>
                   <Col md={4}>
                     <Form.Group controlId={`weight-${exercise.id}`}>
                       <Form.Label>Weight (kg)</Form.Label>
-                      <Form.Control type="number" placeholder="e.g. 40" />
+                      <Form.Control type="number" placeholder="e.g. 40" value={exercise.weight ?? ''} onChange={(e) => handleExerciseChange(index, 'weight', e.target.value)} />
                     </Form.Group>
                   </Col>
                 </Row>
@@ -159,10 +181,36 @@ const WorkoutTrackNew = () => {
           </div>
         )}
 
+        { /* Finish Workout Button */}
         <div className="text-center mt-5">
-          <Button variant="warning" size="lg" className="finish-btn">
-            Finish Workout
-          </Button>
+          <OverlayTrigger
+            placement="top"
+            overlay={
+              <Tooltip id="tooltip-disabled-button">
+                {exercises.length === 0
+                  ? "Add at least one exercise to enable"
+                  : times.duration === 0
+                    ? "Workout duration must be greater than 0"
+                    : "Finish Workout"}
+              </Tooltip>
+            }
+          >
+            <span
+              className="d-inline-block"
+              tabIndex={0}
+              style={{ cursor: exercises.length === 0 || times.duration === 0 ? 'not-allowed' : 'pointer' }}
+            >
+              <Button
+                variant="warning"
+                size="lg"
+                className="finish-btn"
+                onClick={handleFinishWorkout}
+                disabled={exercises.length === 0 || times.duration === 0}
+              >
+                Finish Workout
+              </Button>
+            </span>
+          </OverlayTrigger>
         </div>
       </motion.div>
     </Container>

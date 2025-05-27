@@ -26,7 +26,7 @@ const TIME_MODE_MANUAL = "manual";
 const TIME_SELECTION_START = "start";
 const TIME_SELECTION_END = "end";
 
-export function Stopwatch() {
+export function Stopwatch({ onTimeUpdate }) {
   const [selection, setSelection] = useState(TIME_SELECTION_START);
   const [startTime, setStartTime] = useState(0);
   const [endTime, setEndTime] = useState(0);
@@ -50,6 +50,9 @@ export function Stopwatch() {
   }
 
   useEffect(() => {
+    if (onTimeUpdate) {
+      onTimeUpdate({ startTime, endTime, duration: endTime - startTime });
+    }
     if (isRunning) {
       intervalRef.current = setInterval(() => {
         // Update end time every second if running and end time mode is automatic
@@ -60,7 +63,7 @@ export function Stopwatch() {
       clearInterval(intervalRef.current);
     }
     return () => clearInterval(intervalRef.current);
-  }, [isRunning, endTimeMode]);
+  }, [isRunning, endTimeMode, startTime, endTime, onTimeUpdate]);
 
   const handleReset = () => {
     setIsRunning(false);
