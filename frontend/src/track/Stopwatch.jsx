@@ -16,49 +16,24 @@ import {
 import React, { useState, useEffect, useRef } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { formatDuration, formatDateTime, fromatToDateString } from "../utils/stopwatch";
 
-function formatDateTime(ms) {
-  if (ms === 0) return "00:00:00"; // Handle case when no time is set
-  const date = new Date(ms);
-  return date.toTimeString().split(' ')[0]; // "HH:MM:SS"
-}
-function formatDuration(ms) {
-  const seconds = Math.floor(ms / 1000) % 60;
-  const minutes = Math.floor(ms / (1000 * 60)) % 60;
-  const hours = Math.floor(ms / (1000 * 60 * 60));
+// Time mode constants for automatic and manual selection
+const TIME_MODE_AUTOMATIC = "automatic";
+const TIME_MODE_MANUAL = "manual";
 
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-}
-
-function fromatToDateString(ms) {
-  if (ms === 0) return "Today"; // Handle case when no time is set
-
-  const inputDate = new Date(ms);
-  const today = new Date();
-  // Check if the input date is today (year, month, day all match)
-  const isToday =
-    inputDate.getDate() === today.getDate() &&
-    inputDate.getMonth() === today.getMonth() &&
-    inputDate.getFullYear() === today.getFullYear();
-
-  if (isToday) return "Today";
-
-  const date = new Date(ms);
-  return date.toLocaleDateString('en-US', {
-    month: '2-digit',
-    day: '2-digit',
-  });
-}
+// Selection constants for start and end time
+const TIME_SELECTION_START = "start";
+const TIME_SELECTION_END = "end";
 
 export function Stopwatch() {
-  const [selection, setSelection] = useState("start");
+  const [selection, setSelection] = useState(TIME_SELECTION_START);
   const [startTime, setStartTime] = useState(0);
   const [endTime, setEndTime] = useState(0);
-  const [startTimeMode, setStartTimeMode] = useState("automatic");
-  const [endTimeMode, setEndTimeMode] = useState("automatic");
+  const [startTimeMode, setStartTimeMode] = useState(TIME_MODE_AUTOMATIC);
+  const [endTimeMode, setEndTimeMode] = useState(TIME_MODE_AUTOMATIC);
   const [isRunning, setIsRunning] = useState(false);
   const [showModal, setShowModal] = useState(false);
-
   const intervalRef = useRef(null);
 
   function handleStart() {
@@ -78,7 +53,7 @@ export function Stopwatch() {
     if (isRunning) {
       intervalRef.current = setInterval(() => {
         // Update end time every second if running and end time mode is automatic
-        if (endTimeMode == "automatic")
+        if (endTimeMode == TIME_MODE_AUTOMATIC)
           setEndTime(Date.now());
       }, 1000);
     } else {
@@ -91,9 +66,9 @@ export function Stopwatch() {
     setIsRunning(false);
     setStartTime(0)
     setEndTime(0);
-    setStartTimeMode("automatic");
-    setEndTimeMode("automatic");
-    setSelection("start");
+    setStartTimeMode(TIME_MODE_AUTOMATIC);
+    setEndTimeMode(TIME_MODE_AUTOMATIC);
+    setSelection(TIME_SELECTION_START);
   };
   const getStyle = (id) => ({
     userSelect: selection === id ? 'text' : 'none',
@@ -108,7 +83,7 @@ export function Stopwatch() {
 
   const handleSetSelectedTime = (time) => {
     const now = time.getTime();
-    if (selection === "start") {
+    if (selection === TIME_SELECTION_START) {
       if (now > endTime) {
         alert("Start time cannot be after end time.");
         return;
@@ -123,17 +98,17 @@ export function Stopwatch() {
     }
   }
   const handleGetSelectedDateTime = () => {
-    if (selection === "start") {
+    if (selection === TIME_SELECTION_START) {
       return new Date(startTime);
     } else {
       return new Date(endTime);
     }
   }
   const handleGetSelectedTimeMode = () => {
-    return selection === "start" ? startTimeMode : endTimeMode;
+    return selection === TIME_SELECTION_START ? startTimeMode : endTimeMode;
   }
   const handleSetSelectedTimeMode = (mode) => {
-    if (selection === "start") {
+    if (selection === TIME_SELECTION_START) {
       setStartTimeMode(mode.target.value);
     } else {
       setEndTimeMode(mode.target.value);
@@ -175,7 +150,7 @@ export function Stopwatch() {
           {/* Start/End Time selection */}
           <Row className="gap-2 mx-auto">
             <Col className="border border-warning rounded p-3 mb-3 d-flex justify-content-between align-items-center"
-              onClick={() => setSelection("start")} style={getStyle("start")}
+              onClick={() => setSelection(TIME_SELECTION_START)} style={getStyle(TIME_SELECTION_START)}
             >
               <div> Start </div>
               <strong className="text-warning"> {formatDateTime(startTime)}</strong>
@@ -192,7 +167,7 @@ export function Stopwatch() {
 
           { /* Automatic/Manual tracking time selector */}
           <Col className="mb-3 border border-warning rounded p-2">
-            <h4>{selection === "start" ? "StartTime" : "EndTime"}</h4>
+            <h4>{selection === TIME_SELECTION_START ? "StartTime" : "EndTime"}</h4>
             <Form className="d-flex justify-content-center mb-3">
               <Form.Check
                 inline
@@ -201,7 +176,7 @@ export function Stopwatch() {
                 label="Automatic"
                 name="automatic"
                 value="automatic"
-                checked={handleGetSelectedTimeMode() === 'automatic'}
+                checked={handleGetSelectedTimeMode() === TIME_MODE_AUTOMATIC}
                 onChange={handleSetSelectedTimeMode}
               />
               <Form.Check
@@ -211,7 +186,7 @@ export function Stopwatch() {
                 label="Manual"
                 name="manual"
                 value="manual"
-                checked={handleGetSelectedTimeMode() === 'manual'}
+                checked={handleGetSelectedTimeMode() === TIME_MODE_MANUAL}
                 onChange={handleSetSelectedTimeMode}
               />
             </Form>
@@ -228,7 +203,7 @@ export function Stopwatch() {
                 timeFormat="HH:mm"
                 timeIntervals={1}
                 dateFormat="Pp"
-                disabled={handleGetSelectedTimeMode() === 'automatic'}
+                disabled={handleGetSelectedTimeMode() === TIME_MODE_AUTOMATIC}
                 style="opacity: 0.5; cursor: not-allowed;"
               />
             </Row>
