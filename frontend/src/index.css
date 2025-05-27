@@ -24,3 +24,27 @@ body input:focus {
   transform: translateY(-4px);
   box-shadow: 0 6px 18px rgba(255, 193, 7, 0.25);
 }
+
+.form-check-input[type="checkbox"]:checked {
+  background-color: #ffc107 !important;
+  /* Green (Bootstrap 'success') */
+  border-color: #ffc107 !important;
+}
+
+/* Optional: Thumb color */
+.form-check-input[type="checkbox"]:checked::before {
+  background-color: white !important;
+}
+
+.form-check-input[type="checkbox"]::before{
+  background-color: white !important;
+}
+
+/* Unchecked switch knob */
+.form-check-input[type="checkbox"]:not(:checked){
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23ffc107'/%3e%3c/svg%3e");
+}
+
+.form-check-input[type="checkbox"]:hover {
+    box-shadow: 0 6px 18px rgba(255, 193, 7, 0.25);
+}

@@ -13,11 +13,11 @@ import {
   Alert,
   FormGroup,
 } from "react-bootstrap"
-import { motion } from "framer-motion"
+import { motion, noop } from "framer-motion"
 import React, { useState, useEffect, useRef } from 'react';
-import { getExercisesForWorkout, getSplitById, getSplits, getWorkoutsForSplit } from "../utils/workout";
-import { Stopwatch } from "./Stopwatch";
-import { set } from "date-fns";
+import { getWorkoutsForSplit } from "../utils/workout";
+import { getExerciseFromWorkoutId } from "../utils/track";
+import { getSplitById, getSplits } from "../utils/split";
 import { Navigate, useNavigate } from "react-router-dom";
 
 
@@ -30,32 +30,28 @@ const WorkoutTrack = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedSplit, setSelectedSplit] = useState(null)
-  const [selectedWorkout, setSelectedWorkout] = useState(0)
+  const [selectedWorkoutId, setSelectedWorkoutId] = useState(null)
 
-  //getExercises(setExercises, setError, setLoading)
-  //getSplits(setSplits, setError, setLoading)
   useEffect(() => {
     getSplits(setSplits, setError, setLoading)
   }, [])
 
   const handleSelectSplit = (event) => {
     const splitId = event.target.value
-    if (splitId === "-1") {
-      setSelectedSplit(null)
-      setWorkouts([])
-      setExercises([])
-      setLoading(false)
-      return
-    }
+    setWorkouts([])
+    setExercises([])
+    setSelectedSplit(null)
+    setSelectedWorkoutId(null)
+    if (splitId == "-1") return
     getSplitById(splitId, setSelectedSplit, setError, setLoading)
     getWorkoutsForSplit(splitId, setWorkouts, setError, setLoading)
   }
 
   const handleViewExercises = (workoutId) => {
-    setLoading(true)
+    setSelectedWorkoutId(null)
     setExercises([])
-    setSelectedWorkout(workoutId)
-    getExercisesForWorkout(workoutId, setExercises, setError, setLoading)
+    setSelectedWorkoutId(workoutId)
+    getExerciseFromWorkoutId(workoutId, setExercises, setError, setLoading)
   }
 
 
@@ -68,6 +64,7 @@ const WorkoutTrack = () => {
       >
         <Col className="d-flex justify-content-center align-items-center align-content-center gap-2 mb-2">
           <h1 className="text-center text-warning">Workouts</h1>
+
           {/* Filter by Split */}
           <Form.Group className="text-center ms-3" controlId="splitFilter">
             <Form.Select
@@ -87,15 +84,12 @@ const WorkoutTrack = () => {
         </Col>
 
         {/* No Split Selected */}
-        {selectedSplit == null && (
+        {!selectedSplit ? (
           <Container className="text-center py-5 text-light">
             <Spinner animation="border" variant="warning" />
             <h3 className="mt-3">Please select a split to view workouts</h3>
           </Container>
-        )}
-
-        {/* Selected Split Details */}
-        {selectedSplit && (
+        ) : ( /* Selected Split Details */
           <div>
             <h4>{selectedSplit?.name} <span className="badge text-bg-warning">{selectedSplit?.difficulty}</span></h4>
             <small className="text-secondary">{selectedSplit?.days} Day</small>
@@ -149,7 +143,7 @@ const WorkoutTrack = () => {
                         View Details
                       </Button>
                     </Col>
-                    {selectedWorkout == workout.id && exercises && (
+                    {selectedWorkoutId == workout.id && exercises && (
                       <Container style={{ flexGrow: 1, overflowY: 'auto' }}>
                         <ListGroup>
 
@@ -176,6 +170,15 @@ const WorkoutTrack = () => {
                           )}
                         </ListGroup>
                       </Container>
+                    )}
+
+                    {/* No Exercises Found for selected workout */}
+                    {selectedWorkoutId == workout.id && exercises.length == 0 && !loading && (
+                      <div className="text-center my-2">
+                        <Alert variant="info">
+                          No exercises found for this workout.
+                        </Alert>
+                      </div>
                     )}
                   </Card.Body>
                 </Card>

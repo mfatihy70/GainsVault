@@ -116,7 +116,7 @@ export function Stopwatch() {
   }
 
   return (
-    <Container className="text-center mt-5">
+    <Container className="text-center">
       <Row className="justify-content-center">
         <Col md={6}>
           <Card className="bg-dark text-light selectable p-4 shadow rounded-3">

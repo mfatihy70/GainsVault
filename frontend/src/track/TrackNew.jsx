@@ -11,15 +11,17 @@ import {
 } from "react-bootstrap";
 import { motion } from "framer-motion";
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { getExercisesForWorkout, getWorkoutById } from "../utils/workout";
+import { useNavigate, useParams } from "react-router-dom";
+import { getWorkoutById } from "../utils/workout";
+import { getExerciseFromWorkoutId } from "../utils/track";
 import "./Track.css";
 import SearchableDropdown from "./SearchableDropdown";
 import { getExercises } from "../utils/exercise";
 import { Stopwatch } from "./Stopwatch";
 
 const WorkoutTrackNew = () => {
-  const { id } = useParams();
+  const navigate = useNavigate();
+  const { id: workoutId } = useParams();
 
   const [exercises, setExercises] = useState([]);
   const [workout, setWorkout] = useState(null);
@@ -29,7 +31,8 @@ const WorkoutTrackNew = () => {
 
   const [allExercises, setAllExercises] = useState([]);
 
-  const handleAddExercise = () => {
+  const handleAddExercise = (item) => {
+    console.log("Selected:", item);
     const newExercise = {
       id: Date.now(), // temporary unique ID
       name: "New Exercise",
@@ -48,15 +51,15 @@ const WorkoutTrackNew = () => {
     const updatedExercises = exercises.filter((_, i) => i !== index);
     setExercises(updatedExercises);
   };
-  const handleSelect = (item) => {
-    console.log("Selected:", item);
+  const handleGoBack = () => {
+    navigate('/track')
   }
 
   useEffect(() => {
-    getWorkoutById(id, setWorkout, setError, setLoading);
-    getExercisesForWorkout(id, setExercises, setError, setLoading);
+    getWorkoutById(workoutId, setWorkout, setError, setLoading);
+    getExerciseFromWorkoutId(workoutId, setExercises, setError, setLoading);
     getExercises(setAllExercises, setError, setLoading);
-  }, [id]);
+  }, [workoutId]);
 
   if (loading || !workout) {
     return (
@@ -85,14 +88,30 @@ const WorkoutTrackNew = () => {
       >
         <Card className="mb-4 bg-dark border border-warning">
           <Card.Body>
-            <h1 className="text-center text-warning">{workout.name}</h1>
+            <div className="d-flex align-items-center justify-content-between">
+              <Button variant="outline-warning" onClick={handleGoBack}>
+                ← Back
+              </Button>
+              <h1 className="text-warning text-center flex-grow-1 mb-0">{workout.name}</h1>
+              {/* Spacer to balance layout */}
+              <div style={{ width: '75.5px' }} /> {/* Same width as the button */}
+            </div>
+            <Form>
+              <Form.Check
+                type="switch"
+                label="Customize Workout?"
+                className="d-flex gap-2 align-items-center justify-content-center text-warning mt-2"
+                //checked={checked}
+                onChange={() => alert("This feature is not implemented yet!")}
+              />
+            </Form>
             <Stopwatch />
             <p className="text-center text-muted">{workout.description}</p>
           </Card.Body>
         </Card>
 
         { /* Exercises List */}
-        <Stack gap={4}>
+        <Stack gap={4} className="col-10 mx-auto">
           {exercises.map((exercise, index) => (
             <Card key={index} className="tracker-card mb-4">
               <Card.Body className="tracker-form">
@@ -136,7 +155,7 @@ const WorkoutTrackNew = () => {
         { /* Searchable Add exercise Button (!!only visible if custom workout!!) */}
         {isCustomWorkout && (
           <div className="d-flex text-center mb-4 justify-content-end">
-            <SearchableDropdown items={allExercises.map((exercise) => (exercise.name))} onSelect={handleSelect} />
+            <SearchableDropdown items={allExercises.map((exercise) => (exercise.name))} onSelect={handleAddExercise} />
           </div>
         )}
 
