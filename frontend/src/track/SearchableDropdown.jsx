@@ -7,12 +7,12 @@ import {
   InputGroup,
 } from "react-bootstrap";
 
-const SearchableDropdown = ({ items = [], onSelect }) => {
+const SearchableDropdown = ({ exercises = [], onSelect }) => {
   const [search, setSearch] = useState("");
   const [show, setShow] = useState(false);
 
-  const filteredItems = items.filter((item) =>
-    item.toLowerCase().includes(search.toLowerCase())
+  const filteredExercises = exercises.filter((exercise) =>
+    exercise.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -21,7 +21,10 @@ const SearchableDropdown = ({ items = [], onSelect }) => {
         + Add Exercise
       </Dropdown.Toggle>
 
-      <Dropdown.Menu className="bg-dark text-light border-warning" style={{ minWidth: "300px", padding: "10px" }}>
+      <Dropdown.Menu
+        className="bg-dark text-light border-warning"
+        style={{ minWidth: "300px", padding: "10px" }}
+      >
         <InputGroup className="mb-2">
           <FormControl
             placeholder="Search..."
@@ -32,22 +35,25 @@ const SearchableDropdown = ({ items = [], onSelect }) => {
           />
         </InputGroup>
 
-        {filteredItems.length > 0 ? (
-          filteredItems.map((item, idx) => (
+        {filteredExercises.length > 0 ? (
+          filteredExercises.map((exercise) => (
             <Dropdown.Item
               className="bg-dark text-light"
               style={{ cursor: "pointer" }}
-              key={idx}
+              key={exercise.id}
               onClick={() => {
-                onSelect(item);
+                onSelect(exercise); // return the full exercise object
                 setShow(false);
+                setSearch(""); // optional: clear input after select
               }}
             >
-              {item}
+              {exercise.name}
             </Dropdown.Item>
           ))
         ) : (
-          <Dropdown.Item className="text-secondary" disabled>No results</Dropdown.Item>
+          <Dropdown.Item className="text-secondary" disabled>
+            No results
+          </Dropdown.Item>
         )}
       </Dropdown.Menu>
     </Dropdown>

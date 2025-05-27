@@ -34,14 +34,14 @@ const WorkoutTrackNew = () => {
 
   const [allExercises, setAllExercises] = useState([]);
 
-  const handleAddExercise = (item) => {
-    console.log("Selected:", item);
+  const handleAddExercise = (exercise) => {
+    console.log("Selected:", exercise);
     const newExercise = {
-      id: Date.now(), // temporary unique ID
-      name: "New Exercise",
-      primary: "chest",
-      secondary: null,
-      equipment: null,
+      id: exercise.id,
+      name: exercise.name,
+      primary: exercise.primary || "unknown",
+      secondary: exercise.secondary || null,
+      equipment: exercise.equipment || null,
     };
     setExercises([...exercises, newExercise]);
   };
@@ -67,16 +67,17 @@ const WorkoutTrackNew = () => {
         exercises,
         workoutId,
         times,
-
       },
     });
   }
 
   useEffect(() => {
     getWorkoutById(workoutId, setWorkout, setError, setLoading);
-    getExerciseFromWorkoutId(workoutId, setExercises, setError, setLoading);
+    // Refetch exercises only if it's not a custom workout
+    if (!isCustomWorkout)
+      getExerciseFromWorkoutId(workoutId, setExercises, setError, setLoading);
     getExercises(setAllExercises, setError, setLoading);
-  }, [workoutId]);
+  }, [workoutId, isCustomWorkout]);
 
   if (loading || !workout) {
     return (
@@ -109,7 +110,7 @@ const WorkoutTrackNew = () => {
               <Button variant="outline-warning" onClick={handleGoBack}>
                 ← Back
               </Button>
-              <h1 className="text-warning text-center flex-grow-1 mb-0">{workout.name}</h1>
+              <h1 className="text-warning text-center flex-grow-1 mb-0">{workout.name}<span class="ms-2 fs-6 badge rounded-pill text-bg-info">{isCustomWorkout ? 'Customized' : ''}</span></h1>
               {/* Spacer to balance layout */}
               <div style={{ width: '75.5px' }} /> {/* Same width as the button */}
             </div>
@@ -119,7 +120,7 @@ const WorkoutTrackNew = () => {
                 label="Customize Workout?"
                 className="d-flex gap-2 align-items-center justify-content-center text-warning mt-2"
                 //checked={checked}
-                onChange={() => alert("This feature is not implemented yet!")}
+                onChange={() => setIsCustomWorkout(!isCustomWorkout)}
               />
             </Form>
             <Stopwatch onTimeUpdate={setTimes} />
@@ -141,6 +142,19 @@ const WorkoutTrackNew = () => {
                       {exercise.equipment && <> | Equipment: {exercise.equipment}</>}
                     </div>
                   </Col>
+
+                  {/* Remove Button - only shown in custom mode */}
+                  {isCustomWorkout && (
+                    <Col xs="auto">
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => handleRemoveExercise(index)}
+                      >
+                        ✖ Remove
+                      </Button>
+                    </Col>
+                  )}
                 </Row>
 
                 <Row className="gy-3">
@@ -172,14 +186,14 @@ const WorkoutTrackNew = () => {
             </Card>
 
           ))}
-        </Stack>
 
-        { /* Searchable Add exercise Button (!!only visible if custom workout!!) */}
-        {isCustomWorkout && (
-          <div className="d-flex text-center mb-4 justify-content-end">
-            <SearchableDropdown items={allExercises.map((exercise) => (exercise.name))} onSelect={handleAddExercise} />
-          </div>
-        )}
+          { /* Searchable Add exercise Button (!!only visible if custom workout!!) */}
+          {isCustomWorkout && (
+            <div className="d-flex text-center mb-4 justify-content-end">
+              <SearchableDropdown exercises={allExercises} onSelect={handleAddExercise} />
+            </div>
+          )}
+        </Stack>
 
         { /* Finish Workout Button */}
         <div className="text-center mt-5">
