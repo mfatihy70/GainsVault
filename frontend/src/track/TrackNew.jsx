@@ -16,6 +16,7 @@ import { getExercisesForWorkout, getWorkoutById } from "../utils/workout";
 import "./Track.css";
 import SearchableDropdown from "./SearchableDropdown";
 import { getExercises } from "../utils/exercise";
+import { Stopwatch } from "./Stopwatch";
 
 const WorkoutTrackNew = () => {
   const { id } = useParams();
@@ -24,6 +25,7 @@ const WorkoutTrackNew = () => {
   const [workout, setWorkout] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isCustomWorkout, setIsCustomWorkout] = useState(false);
 
   const [allExercises, setAllExercises] = useState([]);
 
@@ -49,7 +51,6 @@ const WorkoutTrackNew = () => {
   const handleSelect = (item) => {
     console.log("Selected:", item);
   }
-
 
   useEffect(() => {
     getWorkoutById(id, setWorkout, setError, setLoading);
@@ -82,9 +83,10 @@ const WorkoutTrackNew = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Card className="mb-4 bg-black border border-warning">
+        <Card className="mb-4 bg-dark border border-warning">
           <Card.Body>
             <h1 className="text-center text-warning">{workout.name}</h1>
+            <Stopwatch />
             <p className="text-center text-muted">{workout.description}</p>
           </Card.Body>
         </Card>
@@ -131,10 +133,12 @@ const WorkoutTrackNew = () => {
           ))}
         </Stack>
 
-        { /* Searchable Add exercise Button */}
-        <div className="d-flex text-center mb-4 justify-content-end">
-          <SearchableDropdown items={allExercises.map((exercise) => (exercise.name))} onSelect={handleSelect} />
-        </div>
+        { /* Searchable Add exercise Button (!!only visible if custom workout!!) */}
+        {isCustomWorkout && (
+          <div className="d-flex text-center mb-4 justify-content-end">
+            <SearchableDropdown items={allExercises.map((exercise) => (exercise.name))} onSelect={handleSelect} />
+          </div>
+        )}
 
         <div className="text-center mt-5">
           <Button variant="warning" size="lg" className="finish-btn">

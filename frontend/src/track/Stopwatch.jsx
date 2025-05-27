@@ -77,13 +77,15 @@ export function Stopwatch() {
   useEffect(() => {
     if (isRunning) {
       intervalRef.current = setInterval(() => {
-        setEndTime(Date.now());
+        // Update end time every second if running and end time mode is automatic
+        if (endTimeMode == "automatic")
+          setEndTime(Date.now());
       }, 1000);
     } else {
       clearInterval(intervalRef.current);
     }
     return () => clearInterval(intervalRef.current);
-  }, [isRunning]);
+  }, [isRunning, endTimeMode]);
 
   const handleReset = () => {
     setIsRunning(false);
@@ -103,14 +105,24 @@ export function Stopwatch() {
   });
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
+
   const handleSetSelectedTime = (time) => {
+    const now = time.getTime();
     if (selection === "start") {
-      setStartTime(time.getTime());
+      if (now > endTime) {
+        alert("Start time cannot be after end time.");
+        return;
+      }
+      setStartTime(now);
     } else {
-      setEndTime(time.getTime());
+      if (now < startTime) {
+        alert("End time cannot be before start time.");
+        return;
+      }
+      setEndTime(now);
     }
   }
-  const getSelectedDateTime = () => {
+  const handleGetSelectedDateTime = () => {
     if (selection === "start") {
       return new Date(startTime);
     } else {
@@ -132,10 +144,10 @@ export function Stopwatch() {
     <Container className="text-center mt-5">
       <Row className="justify-content-center">
         <Col md={6}>
-          <Card className="p-4 shadow rounded-3">
+          <Card className="bg-dark text-light selectable p-4 shadow rounded-3">
             <div className="row align-items-center">
               <Col className="me-auto">
-                <h1>{formatDuration(endTime - startTime)/*formatTime(seconds)*/}</h1>
+                <h1>{formatDuration(endTime - startTime)}</h1>
               </Col>
               <Col className="ms-auto me-0">
                 <Button variant="secondary" className="btn-sm ms-auto me-0" onClick={handleShow}>
@@ -210,7 +222,7 @@ export function Stopwatch() {
             <Row className="mb-3 mx-auto">
               <DatePicker
                 className="form-control text-center bg-dark text-warning border-warning"
-                selected={getSelectedDateTime()}
+                selected={handleGetSelectedDateTime()}
                 onChange={(date) => handleSetSelectedTime(date)}
                 showTimeSelect
                 timeFormat="HH:mm"

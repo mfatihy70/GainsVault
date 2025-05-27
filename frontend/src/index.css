@@ -20,7 +20,7 @@ body input:focus {
   background-color: #1e1e1e !important;
 }
 
-.card:hover {
+.card.selectable:hover {
   transform: translateY(-4px);
   box-shadow: 0 6px 18px rgba(255, 193, 7, 0.25);
 }
