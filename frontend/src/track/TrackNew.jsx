@@ -23,6 +23,17 @@ import { Stopwatch } from "./Stopwatch";
 
 const WorkoutTrackNew = () => {
   const { state } = useLocation();
+  const newExercise = {
+    id: Date.now(),
+    name: "New Exercise",
+    primary: "chest",
+    secondary: null,
+    equipment: null,
+    sets: '',
+    reps: '',
+    weight: '',
+  };
+
   const navigate = useNavigate();
   const { id: workoutId } = useParams();
   const [times, setTimes] = useState({ startTime: 0, endTime: 0, duration: 0 });
@@ -61,6 +72,10 @@ const WorkoutTrackNew = () => {
     navigate('/track')
   }
   const handleFinishWorkout = () => {
+    //1.Create Workout Entry (user_id, workout_id, name, performed_at)
+    //2.Create Exercise Entries for each exercise in the workout
+    //   (workout_entry_id, workout_exercise_id, exercise_id, performed_at)
+    //3.
     navigate('/summary', {
       state: {
         workout,
@@ -75,7 +90,10 @@ const WorkoutTrackNew = () => {
     getWorkoutById(workoutId, setWorkout, setError, setLoading);
     // Refetch exercises only if it's not a custom workout
     if (!isCustomWorkout)
-      getExerciseFromWorkoutId(workoutId, setExercises, setError, setLoading);
+      getExerciseFromWorkoutId(workoutId, (fetchedExercises) => {
+        setExercises(fetchedExercises.map(ex => ({ ...ex, notes: ex.notes ?? '' })));
+      }, setError, setLoading);
+
     getExercises(setAllExercises, setError, setLoading);
   }, [workoutId, isCustomWorkout]);
 
@@ -179,6 +197,20 @@ const WorkoutTrackNew = () => {
                     <Form.Group controlId={`weight-${exercise.id}`}>
                       <Form.Label>Weight (kg)</Form.Label>
                       <Form.Control type="number" placeholder="e.g. 40" value={exercise.weight ?? ''} onChange={(e) => handleExerciseChange(index, 'weight', e.target.value)} />
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Row className="mt-3">
+                  <Col>
+                    <Form.Group controlId={`notes-${exercise.id}`}>
+                      <Form.Label>Notes <span className="text-muted">(optional)</span></Form.Label>
+                      <Form.Control
+                        as="textarea"
+                        rows={2}
+                        placeholder="Any thoughts or notes about this exercise..."
+                        value={exercise.notes ?? ''}
+                        onChange={(e) => handleExerciseChange(index, 'notes', e.target.value)}
+                      />
                     </Form.Group>
                   </Col>
                 </Row>
