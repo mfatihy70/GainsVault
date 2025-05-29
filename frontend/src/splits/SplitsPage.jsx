@@ -2,18 +2,29 @@ import axiosInstance from "../utils/axios"
 import React, { useEffect, useState } from "react"
 import SplitList from "./SplitList"
 import FilterBar from "./FilterBar"
+import { Container, Spinner } from "react-bootstrap"
+import SplitDetailsModal from './SplitDetailsModal';
 
 const SplitsPage = () => {
   const [splits, setSplits] = useState([])
   const [filters, setFilters] = useState({})
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [showModal, setShowModal] = useState(false);
+  const [selectedSplit, setSelectedSplit] = useState(null);
 
   useEffect(() => {
     const fetchSplits = async () => {
       try {
+        setLoading(true)
         const data = await getSplits(filters)
         setSplits(data)
+        setError(null)
       } catch (error) {
         console.error("Fehler beim Laden der Splits:", error)
+        setError("Fehler beim Laden der Splits. Bitte versuchen Sie es später erneut.")
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -27,13 +38,47 @@ const SplitsPage = () => {
     return response.data
   }
 
+  const handleShowModal = (split) => {
+    setSelectedSplit(split);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedSplit(null);
+  };
 
   return (
-    <div className="container mt-4">
-      <h2>Workout Splits</h2>
+    <Container className="py-4">
+      <div className="text-center mb-4">
+        <h1>Workout Splits</h1>
+        <p className="text-muted">
+          Wählen Sie einen Trainingsplan aus und starten Sie Ihr Training!
+        </p>
+      </div>
+
       <FilterBar onFilterChange={setFilters} />
-      <SplitList splits={splits} />
-    </div>
+
+      {loading ? (
+        <div className="text-center py-5">
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Laden...</span>
+          </Spinner>
+        </div>
+      ) : error ? (
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      ) : (
+        <SplitList splits={splits} onSplitClick={handleShowModal} />
+      )}
+
+      <SplitDetailsModal
+        show={showModal}
+        handleClose={handleCloseModal}
+        split={selectedSplit}
+      />
+    </Container>
   )
 }
 
