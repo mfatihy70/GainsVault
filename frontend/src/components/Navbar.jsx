@@ -51,6 +51,9 @@ const CustomNavbar = () => {
             </>
           ) : (
             <>
+              <Button className="btn-primary me-2" title="Track your next GYM Session" variant="outline-light" onClick={() => navigate('/track')}>
+                Track
+              </Button>
               {/* Logout Button */}
               <Button variant="outline-light" onClick={handleLogout}>
                 Logout
