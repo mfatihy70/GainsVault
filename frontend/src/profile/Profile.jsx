@@ -38,10 +38,16 @@ const ProfilePage = () => {
 
   const handleSave = async () => {
     setSaving(true)
-    await editUser(userId, updatedUser, setError, setSaving)
+    // Remove empty string fields to avoid overwriting with empty values
+    const filteredUpdate = Object.fromEntries(
+      Object.entries(updatedUser).filter(
+        ([_, v]) => v !== "" && v !== undefined
+      )
+    )
+    await editUser(userId, filteredUpdate, setError, setSaving)
     setUser((prev) => ({
       ...prev,
-      ...updatedUser,
+      ...filteredUpdate,
     }))
     setEditing(false)
   }

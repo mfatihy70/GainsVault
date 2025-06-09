@@ -26,6 +26,11 @@ export const getUserById = async (req, res) => {
 // Update user details
 export const updateUser = async (req, res) => {
   try {
+    // Remove empty string fields from req.body
+    Object.keys(req.body).forEach((key) => {
+      if (req.body[key] === "") delete req.body[key]
+    })
+
     const [rowsUpdated, [updatedUser]] = await User.update(req.body, {
       where: { id: req.params.id },
       returning: true,
@@ -121,10 +126,8 @@ export const trackWeight = async (req, res, next) => {
     console.log("New Weight object:", newWeight)
     // add new weight to the existing array
     await user.update({
-      weight: [
-        ...(user.weight || []), newWeight
-      ]
-    });
+      weight: [...(user.weight || []), newWeight],
+    })
 
     res.status(200).json({ msg: "Weight updated successfully" })
   } catch (error) {
@@ -159,11 +162,13 @@ export const deleteWeight = async (req, res, next) => {
     if (!user) return res.status(404).json({ msg: "User not found" })
 
     // remove weight from the existing array
-    const updatedWeights = user.weight.filter((_, index) => index !== parseInt(weightIndex))
+    const updatedWeights = user.weight.filter(
+      (_, index) => index !== parseInt(weightIndex)
+    )
 
     await user.update({
-      weight: updatedWeights
-    });
+      weight: updatedWeights,
+    })
 
     res.status(200).json({ msg: "Weight deleted successfully" })
   } catch (error) {

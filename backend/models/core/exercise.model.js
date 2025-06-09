@@ -42,6 +42,10 @@ const Exercise = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    difficulty: {
+      type: DataTypes.ENUM("beginner", "intermediate", "advanced"),
+      allowNull: true,
+    },
   },
   {
     timestamps: false,
