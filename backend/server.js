@@ -33,12 +33,22 @@ connectDB().then(async () => {
     "./routes/core/workout_exercise.routes.js"
   )
 
+  // Import entries routes
+  const { default: entriesSetRouter } = await import("./routes/entries/set.routes.js")
+  const { default: entriesWorkoutRouter } = await import("./routes/entries/workout.routes.js")
+  const { default: entriesExerciseRouter } = await import("./routes/entries/exercise.routes.js")
+
   // Mount all routes
   app.use("/api/users", usersRouter)
   app.use("/api/exercises", exerciseRouter)
   app.use("/api/splits", splitsRouter)
   app.use("/api/workouts", workoutsRouter)
   app.use("/api/workout-exercises", workoutExerciseRouter)
+
+  // Entries routes
+  app.use("/api/entries/set", entriesSetRouter)
+  app.use("/api/entries/workout", entriesWorkoutRouter)
+  app.use("/api/entries/exercise", entriesExerciseRouter)
 
   // 404 handler for undefined routes
   app.use((req, res) => {

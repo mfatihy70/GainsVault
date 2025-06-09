@@ -5,7 +5,7 @@ import {
   createExerciseEntry,
   updateExerciseEntry,
   deleteExerciseEntry,
-} from "../../controllers/entries/exerciseEntry.controller.js"
+} from "../../controllers/entries/exercise.controller.js"
 
 const router = express.Router()
 
