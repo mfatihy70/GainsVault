@@ -5,20 +5,16 @@ import {
   Spinner,
   Row,
   Col,
-  Image,
   Form,
-  Stack,
   ListGroup,
-  Modal,
   Alert,
-  FormGroup,
 } from "react-bootstrap"
-import { motion, noop } from "framer-motion"
-import React, { useState, useEffect, useRef } from "react"
+import { motion } from "framer-motion"
+import { useState, useEffect } from "react"
 import { getWorkoutsForSplit } from "../utils/workout"
 import { getExerciseFromWorkoutId } from "../utils/track"
 import { getSplitById, getSplits } from "../utils/split"
-import { Navigate, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 const WorkoutTrack = () => {
   const navigate = useNavigate()

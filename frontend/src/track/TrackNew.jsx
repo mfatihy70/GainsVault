@@ -12,11 +12,11 @@ import {
   Tooltip,
 } from "react-bootstrap"
 import { motion } from "framer-motion"
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { getWorkoutById } from "../utils/workout"
 import { getExerciseFromWorkoutId } from "../utils/track"
-import "./Track.css"
+import "../styles/track.css"
 import SearchableDropdown from "./SearchableDropdown"
 import { getExercises } from "../utils/exercise"
 import { Stopwatch } from "./Stopwatch"

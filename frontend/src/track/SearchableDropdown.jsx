@@ -1,11 +1,5 @@
 import React, { useState } from "react"
-import {
-  Dropdown,
-  FormControl,
-  Button,
-  DropdownButton,
-  InputGroup,
-} from "react-bootstrap"
+import { Dropdown, FormControl, InputGroup } from "react-bootstrap"
 
 const SearchableDropdown = ({ exercises = [], onSelect }) => {
   const [search, setSearch] = useState("")
