@@ -38,6 +38,10 @@ const Exercise = sequelize.define(
       type: DataTypes.ENUM(...equipment),
       allowNull: true,
     },
+    image: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
   },
   {
     timestamps: false,

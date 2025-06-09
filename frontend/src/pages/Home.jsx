@@ -32,7 +32,7 @@ const Home = () => {
   const features = [
     {
       title: "Exercise Tracking",
-      description: "Log and track your exercises with detailed metrics",
+      description: "Log and track your exercises with details",
       icon: "💪",
       link: "/exercises",
     },

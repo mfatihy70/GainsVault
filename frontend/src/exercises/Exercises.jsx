@@ -41,11 +41,26 @@ const ExercisePage = () => {
           <Col md={10}>
             <Row>
               {exercises.map((exercise, index) => (
-                <Col md={6} key={exercise.id || index} className="mb-4">
+                <Col md={4} key={exercise.id || index} className="mb-4">
                   <ListGroup.Item className="rounded-3 bg-dark border border-warning p-2">
+                      {exercise.image && (
+                      <div className="mb-3 text-center">
+                        <img
+                          src={exercise.image}
+                          alt={exercise.name}
+                          style={{
+                            maxWidth: "100%",
+                            maxHeight: "180px",
+                            objectFit: "cover",
+                            borderRadius: "0.75rem",
+                          }}
+                        />
+                      </div>
+                    )}
                     <h4 className="mb-3">{exercise.name}</h4>
                     <p className="mb-2">
-                      <strong>Primary Muscles:</strong> {exercise.primaryMuscles}
+                      <strong>Primary Muscles:</strong>{" "}
+                      {exercise.primaryMuscles}
                     </p>
                     <p className="mb-2">
                       <strong>Secondary Muscles:</strong>{" "}

@@ -38,6 +38,22 @@ export const createExercise = async (req, res) => {
   }
 }
 
+// Create multiple exercises
+export const createMultipleExercises = async (req, res) => {
+  try {
+    const exercises = req.body
+    if (!Array.isArray(exercises) || exercises.length === 0)
+      return res.status(400).json({ message: "Invalid exercise data" })
+
+    const createdExercises = await Exercise.bulkCreate(exercises, {
+      returning: true,
+    })
+    res.status(201).json(createdExercises)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
 // Update exercise details
 export const updateExercise = async (req, res) => {
   try {
@@ -49,6 +65,34 @@ export const updateExercise = async (req, res) => {
     if (!rowsUpdated)
       return res.status(404).json({ message: "Exercise not found" })
     res.json(updatedExercise)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+// Update multiple exercises
+export const updateMultipleExercises = async (req, res) => {
+  try {
+    const exercises = req.body
+    if (!Array.isArray(exercises) || exercises.length === 0)
+      return res.status(400).json({ message: "Invalid exercise data" })
+
+    const updatedExercises = await Promise.all(
+      exercises.map(async (exercise) => {
+        // Only update if id is provided
+        if (!exercise.id) throw new Error("Exercise ID is required")
+        const [rowsUpdated, [updatedExercise]] = await Exercise.update(
+          { image: exercise.image }, // Only update the image column
+          {
+            where: { id: exercise.id },
+            returning: true,
+          }
+        )
+        if (!rowsUpdated) throw new Error(`Exercise with ID ${exercise.id} not found`)
+        return updatedExercise
+      })
+    )
+    res.json(updatedExercises)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }

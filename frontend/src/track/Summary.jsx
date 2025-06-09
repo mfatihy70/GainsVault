@@ -1,19 +1,21 @@
-import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { Container, Card, Button, Row, Col } from "react-bootstrap";
-import { formatDateTime, formatDuration } from "../utils/stopwatch"; // Make sure these utilities are available
+import React from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+import { Container, Card, Button, Row, Col } from "react-bootstrap"
+import { formatDateTime, formatDuration } from "../utils/stopwatch" // Make sure these utilities are available
 
 const WorkoutSummary = () => {
-  const { state } = useLocation();
-  const navigate = useNavigate();
+  const { state } = useLocation()
+  const navigate = useNavigate()
 
   if (!state) {
-    return <p className="text-center text-light py-5">No summary data available.</p>;
+    return (
+      <p className="text-center text-light py-5">No summary data available.</p>
+    )
   }
 
-  const { workout, exercises, workoutId, times } = state;
+  const { workout, exercises, workoutId, times } = state
 
-  const { startTime, endTime, duration } = times || {};
+  const { startTime, endTime, duration } = times || {}
 
   return (
     <Container className="py-5 bg-dark text-light">
@@ -61,9 +63,15 @@ const WorkoutSummary = () => {
               {ex.equipment && ` | Equipment: ${ex.equipment}`}
             </p>
             <Row>
-              <Col><strong>Sets:</strong> {ex.sets || "-"}</Col>
-              <Col><strong>Reps:</strong> {ex.reps || "-"}</Col>
-              <Col><strong>Weight:</strong> {ex.weight ? `${ex.weight} kg` : "-"}</Col>
+              <Col>
+                <strong>Sets:</strong> {ex.sets || "-"}
+              </Col>
+              <Col>
+                <strong>Reps:</strong> {ex.reps || "-"}
+              </Col>
+              <Col>
+                <strong>Weight:</strong> {ex.weight ? `${ex.weight} kg` : "-"}
+              </Col>
             </Row>
           </Card.Body>
         </Card>
@@ -76,7 +84,7 @@ const WorkoutSummary = () => {
         </Button>
       </div>
     </Container>
-  );
-};
+  )
+}
 
-export default WorkoutSummary;
+export default WorkoutSummary

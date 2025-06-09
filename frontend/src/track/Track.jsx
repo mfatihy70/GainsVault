@@ -14,12 +14,11 @@ import {
   FormGroup,
 } from "react-bootstrap"
 import { motion, noop } from "framer-motion"
-import React, { useState, useEffect, useRef } from 'react';
-import { getWorkoutsForSplit } from "../utils/workout";
-import { getExerciseFromWorkoutId } from "../utils/track";
-import { getSplitById, getSplits } from "../utils/split";
-import { Navigate, useNavigate } from "react-router-dom";
-
+import React, { useState, useEffect, useRef } from "react"
+import { getWorkoutsForSplit } from "../utils/workout"
+import { getExerciseFromWorkoutId } from "../utils/track"
+import { getSplitById, getSplits } from "../utils/split"
+import { Navigate, useNavigate } from "react-router-dom"
 
 const WorkoutTrack = () => {
   const navigate = useNavigate()
@@ -54,7 +53,6 @@ const WorkoutTrack = () => {
     getExerciseFromWorkoutId(workoutId, setExercises, setError, setLoading)
   }
 
-
   return (
     <Container className="py-3 bg-dark text-light">
       <motion.div
@@ -86,12 +84,17 @@ const WorkoutTrack = () => {
         {/* No Split Selected */}
         {!selectedSplit ? (
           <Container className="text-center py-5 text-light">
-            <Spinner animation="border" variant="warning" />
             <h3 className="mt-3">Please select a split to view workouts</h3>
           </Container>
-        ) : ( /* Selected Split Details */
+        ) : (
+          /* Selected Split Details */
           <div>
-            <h4>{selectedSplit?.name} <span className="badge text-bg-warning">{selectedSplit?.difficulty}</span></h4>
+            <h4>
+              {selectedSplit?.name}{" "}
+              <span className="badge text-bg-warning">
+                {selectedSplit?.difficulty}
+              </span>
+            </h4>
             <small className="text-secondary">{selectedSplit?.days} Day</small>
             <p className="text-secondary">{selectedSplit?.description}</p>
           </div>
@@ -129,31 +132,43 @@ const WorkoutTrack = () => {
                     <Card.Title className="text-warning">
                       {workout.name}
                     </Card.Title>
-                    <Card.Subtitle className="m-2">
-                    </Card.Subtitle>
-                    <Card.Text>
-                    </Card.Text>
-                    <Card.Text className="mb-1">
-                    </Card.Text>
+                    <Card.Subtitle className="m-2"></Card.Subtitle>
+                    <Card.Text></Card.Text>
+                    <Card.Text className="mb-1"></Card.Text>
                     <Col className="d-flex justify-content-between align-items-center gap-2 mb-2">
-                      <Button variant="primary" className="w-100 fw-semibold" onClick={() => { navigate(`/track/${workout.id}`, { state: { workout } }) }}>
+                      <Button
+                        variant="primary"
+                        className="w-100 fw-semibold"
+                        onClick={() => {
+                          navigate(`/track/${workout.id}`, {
+                            state: { workout },
+                          })
+                        }}
+                      >
                         Start Workout
                       </Button>
-                      <Button variant="warning" className="w-100 fw-semibold" onClick={handleViewExercises.bind(null, workout.id)}>
+                      <Button
+                        variant="warning"
+                        className="w-100 fw-semibold"
+                        onClick={handleViewExercises.bind(null, workout.id)}
+                      >
                         View Details
                       </Button>
                     </Col>
                     {selectedWorkoutId == workout.id && exercises && (
-                      <Container style={{ flexGrow: 1, overflowY: 'auto' }}>
+                      <Container style={{ flexGrow: 1, overflowY: "auto" }}>
                         <ListGroup>
-
                           {/* Exercise List */}
                           {exercises.map((entry, index) => (
                             <ListGroup.Item
                               key={index}
                               className="bg-dark text-light d-flex justify-content-between text-start"
                             >
-                              {entry.name}<small className="ms-auto me-2 text-end text-secondary">Muscle : {entry.primary}{entry.secondary && (", " + entry.secondary)}</small>
+                              {entry.name}
+                              <small className="ms-auto me-2 text-end text-secondary">
+                                Muscle : {entry.primary}
+                                {entry.secondary && ", " + entry.secondary}
+                              </small>
                             </ListGroup.Item>
                           ))}
 
@@ -173,13 +188,15 @@ const WorkoutTrack = () => {
                     )}
 
                     {/* No Exercises Found for selected workout */}
-                    {selectedWorkoutId == workout.id && exercises.length == 0 && !loading && (
-                      <div className="text-center my-2">
-                        <Alert variant="info">
-                          No exercises found for this workout.
-                        </Alert>
-                      </div>
-                    )}
+                    {selectedWorkoutId == workout.id &&
+                      exercises.length == 0 &&
+                      !loading && (
+                        <div className="text-center my-2">
+                          <Alert variant="info">
+                            No exercises found for this workout.
+                          </Alert>
+                        </div>
+                      )}
                   </Card.Body>
                 </Card>
               </motion.div>
