@@ -8,8 +8,9 @@ import {
   Alert,
   Form,
   InputGroup,
+  Button,
 } from "react-bootstrap"
-import { getExercises } from "../utils/exercise" // Adjust path if needed
+import { getExercises } from "../utils/exercise"
 import { motion } from "framer-motion"
 
 const muscles = [
@@ -34,8 +35,6 @@ const ExercisePage = () => {
   const [exercises, setExercises] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
-  // Filter states
   const [search, setSearch] = useState("")
   const [primary, setPrimary] = useState("")
   const [secondary, setSecondary] = useState("")
@@ -47,21 +46,25 @@ const ExercisePage = () => {
     getExercises(setExercises, setLoading, setError)
   }, [])
 
-  // Filtering logic
-  const filteredExercises = exercises.filter((ex) => {
-    const matchesSearch = ex.name.toLowerCase().includes(search.toLowerCase())
-    const matchesPrimary = !primary || ex.primary === primary
-    const matchesSecondary = !secondary || ex.secondary === secondary
-    const matchesEquipment = !equipment || ex.equipment === equipment
-    const matchesDifficulty = !difficulty || ex.difficulty === difficulty
-    return (
-      matchesSearch &&
-      matchesPrimary &&
-      matchesSecondary &&
-      matchesEquipment &&
-      matchesDifficulty
-    )
-  })
+  const filteredExercises = exercises.filter(
+    (ex) =>
+      ex.name.toLowerCase().includes(search.toLowerCase()) &&
+      (!primary || ex.primary === primary) &&
+      (!secondary || ex.secondary === secondary) &&
+      (!equipment || ex.equipment === equipment) &&
+      (!difficulty || ex.difficulty === difficulty)
+  )
+
+  const selectOptions = (arr, label) => [
+    <option key="" value="">
+      {label}
+    </option>,
+    ...arr.map((v) => (
+      <option key={v} value={v}>
+        {v.charAt(0).toUpperCase() + v.slice(1)}
+      </option>
+    )),
+  ]
 
   return (
     <Container fluid className="d-flex flex-column min-vh-100 my-5">
@@ -92,56 +95,47 @@ const ExercisePage = () => {
               value={primary}
               className="bg-dark text-light border border-warning"
               onChange={(e) => setPrimary(e.target.value)}
-            >
-              <option value="">Primary Muscle</option>
-              {muscles.map((m) => (
-                <option key={m} value={m}>
-                  {m.charAt(0).toUpperCase() + m.slice(1)}
-                </option>
-              ))}
-            </Form.Select>
+              children={selectOptions(muscles, "Primary Muscle")}
+            />
           </Col>
           <Col md={2}>
             <Form.Select
               value={secondary}
               className="bg-dark text-light border border-warning"
               onChange={(e) => setSecondary(e.target.value)}
-            >
-              <option value="">Secondary Muscle</option>
-              {muscles.map((m) => (
-                <option key={m} value={m}>
-                  {m.charAt(0).toUpperCase() + m.slice(1)}
-                </option>
-              ))}
-            </Form.Select>
+              children={selectOptions(muscles, "Secondary Muscle")}
+            />
           </Col>
           <Col md={2}>
             <Form.Select
               value={equipment}
               className="bg-dark text-light border border-warning"
               onChange={(e) => setEquipment(e.target.value)}
-            >
-              <option value="">Equipment</option>
-              {equipmentList.map((eq) => (
-                <option key={eq} value={eq}>
-                  {eq.charAt(0).toUpperCase() + eq.slice(1)}
-                </option>
-              ))}
-            </Form.Select>
+              children={selectOptions(equipmentList, "Equipment")}
+            />
           </Col>
           <Col md={2}>
             <Form.Select
               value={difficulty}
               className="bg-dark text-light border border-warning"
               onChange={(e) => setDifficulty(e.target.value)}
+              children={selectOptions(difficulties, "Difficulty")}
+            />
+          </Col>
+          <Col md={1} className="d-flex align-items-center">
+            <Button
+              variant="outline-warning"
+              className="w-100"
+              onClick={() => {
+                setSearch("")
+                setPrimary("")
+                setSecondary("")
+                setEquipment("")
+                setDifficulty("")
+              }}
             >
-              <option value="">Difficulty</option>
-              {difficulties.map((d) => (
-                <option key={d} value={d}>
-                  {d.charAt(0).toUpperCase() + d.slice(1)}
-                </option>
-              ))}
-            </Form.Select>
+              Clear
+            </Button>
           </Col>
         </Row>
       </Form>
@@ -170,8 +164,8 @@ const ExercisePage = () => {
                   </Alert>
                 </Col>
               ) : (
-                filteredExercises.map((exercise, index) => (
-                  <Col md={4} key={exercise.id || index} className="mb-4">
+                filteredExercises.map((exercise, idx) => (
+                  <Col md={4} key={exercise.id || idx} className="mb-4">
                     <motion.div
                       whileHover={{
                         y: -10,
