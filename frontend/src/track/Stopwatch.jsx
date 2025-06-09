@@ -26,28 +26,45 @@ const TIME_MODE_MANUAL = "manual";
 const TIME_SELECTION_START = "start";
 const TIME_SELECTION_END = "end";
 
-export function Stopwatch({ onTimeUpdate }) {
+export function Stopwatch({
+  onTimeUpdate,
+  initialStartTime = 0,
+  initialEndTime = 0,
+  initialIsRunning = false
+}) {
   const [selection, setSelection] = useState(TIME_SELECTION_START);
-  const [startTime, setStartTime] = useState(0);
-  const [endTime, setEndTime] = useState(0);
+  const [startTime, setStartTime] = useState(initialStartTime);
+  const [endTime, setEndTime] = useState(initialEndTime);
   const [startTimeMode, setStartTimeMode] = useState(TIME_MODE_AUTOMATIC);
   const [endTimeMode, setEndTimeMode] = useState(TIME_MODE_AUTOMATIC);
-  const [isRunning, setIsRunning] = useState(false);
+  const [isRunning, setIsRunning] = useState(initialIsRunning);
   const [showModal, setShowModal] = useState(false);
   const intervalRef = useRef(null);
 
   function handleStart() {
-    if (isRunning) {
-      ;
-    } else {
-      if (!isRunning) {
-        const timestamp = Date.now();
+    if (!isRunning) {
+      // Only set new times if startTime is 0
+      const timestamp = Date.now();
+      if (startTime === 0) {
         setStartTime(timestamp);
         setEndTime(timestamp);
       }
     }
     setIsRunning(!isRunning);
   }
+
+  const lastUpdateRef = useRef({ startTime: null, endTime: null });
+
+  useEffect(() => {
+    const last = lastUpdateRef.current;
+    if (
+      onTimeUpdate &&
+      (last.startTime !== startTime || last.endTime !== endTime)
+    ) {
+      onTimeUpdate({ startTime, endTime, duration: endTime - startTime });
+      lastUpdateRef.current = { startTime, endTime };
+    }
+  }, [startTime, endTime, onTimeUpdate]);
 
   useEffect(() => {
     if (onTimeUpdate) {

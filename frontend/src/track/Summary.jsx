@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Container, Card, Button, Row, Col } from "react-bootstrap";
-import { formatDateTime, formatDuration } from "../utils/stopwatch"; // Make sure these utilities are available
+import { Container, Card, Button, Row, Col, Badge } from "react-bootstrap";
+import { formatDateTime, formatDuration } from "../utils/stopwatch";
 
 const WorkoutSummary = () => {
   const { state } = useLocation();
@@ -11,18 +11,37 @@ const WorkoutSummary = () => {
     return <p className="text-center text-light py-5">No summary data available.</p>;
   }
 
-  const { workout, exercises, workoutId, times } = state;
-
+  const { workout, exercises, workoutId, times, isCustomWorkout } = state;
   const { startTime, endTime, duration } = times || {};
+
+  const handleSubmitWorkout = () => {
+    console.log("Submitting workout data...");
+    console.log("Workout ID:", workoutId);
+    console.log("Workout Data:", workout);
+    console.log("Exercises:", exercises);
+    console.log("Times:", times);
+    console.log("Is Custom Workout:", isCustomWorkout);
+    // Submit logic here
+  };
+
+  const handleGoBack = () => {
+    navigate(`/track/${workoutId}`, {
+      state: {
+        workout,
+        exercises,
+        workoutId,
+        times,
+        isCustomWorkout
+      },
+    });
+  }
 
   return (
     <Container className="py-5 bg-dark text-light">
       <Button
         variant="outline-warning"
         className="mb-3"
-        onClick={() =>
-          navigate(`/track/${workoutId}`, { state: { workout, exercises } })
-        }
+        onClick={handleGoBack}
       >
         ← Back to Workout
       </Button>
@@ -71,8 +90,8 @@ const WorkoutSummary = () => {
 
       {/* Final Action */}
       <div className="text-center mt-4">
-        <Button variant="success" onClick={() => navigate("/track")}>
-          Done
+        <Button variant="success" size="lg" onClick={handleSubmitWorkout}>
+          Save Workout
         </Button>
       </div>
     </Container>

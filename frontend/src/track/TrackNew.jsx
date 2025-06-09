@@ -22,7 +22,9 @@ import { getExercises } from "../utils/exercise";
 import { Stopwatch } from "./Stopwatch";
 
 const WorkoutTrackNew = () => {
-  const { state } = useLocation();
+  const location = useLocation();
+  const navigationState = location.state;
+
   const newExercise = {
     id: Date.now(),
     name: "New Exercise",
@@ -36,12 +38,12 @@ const WorkoutTrackNew = () => {
 
   const navigate = useNavigate();
   const { id: workoutId } = useParams();
-  const [times, setTimes] = useState({ startTime: 0, endTime: 0, duration: 0 });
-  const [exercises, setExercises] = useState([]);
-  const [workout, setWorkout] = useState(null);
+  const [exercises, setExercises] = useState(navigationState?.exercises || []);
+  const [workout, setWorkout] = useState(navigationState?.workout || null);
+  const [times, setTimes] = useState(navigationState?.times || { startTime: 0, endTime: 0, duration: 0 });
+  const [isCustomWorkout, setIsCustomWorkout] = useState(navigationState?.isCustomWorkout ? true : false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isCustomWorkout, setIsCustomWorkout] = useState(false);
 
   const [allExercises, setAllExercises] = useState([]);
 
@@ -53,6 +55,7 @@ const WorkoutTrackNew = () => {
       primary: exercise.primary || "unknown",
       secondary: exercise.secondary || null,
       equipment: exercise.equipment || null,
+      setsData: [],
     };
     setExercises([...exercises, newExercise]);
   };
@@ -82,6 +85,7 @@ const WorkoutTrackNew = () => {
         exercises,
         workoutId,
         times,
+        isCustomWorkout
       },
     });
   }
@@ -91,7 +95,13 @@ const WorkoutTrackNew = () => {
     // Refetch exercises only if it's not a custom workout
     if (!isCustomWorkout)
       getExerciseFromWorkoutId(workoutId, (fetchedExercises) => {
-        setExercises(fetchedExercises.map(ex => ({ ...ex, notes: ex.notes ?? '' })));
+        setExercises(
+          fetchedExercises.map(ex => ({
+            ...ex,
+            notes: ex.notes ?? '',
+            setsData: (ex.setsData?.length > 0 ? ex.setsData : [{ reps: 0, weight: 0, done: false }]),
+          }))
+        );
       }, setError, setLoading);
 
     getExercises(setAllExercises, setError, setLoading);
@@ -128,7 +138,7 @@ const WorkoutTrackNew = () => {
               <Button variant="outline-warning" onClick={handleGoBack}>
                 ← Back
               </Button>
-              <h1 className="text-warning text-center flex-grow-1 mb-0">{workout.name}<span class="ms-2 fs-6 badge rounded-pill text-bg-info">{isCustomWorkout ? 'Customized' : ''}</span></h1>
+              <h1 className="text-warning text-center flex-grow-1 mb-0">{workout.name}<span className="ms-2 fs-6 badge rounded-pill text-bg-info">{isCustomWorkout ? 'Customized' : ''}</span></h1>
               {/* Spacer to balance layout */}
               <div style={{ width: '75.5px' }} /> {/* Same width as the button */}
             </div>
@@ -137,11 +147,16 @@ const WorkoutTrackNew = () => {
                 type="switch"
                 label="Customize Workout?"
                 className="d-flex gap-2 align-items-center justify-content-center text-warning mt-2"
-                //checked={checked}
+                checked={isCustomWorkout}
                 onChange={() => setIsCustomWorkout(!isCustomWorkout)}
               />
             </Form>
-            <Stopwatch onTimeUpdate={setTimes} />
+            <Stopwatch
+              initialStartTime={times.startTime}
+              initialEndTime={times.endTime}
+              initialIsRunning={false}
+              onTimeUpdate={setTimes}
+            />
             <p className="text-center text-muted">{workout.description}</p>
           </Card.Body>
         </Card>

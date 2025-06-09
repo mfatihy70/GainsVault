@@ -39,6 +39,14 @@ export const createWorkoutEntry = async (req, res) => {
   }
 }
 
+export const createUserWorkoutEntry = async (req, res) => {
+  try {
+    
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
 // Update WorkoutEntry details
 export const updateWorkoutEntry = async (req, res) => {
   try {
