@@ -1,25 +1,23 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
 import {
   Dropdown,
   FormControl,
   Button,
   DropdownButton,
   InputGroup,
-} from "react-bootstrap";
+} from "react-bootstrap"
 
 const SearchableDropdown = ({ exercises = [], onSelect }) => {
-  const [search, setSearch] = useState("");
-  const [show, setShow] = useState(false);
+  const [search, setSearch] = useState("")
+  const [show, setShow] = useState(false)
 
   const filteredExercises = exercises.filter((exercise) =>
     exercise.name.toLowerCase().includes(search.toLowerCase())
-  );
+  )
 
   return (
     <Dropdown show={show} onToggle={() => setShow(!show)}>
-      <Dropdown.Toggle variant="warning">
-        + Add Exercise
-      </Dropdown.Toggle>
+      <Dropdown.Toggle variant="warning">+ Add Exercise</Dropdown.Toggle>
 
       <Dropdown.Menu
         className="bg-dark text-light border-warning"
@@ -42,9 +40,9 @@ const SearchableDropdown = ({ exercises = [], onSelect }) => {
               style={{ cursor: "pointer" }}
               key={exercise.id}
               onClick={() => {
-                onSelect(exercise); // return the full exercise object
-                setShow(false);
-                setSearch(""); // optional: clear input after select
+                onSelect(exercise) // return the full exercise object
+                setShow(false)
+                setSearch("") // optional: clear input after select
               }}
             >
               {exercise.name}
@@ -57,7 +55,7 @@ const SearchableDropdown = ({ exercises = [], onSelect }) => {
         )}
       </Dropdown.Menu>
     </Dropdown>
-  );
-};
+  )
+}
 
-export default SearchableDropdown;
+export default SearchableDropdown

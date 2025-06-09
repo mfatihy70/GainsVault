@@ -1,7 +1,7 @@
-import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { Container, Card, Button, Row, Col, Badge } from "react-bootstrap";
-import { formatDateTime, formatDuration } from "../utils/stopwatch";
+import React from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+import { Container, Card, Button, Row, Col, Badge } from "react-bootstrap"
+import { formatDateTime, formatDuration } from "../utils/stopwatch"
 
 const WorkoutSummary = () => {
   const { state } = useLocation()
@@ -13,18 +13,18 @@ const WorkoutSummary = () => {
     )
   }
 
-  const { workout, exercises, workoutId, times, isCustomWorkout } = state;
-  const { startTime, endTime, duration } = times || {};
+  const { workout, exercises, workoutId, times, isCustomWorkout } = state
+  const { startTime, endTime, duration } = times || {}
 
   const handleSubmitWorkout = () => {
-    console.log("Submitting workout data...");
-    console.log("Workout ID:", workoutId);
-    console.log("Workout Data:", workout);
-    console.log("Exercises:", exercises);
-    console.log("Times:", times);
-    console.log("Is Custom Workout:", isCustomWorkout);
+    console.log("Submitting workout data...")
+    console.log("Workout ID:", workoutId)
+    console.log("Workout Data:", workout)
+    console.log("Exercises:", exercises)
+    console.log("Times:", times)
+    console.log("Is Custom Workout:", isCustomWorkout)
     // Submit logic here
-  };
+  }
 
   const handleGoBack = () => {
     navigate(`/track/${workoutId}`, {
@@ -33,18 +33,14 @@ const WorkoutSummary = () => {
         exercises,
         workoutId,
         times,
-        isCustomWorkout
+        isCustomWorkout,
       },
-    });
+    })
   }
 
   return (
     <Container className="py-5 bg-dark text-light">
-      <Button
-        variant="outline-warning"
-        className="mb-3"
-        onClick={handleGoBack}
-      >
+      <Button variant="outline-warning" className="mb-3" onClick={handleGoBack}>
         ← Back to Workout
       </Button>
 
@@ -77,8 +73,14 @@ const WorkoutSummary = () => {
           <Card.Body>
             <Card.Title className="text-warning mb-2">
               {ex.name}
-              <Badge bg="info" className="ms-2">{ex.primary}</Badge>
-              {ex.secondary && <Badge bg="secondary" className="ms-2">{ex.secondary}</Badge>}
+              <Badge bg="info" className="ms-2">
+                {ex.primary}
+              </Badge>
+              {ex.secondary && (
+                <Badge bg="secondary" className="ms-2">
+                  {ex.secondary}
+                </Badge>
+              )}
             </Card.Title>
 
             {ex.equipment && (
@@ -97,7 +99,9 @@ const WorkoutSummary = () => {
                         text={set.done ? "dark" : "light"}
                         className="p-2"
                       >
-                        <div><strong>Set {setIdx + 1}</strong></div>
+                        <div>
+                          <strong>Set {setIdx + 1}</strong>
+                        </div>
                         <div>Weight: {set.weight} kg</div>
                         <div>Reps: {set.reps}</div>
                       </Card>

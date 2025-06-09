@@ -16,14 +16,14 @@ import React, { useState, useEffect } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { getWorkoutById } from "../utils/workout"
 import { getExerciseFromWorkoutId } from "../utils/track"
-import "../styles/track.css"
+import "./Track.css"
 import SearchableDropdown from "./SearchableDropdown"
 import { getExercises } from "../utils/exercise"
 import { Stopwatch } from "./Stopwatch"
 
 const WorkoutTrackNew = () => {
-  const location = useLocation();
-  const navigationState = location.state;
+  const location = useLocation()
+  const navigationState = location.state
 
   const newExercise = {
     id: Date.now(),
@@ -36,14 +36,18 @@ const WorkoutTrackNew = () => {
     weight: "",
   }
 
-  const navigate = useNavigate();
-  const { id: workoutId } = useParams();
-  const [exercises, setExercises] = useState(navigationState?.exercises || []);
-  const [workout, setWorkout] = useState(navigationState?.workout || null);
-  const [times, setTimes] = useState(navigationState?.times || { startTime: 0, endTime: 0, duration: 0 });
-  const [isCustomWorkout, setIsCustomWorkout] = useState(navigationState?.isCustomWorkout ? true : false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const navigate = useNavigate()
+  const { id: workoutId } = useParams()
+  const [exercises, setExercises] = useState(navigationState?.exercises || [])
+  const [workout, setWorkout] = useState(navigationState?.workout || null)
+  const [times, setTimes] = useState(
+    navigationState?.times || { startTime: 0, endTime: 0, duration: 0 }
+  )
+  const [isCustomWorkout, setIsCustomWorkout] = useState(
+    navigationState?.isCustomWorkout ? true : false
+  )
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   const [allExercises, setAllExercises] = useState([])
 
@@ -56,9 +60,9 @@ const WorkoutTrackNew = () => {
       secondary: exercise.secondary || null,
       equipment: exercise.equipment || null,
       setsData: [],
-    };
-    setExercises([...exercises, newExercise]);
-  };
+    }
+    setExercises([...exercises, newExercise])
+  }
   const handleRemoveExercise = (index) => {
     const updatedExercises = exercises.filter((_, i) => i !== index)
     setExercises(updatedExercises)
@@ -85,7 +89,7 @@ const WorkoutTrackNew = () => {
         exercises,
         workoutId,
         times,
-        isCustomWorkout
+        isCustomWorkout,
       },
     })
   }
@@ -94,15 +98,23 @@ const WorkoutTrackNew = () => {
     getWorkoutById(workoutId, setWorkout, setError, setLoading)
     // Refetch exercises only if it's not a custom workout
     if (!isCustomWorkout)
-      getExerciseFromWorkoutId(workoutId, (fetchedExercises) => {
-        setExercises(
-          fetchedExercises.map(ex => ({
-            ...ex,
-            notes: ex.notes ?? '',
-            setsData: (ex.setsData?.length > 0 ? ex.setsData : [{ reps: 0, weight: 0, done: false }]),
-          }))
-        );
-      }, setError, setLoading);
+      getExerciseFromWorkoutId(
+        workoutId,
+        (fetchedExercises) => {
+          setExercises(
+            fetchedExercises.map((ex) => ({
+              ...ex,
+              notes: ex.notes ?? "",
+              setsData:
+                ex.setsData?.length > 0
+                  ? ex.setsData
+                  : [{ reps: 0, weight: 0, done: false }],
+            }))
+          )
+        },
+        setError,
+        setLoading
+      )
 
     getExercises(setAllExercises, setError, setLoading)
   }, [workoutId, isCustomWorkout])
@@ -138,7 +150,12 @@ const WorkoutTrackNew = () => {
               <Button variant="outline-warning" onClick={handleGoBack}>
                 ← Back
               </Button>
-              <h1 className="text-warning text-center flex-grow-1 mb-0">{workout.name}<span className="ms-2 fs-6 badge rounded-pill text-bg-info">{isCustomWorkout ? 'Customized' : ''}</span></h1>
+              <h1 className="text-warning text-center flex-grow-1 mb-0">
+                {workout.name}
+                <span className="ms-2 fs-6 badge rounded-pill text-bg-info">
+                  {isCustomWorkout ? "Customized" : ""}
+                </span>
+              </h1>
               {/* Spacer to balance layout */}
               <div style={{ width: "75.5px" }} />{" "}
               {/* Same width as the button */}
@@ -197,11 +214,13 @@ const WorkoutTrackNew = () => {
 
                 {/* Exercise-Set Data */}
                 {exercise.setsData?.map((set, setIdx) => {
-                  const isDone = set.done;
+                  const isDone = set.done
                   return (
                     <div
                       key={setIdx}
-                      className={`d-flex flex-column flex-md-row align-items-md-center justify-content-between rounded p-3 mb-2 ${isDone ? 'bg-success text-dark' : 'bg-dark text-light'}`}
+                      className={`d-flex flex-column flex-md-row align-items-md-center justify-content-between rounded p-3 mb-2 ${
+                        isDone ? "bg-success text-dark" : "bg-dark text-light"
+                      }`}
                     >
                       <div className="d-flex align-items-center gap-3 mb-3 mb-md-0">
                         <Form.Check
@@ -209,9 +228,9 @@ const WorkoutTrackNew = () => {
                           className="me-2 text-dark"
                           checked={isDone}
                           onChange={() => {
-                            const updatedSets = [...(exercise.setsData || [])];
-                            updatedSets[setIdx].done = !updatedSets[setIdx].done;
-                            handleExerciseChange(index, 'setsData', updatedSets);
+                            const updatedSets = [...(exercise.setsData || [])]
+                            updatedSets[setIdx].done = !updatedSets[setIdx].done
+                            handleExerciseChange(index, "setsData", updatedSets)
                           }}
                         />
                         <strong>{setIdx + 1}</strong>
@@ -222,9 +241,11 @@ const WorkoutTrackNew = () => {
                           className="w-auto text-center"
                           value={set.weight}
                           onChange={(e) => {
-                            const updatedSets = [...(exercise.setsData || [])];
-                            updatedSets[setIdx].weight = parseFloat(e.target.value);
-                            handleExerciseChange(index, 'setsData', updatedSets);
+                            const updatedSets = [...(exercise.setsData || [])]
+                            updatedSets[setIdx].weight = parseFloat(
+                              e.target.value
+                            )
+                            handleExerciseChange(index, "setsData", updatedSets)
                           }}
                         />
                         <span>kg</span>
@@ -235,43 +256,46 @@ const WorkoutTrackNew = () => {
                           className="w-auto text-center"
                           value={set.reps}
                           onChange={(e) => {
-                            const updatedSets = [...(exercise.setsData || [])];
-                            updatedSets[setIdx].reps = parseInt(e.target.value, 10);
-                            handleExerciseChange(index, 'setsData', updatedSets);
+                            const updatedSets = [...(exercise.setsData || [])]
+                            updatedSets[setIdx].reps = parseInt(
+                              e.target.value,
+                              10
+                            )
+                            handleExerciseChange(index, "setsData", updatedSets)
                           }}
                         />
                         <span>Reps.</span>
                       </div>
 
                       <Button
-                        variant={`${isDone ? 'danger' : 'outline-danger'}`}
+                        variant={`${isDone ? "danger" : "outline-danger"}`}
                         size="sm"
                         onClick={() => {
-                          const updatedSets = [...(exercise.setsData || [])];
-                          updatedSets.splice(setIdx, 1);
-                          handleExerciseChange(index, 'setsData', updatedSets);
+                          const updatedSets = [...(exercise.setsData || [])]
+                          updatedSets.splice(setIdx, 1)
+                          handleExerciseChange(index, "setsData", updatedSets)
                         }}
                       >
                         ✖
                       </Button>
                     </div>
-                  );
+                  )
                 })}
 
-                { /* Add Set Button */}
+                {/* Add Set Button */}
                 <Button
                   variant="outline-warning"
                   className="mt-2 w-100"
                   onClick={() => {
-                    const updatedSets = [...(exercise.setsData || [])];
-                    updatedSets.push({ weight: 0, reps: 0, done: false });
-                    handleExerciseChange(index, 'setsData', updatedSets);
+                    const updatedSets = [...(exercise.setsData || [])]
+                    updatedSets.push({ weight: 0, reps: 0, done: false })
+                    handleExerciseChange(index, "setsData", updatedSets)
                   }}
                 >
                   + Add Set
                 </Button>
 
-                { /* Notes Section */}
+                {/* Notes Section */}
                 <Row className="mt-3">
                   <Col>
                     <Form.Group controlId={`notes-${exercise.id}`}>

@@ -84,6 +84,7 @@ const WorkoutTrack = () => {
         {/* No Split Selected */}
         {!selectedSplit ? (
           <Container className="text-center py-5 text-light">
+            <Spinner animation="border" variant="warning" />
             <h3 className="mt-3">Please select a split to view workouts</h3>
           </Container>
         ) : (

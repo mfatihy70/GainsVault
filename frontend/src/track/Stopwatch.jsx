@@ -2,8 +2,13 @@ import {
   Container,
   Card,
   Button,
+  Spinner,
   Row,
   Col,
+  Image,
+  Form,
+  Stack,
+  ListGroup,
   Modal,
   Alert,
   FormGroup,
@@ -19,52 +24,55 @@ import {
 
 // Time mode constants for automatic and manual selection
 const TIME_MODE_AUTOMATIC = "automatic"
+const TIME_MODE_MANUAL = "manual"
+
 // Selection constants for start and end time
 const TIME_SELECTION_START = "start"
+const TIME_SELECTION_END = "end"
 
 export function Stopwatch({
   onTimeUpdate,
   initialStartTime = 0,
   initialEndTime = 0,
-  initialIsRunning = false
+  initialIsRunning = false,
 }) {
-  const [selection, setSelection] = useState(TIME_SELECTION_START);
-  const [startTime, setStartTime] = useState(initialStartTime);
-  const [endTime, setEndTime] = useState(initialEndTime);
-  const [startTimeMode, setStartTimeMode] = useState(TIME_MODE_AUTOMATIC);
-  const [endTimeMode, setEndTimeMode] = useState(TIME_MODE_AUTOMATIC);
-  const [isRunning, setIsRunning] = useState(initialIsRunning);
-  const [showModal, setShowModal] = useState(false);
-  const intervalRef = useRef(null);
+  const [selection, setSelection] = useState(TIME_SELECTION_START)
+  const [startTime, setStartTime] = useState(initialStartTime)
+  const [endTime, setEndTime] = useState(initialEndTime)
+  const [startTimeMode, setStartTimeMode] = useState(TIME_MODE_AUTOMATIC)
+  const [endTimeMode, setEndTimeMode] = useState(TIME_MODE_AUTOMATIC)
+  const [isRunning, setIsRunning] = useState(initialIsRunning)
+  const [showModal, setShowModal] = useState(false)
+  const intervalRef = useRef(null)
 
   function handleStart() {
     if (!isRunning) {
       // Only set new times if startTime is 0
-      const timestamp = Date.now();
+      const timestamp = Date.now()
       if (startTime === 0) {
-        setStartTime(timestamp);
-        setEndTime(timestamp);
+        setStartTime(timestamp)
+        setEndTime(timestamp)
       }
     }
     setIsRunning(!isRunning)
   }
 
-  const lastUpdateRef = useRef({ startTime: null, endTime: null });
+  const lastUpdateRef = useRef({ startTime: null, endTime: null })
 
   useEffect(() => {
-    const last = lastUpdateRef.current;
+    const last = lastUpdateRef.current
     if (
       onTimeUpdate &&
       (last.startTime !== startTime || last.endTime !== endTime)
     ) {
-      onTimeUpdate({ startTime, endTime, duration: endTime - startTime });
-      lastUpdateRef.current = { startTime, endTime };
+      onTimeUpdate({ startTime, endTime, duration: endTime - startTime })
+      lastUpdateRef.current = { startTime, endTime }
     }
-  }, [startTime, endTime, onTimeUpdate]);
+  }, [startTime, endTime, onTimeUpdate])
 
   useEffect(() => {
     if (onTimeUpdate) {
-      onTimeUpdate({ startTime, endTime, duration: endTime - startTime });
+      onTimeUpdate({ startTime, endTime, duration: endTime - startTime })
     }
     if (isRunning) {
       intervalRef.current = setInterval(() => {
