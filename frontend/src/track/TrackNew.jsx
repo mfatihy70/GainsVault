@@ -190,31 +190,83 @@ const WorkoutTrackNew = () => {
                   )}
                 </Row>
 
-                <Row className="gy-3">
-                  <Col md={4}>
-                    <Form.Group controlId={`sets-${exercise.id}`}>
-                      <Form.Label>Sets</Form.Label>
-                      <Form.Control
-                        type="number"
-                        placeholder="e.g. 3"
-                        value={exercise.sets ?? ''}
-                        onChange={(e) => handleExerciseChange(index, 'sets', e.target.value)}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col md={4}>
-                    <Form.Group controlId={`reps-${exercise.id}`}>
-                      <Form.Label>Reps</Form.Label>
-                      <Form.Control type="number" placeholder="e.g. 12" value={exercise.reps ?? ''} onChange={(e) => handleExerciseChange(index, 'reps', e.target.value)} />
-                    </Form.Group>
-                  </Col>
-                  <Col md={4}>
-                    <Form.Group controlId={`weight-${exercise.id}`}>
-                      <Form.Label>Weight (kg)</Form.Label>
-                      <Form.Control type="number" placeholder="e.g. 40" value={exercise.weight ?? ''} onChange={(e) => handleExerciseChange(index, 'weight', e.target.value)} />
-                    </Form.Group>
-                  </Col>
-                </Row>
+                {/* Exercise-Set Data */}
+                {exercise.setsData?.map((set, setIdx) => {
+                  const isDone = set.done;
+                  return (
+                    <div
+                      key={setIdx}
+                      className={`d-flex flex-column flex-md-row align-items-md-center justify-content-between rounded p-3 mb-2 ${isDone ? 'bg-success text-dark' : 'bg-dark text-light'}`}
+                    >
+                      <div className="d-flex align-items-center gap-3 mb-3 mb-md-0">
+                        <Form.Check
+                          type="checkbox"
+                          className="me-2 text-dark"
+                          checked={isDone}
+                          onChange={() => {
+                            const updatedSets = [...(exercise.setsData || [])];
+                            updatedSets[setIdx].done = !updatedSets[setIdx].done;
+                            handleExerciseChange(index, 'setsData', updatedSets);
+                          }}
+                        />
+                        <strong>{setIdx + 1}</strong>
+
+                        <Form.Control
+                          type="number"
+                          placeholder="Weight"
+                          className="w-auto text-center"
+                          value={set.weight}
+                          onChange={(e) => {
+                            const updatedSets = [...(exercise.setsData || [])];
+                            updatedSets[setIdx].weight = parseFloat(e.target.value);
+                            handleExerciseChange(index, 'setsData', updatedSets);
+                          }}
+                        />
+                        <span>kg</span>
+
+                        <Form.Control
+                          type="number"
+                          placeholder="Reps"
+                          className="w-auto text-center"
+                          value={set.reps}
+                          onChange={(e) => {
+                            const updatedSets = [...(exercise.setsData || [])];
+                            updatedSets[setIdx].reps = parseInt(e.target.value, 10);
+                            handleExerciseChange(index, 'setsData', updatedSets);
+                          }}
+                        />
+                        <span>Reps.</span>
+                      </div>
+
+                      <Button
+                        variant={`${isDone ? 'danger' : 'outline-danger'}`}
+                        size="sm"
+                        onClick={() => {
+                          const updatedSets = [...(exercise.setsData || [])];
+                          updatedSets.splice(setIdx, 1);
+                          handleExerciseChange(index, 'setsData', updatedSets);
+                        }}
+                      >
+                        ✖
+                      </Button>
+                    </div>
+                  );
+                })}
+
+                { /* Add Set Button */}
+                <Button
+                  variant="outline-warning"
+                  className="mt-2 w-100"
+                  onClick={() => {
+                    const updatedSets = [...(exercise.setsData || [])];
+                    updatedSets.push({ weight: 0, reps: 0, done: false });
+                    handleExerciseChange(index, 'setsData', updatedSets);
+                  }}
+                >
+                  + Add Set
+                </Button>
+
+                { /* Notes Section */}
                 <Row className="mt-3">
                   <Col>
                     <Form.Group controlId={`notes-${exercise.id}`}>

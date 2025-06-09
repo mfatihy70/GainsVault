@@ -73,17 +73,47 @@ const WorkoutSummary = () => {
       {exercises.map((ex, i) => (
         <Card key={i} className="mb-4 bg-dark text-light border border-warning">
           <Card.Body>
-            <Card.Title className="text-warning">{ex.name}</Card.Title>
-            <p>
-              Muscle: <strong>{ex.primary}</strong>
-              {ex.secondary && ` → ${ex.secondary}`}
-              {ex.equipment && ` | Equipment: ${ex.equipment}`}
-            </p>
-            <Row>
-              <Col><strong>Sets:</strong> {ex.sets || "-"}</Col>
-              <Col><strong>Reps:</strong> {ex.reps || "-"}</Col>
-              <Col><strong>Weight:</strong> {ex.weight ? `${ex.weight} kg` : "-"}</Col>
-            </Row>
+            <Card.Title className="text-warning mb-2">
+              {ex.name}
+              <Badge bg="info" className="ms-2">{ex.primary}</Badge>
+              {ex.secondary && <Badge bg="secondary" className="ms-2">{ex.secondary}</Badge>}
+            </Card.Title>
+
+            {ex.equipment && (
+              <p className="text-muted mb-3">Equipment: {ex.equipment}</p>
+            )}
+
+            {/* Sets */}
+            <div className="mb-3">
+              <strong className="d-block mb-2">Sets Performed:</strong>
+              {ex.setsData?.length > 0 ? (
+                <Row className="g-2">
+                  {ex.setsData.map((set, setIdx) => (
+                    <Col key={setIdx} md={4}>
+                      <Card
+                        bg={set.done ? "success" : "secondary"}
+                        text={set.done ? "dark" : "light"}
+                        className="p-2"
+                      >
+                        <div><strong>Set {setIdx + 1}</strong></div>
+                        <div>Weight: {set.weight} kg</div>
+                        <div>Reps: {set.reps}</div>
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
+              ) : (
+                <p className="text-muted">No sets recorded.</p>
+              )}
+            </div>
+
+            {/* Notes */}
+            {ex.notes && (
+              <div className="mt-2">
+                <strong>Notes:</strong>
+                <p className="fst-italic text-info mb-0">{ex.notes}</p>
+              </div>
+            )}
           </Card.Body>
         </Card>
       ))}
