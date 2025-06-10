@@ -5,12 +5,14 @@ import {
   createWorkoutExercise,
   updateWorkoutExercise,
   deleteWorkoutExercise,
+  createTrackedWorkout
 } from "../../controllers/core/workout_exercise.controller.js"
 
 const router = express.Router()
 
 // Fetch all exercises for a specific workout
 router.get("/workout/:workoutId", getWorkoutExercises)
+router.post("/workout", createTrackedWorkout)
 
 router.get("/", getWorkoutExercises)
 router.get("/:id", getWorkoutExerciseById)

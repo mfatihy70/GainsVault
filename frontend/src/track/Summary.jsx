@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { Container, Card, Button, Row, Col, Badge, Image } from "react-bootstrap"
 import { formatDateTime, formatDuration } from "../utils/stopwatch"
 import workoutImage from '../assets/workout.png'
+import { createTrackedWorkout } from "../utils/workout"
 
 const WorkoutSummary = () => {
   const { state } = useLocation()
@@ -13,6 +14,7 @@ const WorkoutSummary = () => {
     )
   }
 
+  const userId = localStorage.getItem("userId")
   const { workout, exercises, workoutId, times, isCustomWorkout } = state
   const { startTime, endTime, duration } = times || {}
   const finishedExercises = exercises
@@ -35,6 +37,54 @@ const WorkoutSummary = () => {
     console.log("Times:", times)
     console.log("Is Custom Workout:", isCustomWorkout)
     // Submit logic here
+
+    //const trackedWorkoutData = {
+    //  userId: userId,
+    //  workoutId: workoutId,
+    //  name: workout?.name || "Custom Workout",
+    //  performedAt: new Date(),
+    //  start: new Date(startTime),
+    //  end: new Date(endTime),
+    //  //duration: duration, // in seconds
+    //  exercises: [
+    //    {
+    //      exerciseId: 12,
+    //      performedAt: new Date(),
+    //      sets: [
+    //        { kg: 60, reps: 8, performedAt: new Date() },
+    //        { kg: 60, reps: 6, performedAt: new Date() }
+    //      ]
+    //    },
+    //    {
+    //      exerciseId: 14,
+    //      performedAt: new Date(),
+    //      sets: [
+    //        { kg: 25, reps: 12, performedAt: new Date() }
+    //      ]
+    //    }
+    //  ]
+    //};
+
+    const trackedWorkoutData = {
+      userId: userId,
+      workoutId: workoutId,
+      name: workout?.name || "Custom Workout",
+      performedAt: new Date(),
+      start: new Date(startTime),
+      end: new Date(endTime),
+      exercises: finishedExercises.map((exercise) => ({
+        exerciseId: exercise.id,
+        performedAt: new Date(),
+        sets: exercise.setsData.map((set, index) => ({
+          kg: set.weight,
+          reps: set.reps,
+          performedAt: new Date(),
+          set_order: index + 1,
+        })),
+      })),
+    };
+    console.log("Tracked Workout Data:", trackedWorkoutData);
+    createTrackedWorkout(trackedWorkoutData, () => { }, () => { });
   }
 
   const handleGoBack = () => {
