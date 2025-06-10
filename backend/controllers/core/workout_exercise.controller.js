@@ -10,6 +10,14 @@ export const getWorkoutExercises = async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 }
+export const createTrackedWorkout = async (req, res) => {
+  try {
+    console.log("Creating Tracked Workout exercises:", req.body)
+    res.json(req.body)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
 
 // Fetch a workout exercise by ID
 export const getWorkoutExerciseById = async (req, res) => {
