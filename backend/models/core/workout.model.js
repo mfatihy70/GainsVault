@@ -21,6 +21,10 @@ const Workout = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    default: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false, // Default value is false
+    },
   },
   {
     timestamps: false,

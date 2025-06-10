@@ -1,145 +1,265 @@
-import React, { useState } from "react"
-import { Container, Row, Col, Card, Button, Form } from "react-bootstrap"
+import { useEffect, useState } from "react"
+import {
+  Container,
+  Row,
+  Col,
+  Spinner,
+  Alert,
+  Form,
+  InputGroup,
+  Button,
+  Modal,
+  ListGroup,
+} from "react-bootstrap"
 import { motion } from "framer-motion"
+import {
+  getWorkouts,
+  getWorkoutById,
+  getWorkoutExercises,
+} from "../utils/workout"
+import "../styles/workouts.css"
 
-const Workouts = () => {
-  const [selectedMuscle, setSelectedMuscle] = useState("all")
+const difficulties = ["beginner", "intermediate", "advanced"]
 
-  const workouts = [
-    {
-      id: 1,
-      name: "Push Day",
-      targetMuscle: "Chest",
-      exercises: ["Bench Press", "Incline Dumbbell Press", "Tricep Pushdowns"],
-      difficulty: "Intermediate",
-      duration: "60 min",
-      image:
-        "https://images.unsplash.com/photo-1549476464-37392f717541?q=80&w=1887&auto=format&fit=crop",
-    },
-    {
-      id: 2,
-      name: "Pull Day",
-      targetMuscle: "Back",
-      exercises: ["Pull-ups", "Barbell Rows", "Bicep Curls"],
-      difficulty: "Intermediate",
-      duration: "60 min",
-      image:
-        "https://images.unsplash.com/photo-1581009137042-c552e485697a?ixlib=rb-1.2.1&auto=format&fit=crop",
-    },
-    {
-      id: 3,
-      name: "Leg Day",
-      targetMuscle: "Legs",
-      exercises: ["Squats", "Romanian Deadlifts", "Leg Press"],
-      difficulty: "Advanced",
-      duration: "75 min",
-      image:
-        "https://images.unsplash.com/photo-1596357395217-80de13130e92?q=80&w=2071&auto=format&fit=crop",
-    },
-  ]
+const WorkoutsPage = ({ exercises }) => {
+  const [workouts, setWorkouts] = useState([])
+  const [workoutExercises, setWorkoutExercises] = useState([])
+  const [selectedWorkout, setSelectedWorkout] = useState(null)
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [search, setSearch] = useState("")
+  const [difficulty, setDifficulty] = useState("")
 
-  const muscleGroups = [
-    { value: "all", label: "All Muscles" },
-    { value: "Chest", label: "Chest" },
-    { value: "Back", label: "Back" },
-    { value: "Legs", label: "Legs" },
-    { value: "Shoulders", label: "Shoulders" },
-    { value: "Arms", label: "Arms" },
-    { value: "Core", label: "Core" },
-  ]
+  useEffect(() => {
+    setLoading(true)
+    getWorkouts(setWorkouts, setError, setLoading)
+    getWorkoutExercises(setWorkoutExercises, setError, setLoading)
+  }, [])
 
-  const filteredWorkouts =
-    selectedMuscle === "all"
-      ? workouts
-      : workouts.filter((w) => w.targetMuscle === selectedMuscle)
+  const openWorkoutModal = async (workout) => {
+    setLoading(true)
+    await getWorkoutById(workout.id, setSelectedWorkout, setError, setLoading)
+    setModalVisible(true)
+  }
+
+  const closeWorkoutModal = () => {
+    setSelectedWorkout(null)
+    setModalVisible(false)
+  }
+
+  const getExercisesForWorkout = (workoutId) => {
+    return workoutExercises
+      .filter((we) => we.workout_id === workoutId)
+      .sort((a, b) => a.order - b.order)
+      .map((we) =>
+        Array.isArray(exercises)
+          ? exercises.find((e) => e.id === we.exercise_id)
+          : undefined
+      )
+      .filter(Boolean)
+  }
+
+  const filteredWorkouts = workouts.filter(
+    (w) =>
+      w.name.toLowerCase().includes(search.toLowerCase()) &&
+      (!difficulty || w.difficulty === difficulty)
+  )
 
   return (
-    <Container className="py-5 bg-dark text-light">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 className="text-center mb-4 text-warning">Workouts</h1>
+    <Container fluid className="d-flex flex-column min-vh-100 my-5">
+      <div className="text-center my-4">
+        <h1 className="text-warning">Workouts</h1>
+        <p>
+          Browse and filter curated workouts. Click a workout to see included
+          exercises.
+        </p>
+      </div>
 
-        {/* Filter */}
-        <Form.Group className="mb-5 text-center" controlId="muscleGroupFilter">
-          <Form.Label>Filter by Target Muscle</Form.Label>
-          <Form.Select
-            value={selectedMuscle}
-            onChange={(e) => setSelectedMuscle(e.target.value)}
-            className="mx-auto bg-dark text-light border border-warning"
-            style={{ maxWidth: "300px" }}
-          >
-            {muscleGroups.map((muscle) => (
-              <option key={muscle.value} value={muscle.value}>
-                {muscle.label}
-              </option>
-            ))}
-          </Form.Select>
-        </Form.Group>
-
-        {/* Cards */}
-        <Row>
-          {filteredWorkouts.map((workout) => (
-            <Col key={workout.id} md={4} className="mb-4">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                whileHover={{ y: -10 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Card className="h-100 bg-dark text-light border border-warning shadow-sm">
-                  <div
-                    className="position-relative"
-                    style={{ height: "200px", overflow: "hidden" }}
-                  >
-                    <Card.Img
-                      variant="top"
-                      src={workout.image}
-                      alt={workout.name}
-                      style={{
-                        height: "100%",
-                        width: "100%",
-                        objectFit: "cover",
-                        transition: "transform 0.3s ease",
-                      }}
-                      className="hover-zoom"
-                    />
-                    <span className="position-absolute top-0 end-0 m-2 px-3 py-1 bg-warning text-dark rounded-pill">
-                      {workout.difficulty}
-                    </span>
-                  </div>
-                  <Card.Body className="px-4">
-                    <Card.Title className="text-warning">
-                      {workout.name}
-                    </Card.Title>
-                    <Card.Subtitle className="m-2">
-                      Target: {workout.targetMuscle}
-                    </Card.Subtitle>
-                    <Card.Text>
-                      <strong>Duration:</strong> {workout.duration}
-                    </Card.Text>
-                    <Card.Text className="mb-1">
-                      <strong>Exercises:</strong>
-                    </Card.Text>
-                    <ul className="ps-3 mb-3">
-                      {workout.exercises.map((exercise, idx) => (
-                        <li key={idx}>{exercise}</li>
-                      ))}
-                    </ul>
-                    <Button variant="warning" className="w-100 fw-semibold">
-                      View Details
-                    </Button>
-                  </Card.Body>
-                </Card>
-              </motion.div>
-            </Col>
-          ))}
+      {/* Filter Controls */}
+      <Form className="mb-4">
+        <Row className="g-2 justify-content-center">
+          <Col md={4}>
+            <InputGroup>
+              <Form.Control
+                type="text"
+                placeholder="Search by workout name"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </InputGroup>
+          </Col>
+          <Col md={3}>
+            <Form.Select
+              value={difficulty}
+              className="bg-dark text-light border border-warning"
+              onChange={(e) => setDifficulty(e.target.value)}
+            >
+              <option value="">Difficulty</option>
+              {difficulties.map((d) => (
+                <option key={d} value={d}>
+                  {d.charAt(0).toUpperCase() + d.slice(1)}
+                </option>
+              ))}
+            </Form.Select>
+          </Col>
+          <Col md={2} className="d-flex align-items-center">
+            <Button
+              variant="outline-warning"
+              className="w-100"
+              onClick={() => {
+                setSearch("")
+                setDifficulty("")
+              }}
+            >
+              Clear
+            </Button>
+          </Col>
         </Row>
-      </motion.div>
+      </Form>
+
+      {loading && (
+        <div className="text-center my-5">
+          <Spinner animation="border" variant="warning" />
+        </div>
+      )}
+      {error && (
+        <Alert variant="danger" className="text-center">
+          {error}
+        </Alert>
+      )}
+
+      {!loading && !error && (
+        <Row className="justify-content-center">
+          <Col md={10}>
+            <Row>
+              {filteredWorkouts.length === 0 ? (
+                <Col>
+                  <Alert variant="warning" className="text-center mt-4">
+                    No workouts found.
+                  </Alert>
+                </Col>
+              ) : (
+                filteredWorkouts.map((workout, idx) => (
+                  <Col md={4} key={workout.id || idx} className="mb-4">
+                    <motion.div
+                      whileHover={{
+                        y: -8,
+                        boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
+                      }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 20,
+                      }}
+                    >
+                      <ListGroup.Item
+                        className="rounded-3 bg-dark border border-warning p-3 position-relative workout-card"
+                        style={{ minHeight: "220px", cursor: "pointer" }}
+                        onClick={() => openWorkoutModal(workout)}
+                      >
+                        <h4 className="mb-2 text-warning">{workout.name}</h4>
+                        <p className="mb-2">
+                          <strong>Exercises:</strong>{" "}
+                          {getExercisesForWorkout(workout.id).length}
+                        </p>
+                        {workout.difficulty && (
+                          <span
+                            className="px-3 py-1 rounded-pill small"
+                            style={{
+                              background:
+                                workout.difficulty === "beginner"
+                                  ? "#198754"
+                                  : workout.difficulty === "intermediate"
+                                  ? "#ffc107"
+                                  : "#dc3545",
+                              color:
+                                workout.difficulty === "intermediate"
+                                  ? "#212529"
+                                  : "#fff",
+                              fontWeight: 600,
+                              minWidth: "100px",
+                              textAlign: "center",
+                              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                            }}
+                          >
+                            {workout.difficulty}
+                          </span>
+                        )}
+                        <div className="mt-3">
+                          <Button
+                            variant="outline-warning"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              openWorkoutModal(workout)
+                            }}
+                          >
+                            View Details
+                          </Button>
+                        </div>
+                      </ListGroup.Item>
+                    </motion.div>
+                  </Col>
+                ))
+              )}
+            </Row>
+          </Col>
+        </Row>
+      )}
+
+      {/* Workout Modal */}
+      {selectedWorkout && (
+        <Modal
+          show={modalVisible}
+          onHide={closeWorkoutModal}
+          size="lg"
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>{selectedWorkout.name}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <h6>Included Exercises:</h6>
+            <Row>
+              {getExercisesForWorkout(selectedWorkout.id).map((exercise) => (
+                <Col md={6} key={exercise.id} className="mb-3">
+                  <div className="card p-2">
+                    <img
+                      src={exercise.image}
+                      alt={exercise.name}
+                      className="img-fluid"
+                      style={{ maxHeight: 120, objectFit: "cover" }}
+                    />
+                    <div className="mt-2">
+                      <h6>{exercise.name}</h6>
+                      <p className="mb-1">
+                        <strong>Primary:</strong> {exercise.primary}
+                      </p>
+                      {exercise.secondary && (
+                        <p className="mb-1">
+                          <strong>Secondary:</strong> {exercise.secondary}
+                        </p>
+                      )}
+                      <p className="mb-0">
+                        <strong>Equipment:</strong> {exercise.equipment} |{" "}
+                        <strong>Difficulty:</strong> {exercise.difficulty}
+                      </p>
+                    </div>
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={closeWorkoutModal}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
     </Container>
   )
 }
 
-export default Workouts
+export default WorkoutsPage

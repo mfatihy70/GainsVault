@@ -1,32 +1,33 @@
 import Split from "../../models/core/split.model.js"
+import Workout from "../../models/core/workout.model.js"
 
 // Fetch all splits
 export const getSplits = async (req, res) => {
   try {
-    console.log('Received request for splits');
-    const { days, difficulty } = req.query;
-    const whereClause = {};
+    console.log("Received request for splits")
+    const { days, difficulty } = req.query
+    const whereClause = {}
 
-    if (days && days !== '') {
-      whereClause.days = days;
+    if (days && days !== "") {
+      whereClause.days = days
     }
-    if (difficulty && difficulty !== '') {
-      whereClause.difficulty = difficulty;
+    if (difficulty && difficulty !== "") {
+      whereClause.difficulty = difficulty
     }
-    
-    console.log('Filtering splits with:', whereClause);
+
+    console.log("Filtering splits with:", whereClause)
 
     const splits = await Split.findAll({
       where: whereClause,
-      order: [['name', 'ASC']],
-      raw: true
-    });
-    
-    console.log(`Found ${splits.length} splits`);
-    
-    res.json(splits);
+      order: [["name", "ASC"]],
+      raw: true,
+    })
+
+    console.log(`Found ${splits.length} splits`)
+
+    res.json(splits)
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message })
   }
 }
 
@@ -80,6 +81,21 @@ export const deleteSplit = async (req, res) => {
     if (!deletedSplit)
       return res.status(404).json({ message: "Split not found" })
     res.json({ message: "Split deleted successfully" })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+// Fetch workouts for a split by splitId
+export const getWorkoutsForSplit = async (req, res) => {
+  try {
+    const splitId = req.params.id
+    const workouts = await Workout.findAll({
+      where: { split_id: splitId },
+      order: [["order", "ASC"]],
+      raw: true,
+    })
+    res.json(workouts)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
