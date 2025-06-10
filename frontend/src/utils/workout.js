@@ -75,15 +75,19 @@ export const createWorkout = async (workout, setError, setLoading) => {
 }
 
 // Get workout exercises by workout ID (with full exercise data)
-export const getWorkoutExercisesByWorkoutId = async (workoutId) => {
+export const getWorkoutExercisesByWorkoutId = async (
+  workoutId,
+  setWorkoutExercises,
+  setError,
+  setLoading
+) => {
   try {
-    const response = await axiosInstance.get(
-      `/workout-exercises/workout/${workoutId}`
-    )
-    return response.data
+    const response = await axiosInstance.get(`/workout-exercises/workout/${workoutId}`)
+    setWorkoutExercises(response.data)
   } catch (err) {
-    console.error("Error fetching workout exercises:", err)
-    return []
+    setError(err.message)
+  } finally {
+    setLoading(false)
   }
 }
 
