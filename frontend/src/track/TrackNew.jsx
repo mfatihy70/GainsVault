@@ -11,6 +11,7 @@ import {
   OverlayTrigger,
   Tooltip,
   InputGroup,
+  Image,
 } from "react-bootstrap"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
@@ -20,6 +21,7 @@ import "../styles/track.css"
 import SearchableDropdown from "./SearchableDropdown"
 import { getExercises } from "../utils/exercise"
 import { Stopwatch } from "./Stopwatch"
+import workoutImage from '../assets/workout.png'
 
 const WorkoutTrackNew = () => {
   const location = useLocation()
@@ -120,6 +122,10 @@ const WorkoutTrackNew = () => {
       });
     }
   }
+  const hasAtLeastOneDoneSet = exercises.some((exercise) =>
+    exercise.setsData?.some((set) => set.done)
+  )
+
 
 
   useEffect(() => {
@@ -222,6 +228,19 @@ const WorkoutTrackNew = () => {
             <Card key={index} className="tracker-card mb-4">
               <Card.Body className="tracker-form">
                 <Row className="align-items-center mb-3">
+                  <Col xs="auto">
+                    <Image
+                      src={exercise.image || workoutImage}
+                      alt={exercise.name}
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        objectFit: "cover",
+                        borderRadius: "0.25rem"
+                      }}
+                      rounded
+                    />
+                  </Col>
                   <Col>
                     <Card.Title className="mb-1 text-warning">
                       {exercise.name}
@@ -249,6 +268,7 @@ const WorkoutTrackNew = () => {
                   )}
                 </Row>
 
+                { /* Sets Section */ }
                 {exercise.setsData.map((set, setIdx) => {
                   const setKey = `set-${index}-${setIdx}`;
                   const isValid = set.weight > 0 && set.reps > 0;
@@ -442,7 +462,9 @@ const WorkoutTrackNew = () => {
                   ? "Add at least one exercise to enable"
                   : times.duration === 0
                     ? "Workout duration must be greater than 0"
-                    : "Finish Workout"}
+                    : !hasAtLeastOneDoneSet
+                      ? "Mark at least one set as done to enable"
+                      : "Finish Workout"}
               </Tooltip>
             }
           >
@@ -461,7 +483,7 @@ const WorkoutTrackNew = () => {
                 size="lg"
                 className="finish-btn"
                 onClick={handleFinishWorkout}
-                disabled={exercises.length === 0 || times.duration === 0}
+                disabled={exercises.length === 0 || times.duration === 0 || !hasAtLeastOneDoneSet}
               >
                 Finish Workout
               </Button>
