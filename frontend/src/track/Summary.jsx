@@ -14,6 +14,17 @@ const WorkoutSummary = () => {
 
   const { workout, exercises, workoutId, times, isCustomWorkout } = state
   const { startTime, endTime, duration } = times || {}
+  const finishedExercises = exercises
+    .map((ex) => {
+      const finishedSets = ex.setsData?.filter((set) => set.done) || []
+      if (finishedSets.length === 0) return null
+
+      return {
+        ...ex,
+        setsData: finishedSets, // replace original sets with only finished ones
+      }
+    })
+    .filter(Boolean) // removes nulls
 
   const handleSubmitWorkout = () => {
     console.log("Submitting workout data...")
@@ -67,61 +78,62 @@ const WorkoutSummary = () => {
       </Card>
 
       {/* Exercise Summary */}
-      {exercises.map((ex, i) => (
-        <Card key={i} className="mb-4 bg-dark text-light border border-warning">
-          <Card.Body>
-            <Card.Title className="text-warning mb-2">
-              {ex.name}
-              <Badge bg="info" className="ms-2">
-                {ex.primary}
-              </Badge>
-              {ex.secondary && (
-                <Badge bg="secondary" className="ms-2">
-                  {ex.secondary}
-                </Badge>
-              )}
-            </Card.Title>
+      {finishedExercises.map((ex, i) => {
+          const finishedSets = ex.setsData
 
-            {ex.equipment && (
-              <p className="text-muted mb-3">Equipment: {ex.equipment}</p>
-            )}
+          return (
+            <Card key={i} className="mb-4 bg-dark text-light border border-warning">
+              <Card.Body>
+                <Card.Title className="text-warning mb-2">
+                  {ex.name}
+                  <Badge bg="info" className="ms-2">
+                    {ex.primary}
+                  </Badge>
+                  {ex.secondary && (
+                    <Badge bg="secondary" className="ms-2">
+                      {ex.secondary}
+                    </Badge>
+                  )}
+                </Card.Title>
 
-            {/* Sets */}
-            <div className="mb-3">
-              <strong className="d-block mb-2">Sets Performed:</strong>
-              {ex.setsData?.length > 0 ? (
-                <Row className="g-2">
-                  {ex.setsData.map((set, setIdx) => (
-                    <Col key={setIdx} md={4}>
-                      <Card
-                        bg={set.done ? "success" : "secondary"}
-                        text={set.done ? "dark" : "light"}
-                        className="p-2"
-                      >
-                        <div>
-                          <strong>Set {setIdx + 1}</strong>
-                        </div>
-                        <div>Weight: {set.weight} kg</div>
-                        <div>Reps: {set.reps}</div>
-                      </Card>
-                    </Col>
-                  ))}
-                </Row>
-              ) : (
-                <p className="text-muted">No sets recorded.</p>
-              )}
-            </div>
+                {ex.equipment && (
+                  <p className="text-muted mb-3">Equipment: {ex.equipment}</p>
+                )}
 
-            {/* Notes */}
-            {ex.notes && (
-              <div className="mt-2">
-                <strong>Notes:</strong>
-                <p className="fst-italic text-info mb-0">{ex.notes}</p>
-              </div>
-            )}
-          </Card.Body>
-        </Card>
-      ))}
+                {/* Sets */}
+                <div className="mb-3">
+                  <strong className="d-block mb-2">Sets Performed:</strong>
+                  <Row className="g-2">
+                    {finishedSets.map((set, idx) => (
+                      <Col key={idx} md={4}>
+                        <Card
+                          bg="success"
+                          text="dark"
+                          className="p-2"
+                        >
+                          <div>
+                            <strong>Set {idx + 1}</strong>
+                          </div>
+                          <div>Weight: {set.weight} kg</div>
+                          <div>Reps: {set.reps}</div>
+                        </Card>
+                      </Col>
+                    ))}
+                  </Row>
+                </div>
+
+                {/* Notes */}
+                {ex.notes && (
+                  <div className="mt-2">
+                    <strong>Notes:</strong>
+                    <p className="fst-italic text-info mb-0">{ex.notes}</p>
+                  </div>
+                )}
+              </Card.Body>
+            </Card>
+          )
+        })}
+
 
       {/* Final Action */}
       <div className="text-center mt-4">
