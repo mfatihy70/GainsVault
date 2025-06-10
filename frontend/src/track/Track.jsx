@@ -45,7 +45,18 @@ const WorkoutTrack = () => {
     setSelectedWorkoutId(null)
     setExercises([])
     setSelectedWorkoutId(workoutId)
-    getExerciseFromWorkoutId(workoutId, setExercises, setError, setLoading)
+    getWorkoutExercises(
+      workoutId,
+      (fetchedWorkoutExercises) => {
+        const enrichedExercises = fetchedWorkoutExercises.map((we) => ({
+          ...we.exercise,
+        }))
+        setExercises(enrichedExercises)
+        setLoading(false)
+      },
+      setError,
+      () => setLoading(false)
+    )
   }
 
   return (
