@@ -1,9 +1,24 @@
 import WorkoutExercise from "../../models/core/workout_exercise.model.js"
+import Exercise from "../../models/core/exercise.model.js"
 
-// Fetch all workout exercises
+// Fetch all exercises for a specific workout
 export const getWorkoutExercises = async (req, res) => {
   try {
-    const workoutExercises = await WorkoutExercise.findAll()
+    const workoutExercises = await WorkoutExercise.findAll({
+      where: { workout_id: req.params.workoutId },
+      include: [
+        {
+          model: Exercise,
+          attributes: [
+            "id",
+            "name",
+            "primaryMuscles",
+            "secondaryMuscles",
+            "equipment",
+          ],
+        },
+      ],
+    })
     res.json(workoutExercises)
   } catch (error) {
     res.status(500).json({ message: error.message })

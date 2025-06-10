@@ -14,5 +14,6 @@ router.get("/:id", getWorkoutExerciseById)
 router.post("/", createWorkoutExercise)
 router.put("/:id", updateWorkoutExercise)
 router.delete("/:id", deleteWorkoutExercise)
+router.get("/workouts/:workoutId/exercises", getWorkoutExercises)
 
 export default router
