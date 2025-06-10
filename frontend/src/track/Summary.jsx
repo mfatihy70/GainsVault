@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { Container, Card, Button, Row, Col, Badge } from "react-bootstrap"
+import { Container, Card, Button, Row, Col, Badge, Image } from "react-bootstrap"
 import { formatDateTime, formatDuration } from "../utils/stopwatch"
+import workoutImage from '../assets/workout.png'
 
 const WorkoutSummary = () => {
   const { state } = useLocation()
@@ -79,60 +80,86 @@ const WorkoutSummary = () => {
 
       {/* Exercise Summary */}
       {finishedExercises.map((ex, i) => {
-          const finishedSets = ex.setsData
+        const finishedSets = ex.setsData
 
-          return (
-            <Card key={i} className="mb-4 bg-dark text-light border border-warning">
-              <Card.Body>
-                <Card.Title className="text-warning mb-2">
-                  {ex.name}
-                  <Badge bg="info" className="ms-2">
-                    {ex.primary}
-                  </Badge>
-                  {ex.secondary && (
-                    <Badge bg="secondary" className="ms-2">
-                      {ex.secondary}
-                    </Badge>
-                  )}
-                </Card.Title>
-
-                {ex.equipment && (
-                  <p className="text-muted mb-3">Equipment: {ex.equipment}</p>
-                )}
-
-                {/* Sets */}
-                <div className="mb-3">
-                  <strong className="d-block mb-2">Sets Performed:</strong>
-                  <Row className="g-2">
-                    {finishedSets.map((set, idx) => (
-                      <Col key={idx} md={4}>
-                        <Card
-                          bg="success"
-                          text="dark"
-                          className="p-2"
-                        >
-                          <div>
-                            <strong>Set {idx + 1}</strong>
-                          </div>
-                          <div>Weight: {set.weight} kg</div>
-                          <div>Reps: {set.reps}</div>
-                        </Card>
-                      </Col>
-                    ))}
-                  </Row>
-                </div>
-
-                {/* Notes */}
-                {ex.notes && (
-                  <div className="mt-2">
-                    <strong>Notes:</strong>
-                    <p className="fst-italic text-info mb-0">{ex.notes}</p>
+        return (
+          <Card key={i} className="mb-4 bg-dark text-light border border-warning">
+            <Card.Body>
+              <Card.Title className="text-warning mb-3 d-flex justify-content-center">
+                <div className="d-flex align-items-center">
+                  <Image
+                    src={ex.image || workoutImage}
+                    alt={ex.name}
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      objectFit: "cover",
+                      borderRadius: "0.25rem",
+                      marginRight: "1rem",
+                    }}
+                    rounded
+                  />
+                  <div className="d-flex flex-column">
+                    <div className="fw-bold">{ex.name}</div>
+                    <div className="mt-1">
+                      <Badge bg="info" className="me-2">
+                        {ex.primary}
+                      </Badge>
+                      {ex.secondary && (
+                        <Badge bg="secondary" className="me-2">
+                          {ex.secondary}
+                        </Badge>
+                      )}
+                    </div>
+                    {ex.equipment && (
+                      <p
+                        style={{
+                          color: "#dcdcdc",
+                          fontSize: "0.8rem",
+                          marginBottom: "0.25rem",
+                          marginTop: "0.25rem",
+                        }}
+                      >
+                        Equipment: {ex.equipment}
+                      </p>
+                    )}
                   </div>
-                )}
-              </Card.Body>
-            </Card>
-          )
-        })}
+                </div>
+              </Card.Title>
+
+              {/* Sets */}
+              <div className="mb-3">
+                <strong className="d-block mb-2">Sets Performed:</strong>
+                <div className="d-flex flex-column gap-2">
+                  {finishedSets.map((set, idx) => (
+                    <Card
+                      key={idx}
+                      bg="success"
+                      text="dark"
+                      className="p-2"
+                    >
+                      <div className="d-flex justify-content-between gap-3">
+                        <div><strong>Set {idx + 1}</strong></div>
+                        <div>Weight: {set.weight} kg</div>
+                        <div>Reps: {set.reps}</div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+
+              {/* Notes */}
+              {ex.notes && (
+                <div className="mt-2">
+                  <strong>Notes:</strong>
+                  <p className="fst-italic text-info mb-0">{ex.notes}</p>
+                </div>
+              )}
+            </Card.Body>
+          </Card>
+        )
+      })}
 
 
       {/* Final Action */}
