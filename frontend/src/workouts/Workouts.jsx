@@ -21,6 +21,7 @@ const WorkoutsPage = () => {
   const [selectedWorkoutExercises, setSelectedWorkoutExercises] = useState([])
   const [search, setSearch] = useState("")
   const [difficulty, setDifficulty] = useState("")
+  const [splits, setSplits] = useState([])
 
   const handleCloseModal = () => setShowModal(false)
   const handleShowModal = async (workout, e) => {
@@ -36,7 +37,7 @@ const WorkoutsPage = () => {
   const fetchWorkoutExercises = async (workoutId) => {
     try {
       const response = await fetch(
-        `http://localhost:5050/api/workouts/${workoutId}/exercises`
+        `http://localhost:5050/api/workout-exercises/workout/${workoutId}`
       )
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -68,6 +69,22 @@ const WorkoutsPage = () => {
     fetchWorkouts()
   }, [])
 
+  // Fetch splits for mapping split_id to split name
+  useEffect(() => {
+    const fetchSplits = async () => {
+      try {
+        const response = await fetch("http://localhost:5050/api/splits")
+        if (!response.ok)
+          throw new Error(`HTTP error! status: ${response.status}`)
+        const data = await response.json()
+        setSplits(data)
+      } catch (error) {
+        // Optionally handle split fetch error
+      }
+    }
+    fetchSplits()
+  }, [])
+
   const muscleGroups = [
     { value: "all", label: "All Muscles" },
     { value: "Chest", label: "Chest" },
@@ -84,6 +101,12 @@ const WorkoutsPage = () => {
       (!difficulty || w.difficulty === difficulty)
   )
 
+  // Helper to get split name by id
+  const getSplitName = (splitId) => {
+    const split = splits.find((s) => s.id === splitId)
+    return split ? split.name : `Split ${splitId}`
+  }
+
   return (
     <Container className="py-5 bg-dark text-light">
       <motion.div
@@ -93,47 +116,54 @@ const WorkoutsPage = () => {
       >
         <h1 className="text-center mb-4 text-warning">Workouts</h1>
 
-        {/* Filter */}
-        <Form.Group className="mb-3 text-center" controlId="searchFilter">
-          <Form.Label>Search Workouts</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Search by workout name"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="mx-auto bg-dark text-light border border-warning"
-            style={{ maxWidth: "300px" }}
-          />
-        </Form.Group>
-        <Form.Group className="mb-3 text-center" controlId="difficultyFilter">
-          <Form.Label>Filter by Difficulty</Form.Label>
-          <Form.Select
-            value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value)}
-            className="mx-auto bg-dark text-light border border-warning"
-            style={{ maxWidth: "300px" }}
-          >
-            <option value="">All</option>
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-          </Form.Select>
-        </Form.Group>
-        <Form.Group className="mb-5 text-center" controlId="muscleGroupFilter">
-          <Form.Label>Filter by Target Muscle</Form.Label>
-          <Form.Select
-            value={selectedMuscle}
-            onChange={(e) => setSelectedMuscle(e.target.value)}
-            className="mx-auto bg-dark text-light border border-warning"
-            style={{ maxWidth: "300px" }}
-          >
-            {muscleGroups.map((muscle) => (
-              <option key={muscle.value} value={muscle.value}>
-                {muscle.label}
-              </option>
-            ))}
-          </Form.Select>
-        </Form.Group>
+        {/* Filters in one row */}
+        <Form className="mb-4">
+          <Row className="align-items-end">
+            <Col md={4} className="mb-2">
+              <Form.Group controlId="searchFilter">
+                <Form.Label>Search Workouts</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Search by workout name"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="bg-dark text-light border border-warning"
+                />
+              </Form.Group>
+            </Col>
+            <Col md={4} className="mb-2">
+              <Form.Group controlId="difficultyFilter">
+                <Form.Label>Difficulty</Form.Label>
+                <Form.Select
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value)}
+                  className="bg-dark text-light border border-warning"
+                >
+                  <option value="">All</option>
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col md={4} className="mb-2">
+              <Form.Group controlId="muscleGroupFilter">
+                <Form.Label>Target Muscle</Form.Label>
+                <Form.Select
+                  value={selectedMuscle}
+                  onChange={(e) => setSelectedMuscle(e.target.value)}
+                  className="bg-dark text-light border border-warning"
+                >
+                  {muscleGroups.map((muscle) => (
+                    <option key={muscle.value} value={muscle.value}>
+                      {muscle.label}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+          </Row>
+        </Form>
 
         {/* Cards */}
         <Row>
@@ -155,11 +185,8 @@ const WorkoutsPage = () => {
                         {workout.name}
                       </Card.Title>
                       <Card.Subtitle className="m-2">
-                        Split ID: {workout.split_id}
+                        Split: {getSplitName(workout.split_id)}
                       </Card.Subtitle>
-                      <Card.Text>
-                        <strong>Order:</strong> {workout.order}
-                      </Card.Text>
                       <Button
                         variant="warning"
                         className="w-100 fw-semibold"
@@ -186,10 +213,7 @@ const WorkoutsPage = () => {
           {selectedWorkout && (
             <>
               <p>
-                <strong>Split ID:</strong> {selectedWorkout.split_id}
-              </p>
-              <p>
-                <strong>Order:</strong> {selectedWorkout.order}
+                <strong>Split:</strong> {getSplitName(selectedWorkout.split_id)}
               </p>
 
               <h4>Exercises:</h4>
@@ -204,19 +228,35 @@ const WorkoutsPage = () => {
                   <tr>
                     <th>#</th>
                     <th>Exercise</th>
-                    <th>Primary Muscles</th>
-                    <th>Secondary Muscles</th>
+                    <th>Primary Muscle</th>
+                    <th>Secondary Muscle</th>
                     <th>Equipment</th>
+                    <th>Image</th>
+                    <th>Difficulty</th>
                   </tr>
                 </thead>
                 <tbody>
                   {selectedWorkoutExercises.map((we, idx) => (
                     <tr key={we.id}>
                       <td>{idx + 1}</td>
-                      <td>{we.exercise.name}</td>
-                      <td>{we.exercise.primaryMuscles}</td>
-                      <td>{we.exercise.secondaryMuscles}</td>
-                      <td>{we.exercise.equipment}</td>
+                      <td>{we.exercise?.name}</td>
+                      <td>{we.exercise?.primary}</td>
+                      <td>{we.exercise?.secondary || "-"}</td>
+                      <td>{we.exercise?.equipment}</td>
+                      <td>
+                        {we.exercise?.image && (
+                          <img
+                            src={we.exercise.image}
+                            alt={we.exercise.name}
+                            style={{
+                              width: 60,
+                              height: 40,
+                              objectFit: "cover",
+                            }}
+                          />
+                        )}
+                      </td>
+                      <td>{we.exercise?.difficulty}</td>
                     </tr>
                   ))}
                 </tbody>

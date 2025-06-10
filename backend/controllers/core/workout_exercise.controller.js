@@ -12,12 +12,15 @@ export const getWorkoutExercises = async (req, res) => {
           attributes: [
             "id",
             "name",
-            "primaryMuscles",
-            "secondaryMuscles",
+            "primary",
+            "secondary",
             "equipment",
+            "image",
+            "difficulty",
           ],
         },
       ],
+      order: [["order", "ASC"]],
     })
     res.json(workoutExercises)
   } catch (error) {

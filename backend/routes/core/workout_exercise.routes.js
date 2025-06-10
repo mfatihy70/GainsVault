@@ -9,11 +9,13 @@ import {
 
 const router = express.Router()
 
+// Fetch all exercises for a specific workout
+router.get("/workout/:workoutId", getWorkoutExercises)
+
 router.get("/", getWorkoutExercises)
 router.get("/:id", getWorkoutExerciseById)
 router.post("/", createWorkoutExercise)
 router.put("/:id", updateWorkoutExercise)
 router.delete("/:id", deleteWorkoutExercise)
-router.get("/workouts/:workoutId/exercises", getWorkoutExercises)
 
 export default router
