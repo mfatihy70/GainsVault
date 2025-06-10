@@ -11,8 +11,7 @@ import {
 } from "react-bootstrap"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
-import { getWorkoutsForSplit } from "../utils/workout"
-import { getExerciseFromWorkoutId } from "../utils/track"
+import { getWorkoutExercises, getWorkoutsForSplit } from "../utils/workout"
 import { getSplitById, getSplits } from "../utils/split"
 import { useNavigate } from "react-router-dom"
 

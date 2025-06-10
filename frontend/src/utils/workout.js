@@ -76,12 +76,13 @@ export const createWorkout = async (workout, setError, setLoading) => {
 /// Workout Exercises
 // ============================================
 export const getWorkoutExercises = async (
+  workoutId,
   setWorkoutExercises,
   setError,
   setLoading
 ) => {
   try {
-    const response = await axiosInstance.get(`/workout-exercises`)
+    const response = await axiosInstance.get(`/workout-exercises/workout/${workoutId}`)
     setWorkoutExercises(response.data)
   } catch (err) {
     setError(err.message)
