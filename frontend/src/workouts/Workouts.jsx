@@ -25,7 +25,7 @@ const WorkoutsPage = () => {
   const [difficulty, setDifficulty] = useState("")
   const [splits, setSplits] = useState([])
   const [splitMap, setSplitMap] = useState({})
-  const [selectedSplit, setSelectedSplit] = useState("") // NEW: for split filter
+  const [selectedSplit, setSelectedSplit] = useState("") // for split filter
 
   const handleCloseModal = () => setShowModal(false)
   const handleShowModal = async (workout, e) => {
@@ -54,6 +54,13 @@ const WorkoutsPage = () => {
   useEffect(() => {
     // Use the extracted getWorkouts function
     getWorkouts(setWorkouts, setError, setLoading)
+  }, [])
+
+  // On mount, check for split query param and set selectedSplit
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const splitParam = params.get("split")
+    if (splitParam) setSelectedSplit(splitParam)
   }, [])
 
   const muscleGroups = [
@@ -267,8 +274,8 @@ const WorkoutsPage = () => {
 
 // Add this style globally or in your CSS file if not already present
 // You can also use a <style> tag here for quick testing:
-<style>
-{`
+;<style>
+  {`
 .workout-modal-xl .modal-dialog {
   max-width: 1100px !important;
 }

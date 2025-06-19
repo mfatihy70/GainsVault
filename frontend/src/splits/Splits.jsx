@@ -239,7 +239,11 @@ const SplitPage = () => {
           <Button
             variant="warning"
             onClick={() => {
-              window.location.href = "/workouts"
+              if (selectedSplit?.id) {
+                window.location.href = `/workouts?split=${selectedSplit.id}`
+              } else {
+                window.location.href = "/workouts"
+              }
             }}
           >
             Go to Workouts
