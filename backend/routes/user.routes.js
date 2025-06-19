@@ -13,6 +13,8 @@ import {
   // Workout tracking
   getUserWorkoutEntries,
   getUserWorkoutEntryById,
+  deleteUserWorkoutEntry,
+  updateUserWorkoutEntry,
 } from "../controllers/user.controller.js"
 
 const router = express.Router()
@@ -32,5 +34,7 @@ router.delete("/:id/weight/:index", deleteWeight)
 // Workout tracking routes
 router.get("/:id/workout", getUserWorkoutEntries)
 router.get("/:id/workout/:workoutId", getUserWorkoutEntryById)
+router.delete("/:id/workout/:workoutId", deleteUserWorkoutEntry)
+router.put("/:id/workout/:workoutId", updateUserWorkoutEntry)
 
 export default router

@@ -5,14 +5,22 @@ import {
   Accordion,
   Card,
   Table,
-  Container
+  Container,
+  Button,
+  Form
 } from "react-bootstrap"
-import { getUserWorkoutEntries } from "../utils/user"
+import { updateUserWorkoutEntry, deleteUserWorkoutEntry, getUserWorkoutEntries } from "../utils/user"
 
 const WorkoutEntries = ({ userId }) => {
   const [workouts, setWorkouts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [editId, setEditId] = useState(null)
+  const [editedName, setEditedName] = useState("")
+  const [editingSetId, setEditingSetId] = useState(null)
+  const [editedSet, setEditedSet] = useState({})
+  const [editedStart, setEditedStart] = useState("");
+  const [editedEnd, setEditedEnd] = useState("");
 
   useEffect(() => {
     const fetchWorkouts = async () => {
@@ -28,6 +36,113 @@ const WorkoutEntries = ({ userId }) => {
     fetchWorkouts()
   }, [userId])
 
+  const handleWorkoutEntryDelete = async (workoutId) => {
+    try {
+      await deleteUserWorkoutEntry(userId, workoutId, setError, setLoading)
+      setWorkouts((prev) => prev.filter((workout) => workout.id !== workoutId))
+    } catch (err) {
+      setError("Failed to delete workout entry.")
+    }
+  }
+
+  const handleStartEditWorkout = (workout) => {
+    setEditId(workout.id);
+    setEditedName(workout.name || "");
+    setEditedStart(workout.start.slice(0, 16)); // format: "YYYY-MM-DDTHH:mm"
+    setEditedEnd(workout.end.slice(0, 16));
+  };
+  const handleSaveWorkoutEdit = async () => {
+    try {
+      const updatedWorkout = workouts.find((w) => w.id === editId);
+      const updatedData = {
+        ...updatedWorkout,
+        name: editedName,
+        start: new Date(editedStart).toISOString(),
+        end: new Date(editedEnd).toISOString(),
+      };
+
+      await updateUserWorkoutEntry(userId, editId, updatedData);
+
+      setWorkouts((prev) =>
+        prev.map((w) => (w.id === editId ? updatedData : w))
+      );
+
+      setEditId(null);
+      setEditedName("");
+      setEditedStart("");
+      setEditedEnd("");
+    } catch (err) {
+      setError("Failed to save workout edit.");
+    }
+  };
+
+  const handleSetEditClick = (set) => {
+    setEditingSetId(set.id)
+    setEditedSet({
+      reps: set.reps,
+      kg: set.kg,
+      performed_at: set.performed_at
+    })
+  }
+
+  const handleCancelSetEdit = () => {
+    setEditingSetId(null)
+    setEditedSet({})
+  }
+
+  const handleSaveSetEdit = async (setId) => {
+    try {
+      // Find the workout and exercise entry that contains this set
+      let workoutId;
+      let workoutToUpdate;
+
+      workouts.forEach((workout) => {
+        workout.exercise_entries.forEach((entry) => {
+          if (entry.set_entries.some((set) => set.id === setId)) {
+            workoutId = workout.id;
+            workoutToUpdate = workout;
+          }
+        });
+      });
+
+      if (!workoutToUpdate) {
+        throw new Error("Workout not found for set");
+      }
+
+      // Build updated workout data with the edited set updated
+      const updatedExerciseEntries = workoutToUpdate.exercise_entries.map((entry) => {
+        const updatedSetEntries = entry.set_entries.map((set) =>
+          set.id === setId ? { ...set, ...editedSet } : set
+        );
+        return { ...entry, set_entries: updatedSetEntries };
+      });
+
+      const updateData = {
+        ...workoutToUpdate,
+        exercise_entries: updatedExerciseEntries,
+      };
+
+      // Call API to update workout
+      await updateUserWorkoutEntry(userId, workoutId, updateData);
+
+      // Update state locally for immediate UI feedback
+      setWorkouts((prev) =>
+        prev.map((workout) =>
+          workout.id === workoutId
+            ? { ...workout, exercise_entries: updatedExerciseEntries }
+            : workout
+        )
+      );
+
+      setEditingSetId(null);
+      setEditedSet({});
+    } catch (err) {
+      setError("Failed to save set edit.");
+    }
+  }
+
+
+
   if (loading) return <Spinner animation="border" variant="warning" />
   if (error) return <Alert variant="danger">{error}</Alert>
   if (workouts.length === 0) return <p className="text-light">No workout entries found.</p>
@@ -42,10 +157,98 @@ const WorkoutEntries = ({ userId }) => {
             className="bg-dark border border-warning text-light"
           >
             <Accordion.Header className="custom-accordion-header">
-              <span className="text-warning fw-semibold">
-                {new Date(workout.start).toLocaleDateString("fi-FI")} — {workout.name || "Unnamed Workout"}
-              </span>
+              <div className="d-flex justify-content-between align-items-center w-100">
+                <div className="d-flex flex-column text-warning fw-semibold">
+                  <div>
+                    {editId === workout.id ? (
+                      <Form.Control
+                        size="sm"
+                        type="text"
+                        value={editedName}
+                        onChange={(e) => setEditedName(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="d-inline w-auto mb-1"
+                      />
+                    ) : (
+                      workout.name || "Unnamed Workout"
+                    )}
+                  </div>
+
+                  {editId === workout.id ? (
+                    <div className="d-flex gap-2 align-items-center" onClick={(e) => e.stopPropagation()}>
+                      <Form.Control
+                        size="sm"
+                        type="datetime-local"
+                        value={editedStart}
+                        onChange={(e) => setEditedStart(e.target.value)}
+                      />
+                      <Form.Control
+                        size="sm"
+                        type="datetime-local"
+                        value={editedEnd}
+                        onChange={(e) => setEditedEnd(e.target.value)}
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      {new Date(workout.start).toLocaleString()} →{" "}
+                      {new Date(workout.end).toLocaleTimeString()} [
+                      {
+                        (() => {
+                          const durationMs = new Date(workout.end) - new Date(workout.start);
+                          const totalSeconds = Math.floor(durationMs / 1000);
+                          const hours = Math.floor(totalSeconds / 3600);
+                          const minutes = Math.floor((totalSeconds % 3600) / 60);
+                          const seconds = totalSeconds % 60;
+                          return `${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds}s`;
+                        })()
+                      }
+                      ]
+                    </div>
+
+                  )}
+                </div>
+                <div className="d-flex gap-2 me-4" onClick={(e) => e.stopPropagation()}>
+                  {editId === workout.id ? (
+                    <>
+                      <Button
+                        variant="success"
+                        size="sm"
+                        onClick={handleSaveWorkoutEdit}
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setEditId(null)}
+                      >
+                        Cancel
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        variant="warning"
+                        size="sm"
+                        onClick={() => handleStartEditWorkout(workout)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => handleWorkoutEntryDelete(workout.id)}
+                      >
+                        <i className="bi bi-trash-fill"></i>
+                      </Button>
+                    </>
+                  )}
+                </div>
+
+              </div>
             </Accordion.Header>
+
             <Accordion.Body className="bg-dark text-light">
               {workout.exercise_entries.map((entry) => (
                 <Card className="bg-dark border border-warning text-light mb-3" key={entry.id}>
@@ -61,21 +264,96 @@ const WorkoutEntries = ({ userId }) => {
                             <th>Reps</th>
                             <th>Weight (kg)</th>
                             <th>Time</th>
+                            <th>Actions</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {entry.set_entries.map((set, index) => (
-                            <tr key={set.id}>
-                              <td>{index + 1}</td>
-                              <td>{set.reps}</td>
-                              <td>{set.kg}</td>
-                              <td>
-                                {set.performed_at
-                                  ? new Date(set.performed_at).toLocaleTimeString()
-                                  : "—"}
-                              </td>
-                            </tr>
-                          ))}
+                          {entry.set_entries.map((set, index) => {
+                            const isEditing = editingSetId === set.id
+                            return (
+                              <tr key={set.id}>
+                                <td>{index + 1}</td>
+                                <td>
+                                  {isEditing ? (
+                                    <Form.Control
+                                      size="sm"
+                                      type="number"
+                                      value={editedSet.reps}
+                                      onChange={(e) =>
+                                        setEditedSet({ ...editedSet, reps: e.target.value })
+                                      }
+                                    />
+                                  ) : (
+                                    set.reps
+                                  )}
+                                </td>
+                                <td>
+                                  {isEditing ? (
+                                    <Form.Control
+                                      size="sm"
+                                      type="number"
+                                      value={editedSet.kg}
+                                      onChange={(e) =>
+                                        setEditedSet({ ...editedSet, kg: e.target.value })
+                                      }
+                                    />
+                                  ) : (
+                                    set.kg
+                                  )}
+                                </td>
+                                <td>
+                                  {isEditing ? (
+                                    <Form.Control
+                                      size="sm"
+                                      type="time"
+                                      value={editedSet.performed_at?.slice(11, 16) || ""}
+                                      onChange={(e) =>
+                                        setEditedSet({
+                                          ...editedSet,
+                                          performed_at: new Date(
+                                            `${new Date(set.performed_at).toISOString().slice(0, 10)}T${e.target.value}`
+                                          ).toISOString()
+                                        })
+                                      }
+                                    />
+                                  ) : (
+                                    set.performed_at
+                                      ? new Date(set.performed_at).toLocaleTimeString()
+                                      : "—"
+                                  )}
+                                </td>
+                                <td>
+                                  {isEditing ? (
+                                    <>
+                                      <Button
+                                        variant="success"
+                                        size="sm"
+                                        onClick={() => handleSaveSetEdit(set.id)}
+                                        className="me-1"
+                                      >
+                                        <i className="bi bi-check-lg"></i>
+                                      </Button>
+                                      <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={handleCancelSetEdit}
+                                      >
+                                        <i className="bi bi-x-lg"></i>
+                                      </Button>
+                                    </>
+                                  ) : (
+                                    <Button
+                                      variant="warning"
+                                      size="sm"
+                                      onClick={() => handleSetEditClick(set)}
+                                    >
+                                      <i className="bi bi-pencil-fill"></i>
+                                    </Button>
+                                  )}
+                                </td>
+                              </tr>
+                            )
+                          })}
                         </tbody>
                       </Table>
                     ) : (
@@ -88,7 +366,6 @@ const WorkoutEntries = ({ userId }) => {
           </Accordion.Item>
         ))}
       </Accordion>
-
     </Container>
   )
 }

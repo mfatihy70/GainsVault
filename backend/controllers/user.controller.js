@@ -246,3 +246,97 @@ export const getUserWorkoutEntryById = async (req, res, next) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const updateUserWorkoutEntry = async (req, res, next) => {
+  try {
+    const { id: userId, workoutId } = req.params
+    const updateData = req.body
+
+    const workout = await WorkoutEntry.findOne({
+      where: {
+        id: workoutId,
+        user_id: userId,
+      },
+    })
+
+    if (!workout) {
+      return res.status(404).json({ message: "Workout not found or does not belong to user" })
+    }
+
+    // Update fields of the workout entry itself (e.g., name, start, end)
+    await workout.update({
+      name: updateData.name,
+      start: updateData.start,
+      end: updateData.end,
+    })
+
+    // Iterate over exercise entries
+    if (Array.isArray(updateData.exercise_entries)) {
+      for (const exerciseEntry of updateData.exercise_entries) {
+        const existingExerciseEntry = await ExerciseEntry.findOne({
+          where: {
+            id: exerciseEntry.id,
+            workout_entry_id: workoutId,
+          },
+        })
+
+        if (!existingExerciseEntry) continue // skip if not found
+
+        // Optionally update exerciseEntry fields if needed
+        // await existingExerciseEntry.update({ ... })
+
+        // Iterate over set entries
+        if (Array.isArray(exerciseEntry.set_entries)) {
+          for (const setEntry of exerciseEntry.set_entries) {
+            const existingSet = await SetEntry.findOne({
+              where: {
+                id: setEntry.id,
+                exercise_entry_id: exerciseEntry.id,
+              },
+            })
+
+            if (existingSet) {
+              await existingSet.update({
+                kg: setEntry.kg,
+                reps: setEntry.reps,
+                performed_at: setEntry.performed_at,
+              })
+            }
+          }
+        }
+      }
+    }
+
+    res.status(200).json({ message: "Workout updated successfully" })
+  } catch (error) {
+    console.error("Error updating workout entry:", error)
+    res.status(400).json({ message: error.message || "Update failed" })
+  }
+}
+
+export const deleteUserWorkoutEntry = async (req, res, next) => {
+  try {
+    const userId = req.params.id
+    const workoutEntryId = req.params.workoutId
+
+    console.log("Deleting workoutEntry for user:", userId, "Workout ID:", workoutEntryId)
+
+    const workout = await WorkoutEntry.findOne({
+      where: {
+        id: workoutEntryId,
+        user_id: userId, // Ensure workout belongs to the user
+      },
+    })
+
+    if (!workout) {
+      return res.status(404).json({ message: "Workout not found" })
+    }
+
+    await workout.destroy()
+
+    res.status(200).json({ message: "Workout deleted successfully" })
+  } catch (error) {
+    console.error("Error deleting workout entry:", error)
+    res.status(500).json({ message: "Internal server error" })
+  }
+}

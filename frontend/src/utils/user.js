@@ -123,3 +123,28 @@ export const getUserWorkoutEntries = async (
     setLoading(false)
   }
 }
+
+export const updateUserWorkoutEntry = async (userId, workoutId, data, setError, setLoading) => {
+  try {
+    setLoading?.(true)
+    await axiosInstance.put(`/users/${userId}/workout/${workoutId}`, data)
+  } catch (err) {
+    setError?.(err.message || "Failed to update workout.")
+    throw err
+  } finally {
+    setLoading?.(false)
+  }
+}
+
+export const deleteUserWorkoutEntry = async (userId, workoutId, setError, setLoading) => {
+  try {
+    setLoading?.(true)
+    await axiosInstance.delete(`/users/${userId}/workout/${workoutId}`)
+  } catch (err) {
+    setError?.(err.response?.data?.message || "Failed to delete workout.")
+    throw err
+  } finally {
+    setLoading?.(false)
+  }
+}
+
