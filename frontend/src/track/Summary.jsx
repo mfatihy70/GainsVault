@@ -1,6 +1,8 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { Container, Card, Button, Row, Col, Badge } from "react-bootstrap"
+import { Container, Card, Button, Row, Col, Badge, Image } from "react-bootstrap"
 import { formatDateTime, formatDuration } from "../utils/stopwatch"
+import workoutImage from '../assets/workout.png'
+import { createTrackedWorkout } from "../utils/workout"
 
 const WorkoutSummary = () => {
   const { state } = useLocation()
@@ -12,8 +14,20 @@ const WorkoutSummary = () => {
     )
   }
 
+  const userId = localStorage.getItem("userId")
   const { workout, exercises, workoutId, times, isCustomWorkout } = state
   const { startTime, endTime, duration } = times || {}
+  const finishedExercises = exercises
+    .map((ex) => {
+      const finishedSets = ex.setsData?.filter((set) => set.done) || []
+      if (finishedSets.length === 0) return null
+
+      return {
+        ...ex,
+        setsData: finishedSets, // replace original sets with only finished ones
+      }
+    })
+    .filter(Boolean) // removes nulls
 
   const handleSubmitWorkout = () => {
     console.log("Submitting workout data...")
@@ -23,6 +37,55 @@ const WorkoutSummary = () => {
     console.log("Times:", times)
     console.log("Is Custom Workout:", isCustomWorkout)
     // Submit logic here
+
+    //const trackedWorkoutData = {
+    //  userId: userId,
+    //  workoutId: workoutId,
+    //  name: workout?.name || "Custom Workout",
+    //  performedAt: new Date(),
+    //  start: new Date(startTime),
+    //  end: new Date(endTime),
+    //  //duration: duration, // in seconds
+    //  exercises: [
+    //    {
+    //      exerciseId: 12,
+    //      performedAt: new Date(),
+    //      sets: [
+    //        { kg: 60, reps: 8, performedAt: new Date() },
+    //        { kg: 60, reps: 6, performedAt: new Date() }
+    //      ]
+    //    },
+    //    {
+    //      exerciseId: 14,
+    //      performedAt: new Date(),
+    //      sets: [
+    //        { kg: 25, reps: 12, performedAt: new Date() }
+    //      ]
+    //    }
+    //  ]
+    //};
+
+    const trackedWorkoutData = {
+      userId: userId,
+      workoutId: workoutId,
+      name: workout?.name || "Custom Workout",
+      performedAt: new Date(),
+      start: new Date(startTime),
+      end: new Date(endTime),
+      default: !isCustomWorkout, // true if it's a default workout
+      exercises: finishedExercises.map((exercise) => ({
+        exerciseId: exercise.id,
+        performedAt: new Date(),
+        sets: exercise.setsData.map((set, index) => ({
+          kg: set.weight,
+          reps: set.reps,
+          performedAt: new Date(),
+          set_order: index + 1,
+        })),
+      })),
+    };
+    console.log("Tracked Workout Data:", trackedWorkoutData);
+    createTrackedWorkout(trackedWorkoutData, () => { }, () => { });
   }
 
   const handleGoBack = () => {
@@ -67,61 +130,88 @@ const WorkoutSummary = () => {
       </Card>
 
       {/* Exercise Summary */}
-      {exercises.map((ex, i) => (
-        <Card key={i} className="mb-4 bg-dark text-light border border-warning">
-          <Card.Body>
-            <Card.Title className="text-warning mb-2">
-              {ex.name}
-              <Badge bg="info" className="ms-2">
-                {ex.primary}
-              </Badge>
-              {ex.secondary && (
-                <Badge bg="secondary" className="ms-2">
-                  {ex.secondary}
-                </Badge>
-              )}
-            </Card.Title>
+      {finishedExercises.map((ex, i) => {
+        const finishedSets = ex.setsData
 
-            {ex.equipment && (
-              <p className="text-muted mb-3">Equipment: {ex.equipment}</p>
-            )}
-
-            {/* Sets */}
-            <div className="mb-3">
-              <strong className="d-block mb-2">Sets Performed:</strong>
-              {ex.setsData?.length > 0 ? (
-                <Row className="g-2">
-                  {ex.setsData.map((set, setIdx) => (
-                    <Col key={setIdx} md={4}>
-                      <Card
-                        bg={set.done ? "success" : "secondary"}
-                        text={set.done ? "dark" : "light"}
-                        className="p-2"
+        return (
+          <Card key={i} className="mb-4 bg-dark text-light border border-warning">
+            <Card.Body>
+              <Card.Title className="text-warning mb-3 d-flex justify-content-center">
+                <div className="d-flex align-items-center">
+                  <Image
+                    src={ex.image || workoutImage}
+                    alt={ex.name}
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      objectFit: "cover",
+                      borderRadius: "0.25rem",
+                      marginRight: "1rem",
+                    }}
+                    rounded
+                  />
+                  <div className="d-flex flex-column">
+                    <div className="fw-bold">{ex.name}</div>
+                    <div className="mt-1">
+                      <Badge bg="info" className="me-2">
+                        {ex.primary}
+                      </Badge>
+                      {ex.secondary && (
+                        <Badge bg="secondary" className="me-2">
+                          {ex.secondary}
+                        </Badge>
+                      )}
+                    </div>
+                    {ex.equipment && (
+                      <p
+                        style={{
+                          color: "#dcdcdc",
+                          fontSize: "0.8rem",
+                          marginBottom: "0.25rem",
+                          marginTop: "0.25rem",
+                        }}
                       >
-                        <div>
-                          <strong>Set {setIdx + 1}</strong>
-                        </div>
+                        Equipment: {ex.equipment}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </Card.Title>
+
+              {/* Sets */}
+              <div className="mb-3">
+                <strong className="d-block mb-2">Sets Performed:</strong>
+                <div className="d-flex flex-column gap-2">
+                  {finishedSets.map((set, idx) => (
+                    <Card
+                      key={idx}
+                      bg="success"
+                      text="dark"
+                      className="p-2"
+                    >
+                      <div className="d-flex justify-content-between gap-3">
+                        <div><strong>Set {idx + 1}</strong></div>
                         <div>Weight: {set.weight} kg</div>
                         <div>Reps: {set.reps}</div>
-                      </Card>
-                    </Col>
+                      </div>
+                    </Card>
                   ))}
-                </Row>
-              ) : (
-                <p className="text-muted">No sets recorded.</p>
-              )}
-            </div>
-
-            {/* Notes */}
-            {ex.notes && (
-              <div className="mt-2">
-                <strong>Notes:</strong>
-                <p className="fst-italic text-info mb-0">{ex.notes}</p>
+                </div>
               </div>
-            )}
-          </Card.Body>
-        </Card>
-      ))}
+
+
+              {/* Notes */}
+              {ex.notes && (
+                <div className="mt-2">
+                  <strong>Notes:</strong>
+                  <p className="fst-italic text-info mb-0">{ex.notes}</p>
+                </div>
+              )}
+            </Card.Body>
+          </Card>
+        )
+      })}
+
 
       {/* Final Action */}
       <div className="text-center mt-4">

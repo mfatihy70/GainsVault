@@ -10,16 +10,18 @@ import {
   Alert,
   OverlayTrigger,
   Tooltip,
+  InputGroup,
+  Image,
 } from "react-bootstrap"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { getWorkoutById } from "../utils/workout"
-import { getExerciseFromWorkoutId } from "../utils/track"
+import { getWorkoutExercisesByWorkoutId, getWorkoutById} from "../utils/workout"
 import "../styles/track.css"
 import SearchableDropdown from "./SearchableDropdown"
 import { getExercises } from "../utils/exercise"
 import { Stopwatch } from "./Stopwatch"
+import workoutImage from '../assets/workout.png'
 
 const WorkoutTrackNew = () => {
   const location = useLocation()
@@ -40,14 +42,11 @@ const WorkoutTrackNew = () => {
   const { id: workoutId } = useParams()
   const [exercises, setExercises] = useState(navigationState?.exercises || [])
   const [workout, setWorkout] = useState(navigationState?.workout || null)
-  const [times, setTimes] = useState(
-    navigationState?.times || { startTime: 0, endTime: 0, duration: 0 }
-  )
-  const [isCustomWorkout, setIsCustomWorkout] = useState(
-    navigationState?.isCustomWorkout ? true : false
-  )
+  const [times, setTimes] = useState(navigationState?.times || { startTime: 0, endTime: 0, duration: 0 })
+  const [isCustomWorkout, setIsCustomWorkout] = useState(navigationState?.isCustomWorkout ? true : false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [validationErrors, setValidationErrors] = useState({});
 
   const [allExercises, setAllExercises] = useState([])
 
@@ -79,10 +78,6 @@ const WorkoutTrackNew = () => {
     navigate("/track")
   }
   const handleFinishWorkout = () => {
-    //1.Create Workout Entry (user_id, workout_id, name, performed_at)
-    //2.Create Exercise Entries for each exercise in the workout
-    //   (workout_entry_id, workout_exercise_id, exercise_id, performed_at)
-    //3.
     navigate("/summary", {
       state: {
         workout,
@@ -93,31 +88,79 @@ const WorkoutTrackNew = () => {
       },
     })
   }
+  const handleRepsChange = (e, index, setIdx, setKey) => {
+    const val = Number(e.target.value);
+    const updatedExercises = [...exercises];
+    updatedExercises[index].setsData[setIdx].reps = val;
+    setExercises(updatedExercises);
+
+    if (val > 0 && validationErrors[setKey]?.reps) {
+      setValidationErrors((prev) => {
+        const copy = { ...prev };
+        if (copy[setKey]) {
+          delete copy[setKey].reps;
+          if (Object.keys(copy[setKey]).length === 0) delete copy[setKey];
+        }
+        return copy;
+      });
+    }
+  }
+  const handleWeightChange = (e, index, setIdx, setKey) => {
+    const val = Number(e.target.value);
+    const updatedExercises = [...exercises];
+    updatedExercises[index].setsData[setIdx].weight = val;
+    setExercises(updatedExercises);
+
+    if (val > 0 && validationErrors[setKey]?.weight) {
+      setValidationErrors((prev) => {
+        const copy = { ...prev };
+        if (copy[setKey]) {
+          delete copy[setKey].weight;
+          if (Object.keys(copy[setKey]).length === 0) delete copy[setKey];
+        }
+        return copy;
+      });
+    }
+  }
+  const hasAtLeastOneDoneSet = exercises.some((exercise) =>
+    exercise.setsData?.some((set) => set.done)
+  )
+
+
 
   useEffect(() => {
-    getWorkoutById(workoutId, setWorkout, setError, setLoading)
-    // Refetch exercises only if it's not a custom workout
-    if (!isCustomWorkout)
-      getExerciseFromWorkoutId(
+    setLoading(true)
+
+    getWorkoutById(workoutId, setWorkout, setError, () => setLoading(false))
+
+    if (navigationState?.exercises?.length) {
+      // Restoring previous exercise state (with user-entered data)
+      setExercises(navigationState.exercises)
+      setLoading(false)
+    } else if (!isCustomWorkout) {
+      // Fresh fetch from backend
+      getWorkoutExercisesByWorkoutId(
         workoutId,
-        (fetchedExercises) => {
-          setExercises(
-            fetchedExercises.map((ex) => ({
-              ...ex,
-              notes: ex.notes ?? "",
-              setsData:
-                ex.setsData?.length > 0
-                  ? ex.setsData
-                  : [{ reps: 0, weight: 0, done: false }],
-            }))
-          )
+        (fetchedWorkoutExercises) => {
+          const enrichedExercises = fetchedWorkoutExercises.map((we) => ({
+            ...we.exercise,
+            workoutExerciseId: we.id,
+            notes: we.notes ?? "",
+            setsData:
+              we.setsData?.length > 0
+                ? we.setsData
+                : [{ reps: 0, weight: 0, done: false }],
+          }))
+          setExercises(enrichedExercises)
+          setLoading(false)
         },
         setError,
-        setLoading
+        () => setLoading(false)
       )
+    }
 
-    getExercises(setAllExercises, setError, setLoading)
-  }, [workoutId, isCustomWorkout])
+    getExercises(setAllExercises, setError, () => { })
+  }, [navigationState?.exercises, workoutId, isCustomWorkout])
 
   if (loading || !workout) {
     return (
@@ -185,6 +228,19 @@ const WorkoutTrackNew = () => {
             <Card key={index} className="tracker-card mb-4">
               <Card.Body className="tracker-form">
                 <Row className="align-items-center mb-3">
+                  <Col xs="auto">
+                    <Image
+                      src={exercise.image || workoutImage}
+                      alt={exercise.name}
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        objectFit: "cover",
+                        borderRadius: "0.25rem"
+                      }}
+                      rounded
+                    />
+                  </Col>
                   <Col>
                     <Card.Title className="mb-1 text-warning">
                       {exercise.name}
@@ -212,74 +268,141 @@ const WorkoutTrackNew = () => {
                   )}
                 </Row>
 
-                {/* Exercise-Set Data */}
-                {exercise.setsData?.map((set, setIdx) => {
-                  const isDone = set.done
+                { /* Sets Section */ }
+                {exercise.setsData.map((set, setIdx) => {
+                  const setKey = `set-${index}-${setIdx}`;
+                  const isValid = set.weight > 0 && set.reps > 0;
+                  const hasWeightError = validationErrors[setKey]?.weight;
+                  const hasRepsError = validationErrors[setKey]?.reps;
+
+                  // Style for done sets
+                  let doneStyle = set.done
+                    ? {
+                      //backgroundColor: "#1e1e1e",
+                      border: "2px solid #28a745", // green when done
+                      opacity: 0.85,
+                    }
+                    : {
+                      //  backgroundColor: "#111", // near-black
+                      border: "2px solid #ffc107", // Bootstrap warning yellow
+                    };
+
+                  if (hasWeightError || hasRepsError) {
+                    doneStyle = {
+                      ...doneStyle,
+                      border: "2px solid #dc3545", // red border for errors
+                    };
+                  }
+
                   return (
                     <div
-                      key={setIdx}
-                      className={`d-flex flex-column flex-md-row align-items-md-center justify-content-between rounded p-3 mb-2 ${
-                        isDone ? "bg-success text-dark" : "bg-dark text-light"
-                      }`}
+                      key={setKey}
+                      style={{
+                        border: "1px solid",
+                        borderRadius: "6px",
+                        marginBottom: "10px",
+                        ...doneStyle,
+                      }}
+                      className="d-flex py-3 px-3 align-items-center"
                     >
-                      <div className="d-flex align-items-center gap-3 mb-3 mb-md-0">
+
+                      {/* Checkbox on left */}
+                      <div className="me-3" style={{ minWidth: "110px" }}>
+                        {/* Set number */}
                         <Form.Check
                           type="checkbox"
-                          className="me-2 text-dark"
-                          checked={isDone}
-                          onChange={() => {
-                            const updatedSets = [...(exercise.setsData || [])]
-                            updatedSets[setIdx].done = !updatedSets[setIdx].done
-                            handleExerciseChange(index, "setsData", updatedSets)
-                          }}
-                        />
-                        <strong>{setIdx + 1}</strong>
+                          label={`Set ${setIdx + 1}`}
+                          className="text-warning fw-bold"
+                          checked={set.done}
+                          isInvalid={!!validationErrors[setKey]}
+                          onClick={(e) => {
+                            const weightValid = set.weight > 0;
+                            const repsValid = set.reps > 0;
 
-                        <Form.Control
-                          type="number"
-                          placeholder="Weight"
-                          className="w-auto text-center"
-                          value={set.weight}
-                          onChange={(e) => {
-                            const updatedSets = [...(exercise.setsData || [])]
-                            updatedSets[setIdx].weight = parseFloat(
-                              e.target.value
-                            )
-                            handleExerciseChange(index, "setsData", updatedSets)
-                          }}
-                        />
-                        <span>kg</span>
+                            if (!weightValid || !repsValid) {
+                              e.preventDefault();
+                              setValidationErrors((prev) => ({
+                                ...prev,
+                                [setKey]: {
+                                  weight: !weightValid,
+                                  reps: !repsValid,
+                                },
+                              }));
+                            } else {
+                              setValidationErrors((prev) => {
+                                const copy = { ...prev };
+                                delete copy[setKey];
+                                return copy;
+                              });
 
-                        <Form.Control
-                          type="number"
-                          placeholder="Reps"
-                          className="w-auto text-center"
-                          value={set.reps}
-                          onChange={(e) => {
-                            const updatedSets = [...(exercise.setsData || [])]
-                            updatedSets[setIdx].reps = parseInt(
-                              e.target.value,
-                              10
-                            )
-                            handleExerciseChange(index, "setsData", updatedSets)
+                              const updatedExercises = [...exercises];
+                              updatedExercises[index].setsData[setIdx].done = e.target.checked;
+                              setExercises(updatedExercises);
+                            }
                           }}
                         />
-                        <span>Reps.</span>
                       </div>
+                      <Col>
+                        <Row className="justify-content-end text-end">
+                          {/* Weight input */}
+                          <Col md={6}>
+                            <InputGroup>
+                              <Form.Control
+                                type="number"
+                                min={0}
+                                value={set.weight}
+                                isInvalid={hasWeightError}
+                                onChange={(e) => handleWeightChange(e, index, setIdx, setKey)}
+                                className="text-center"
+                              />
+                              <InputGroup.Text className="bg-dark text-warning border-warning">
+                                kg
+                              </InputGroup.Text>
+                            </InputGroup>
 
-                      <Button
-                        variant={`${isDone ? "danger" : "outline-danger"}`}
-                        size="sm"
-                        onClick={() => {
-                          const updatedSets = [...(exercise.setsData || [])]
-                          updatedSets.splice(setIdx, 1)
-                          handleExerciseChange(index, "setsData", updatedSets)
-                        }}
-                      >
-                        ✖
-                      </Button>
+                          </Col>
+                          {/* Reps input */}
+                          <Col md={6} >
+                            <InputGroup >
+                              <Form.Control
+                                type="number"
+                                min={0}
+                                value={set.reps}
+                                isInvalid={hasRepsError}
+                                onChange={(e) => handleRepsChange(e, index, setIdx, setKey)}
+                                className="text-center"
+                              />
+                              <InputGroup.Text className="bg-dark text-warning border-warning">
+                                reps
+                              </InputGroup.Text>
+                            </InputGroup>
+
+                          </Col>
+                        </Row>
+                      </Col>
+
+                      {/* Delete set button on far right */}
+                      <div className="ms-3">
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          onClick={() => {
+                            const updatedExercises = [...exercises];
+                            updatedExercises[index].setsData.splice(setIdx, 1);
+                            setExercises(updatedExercises);
+
+                            setValidationErrors((prev) => {
+                              const copy = { ...prev };
+                              delete copy[setKey];
+                              return copy;
+                            });
+                          }}
+                        >
+                          ✖
+                        </Button>
+                      </div>
                     </div>
-                  )
+                  );
                 })}
 
                 {/* Add Set Button */}
@@ -338,8 +461,10 @@ const WorkoutTrackNew = () => {
                 {exercises.length === 0
                   ? "Add at least one exercise to enable"
                   : times.duration === 0
-                  ? "Workout duration must be greater than 0"
-                  : "Finish Workout"}
+                    ? "Workout duration must be greater than 0"
+                    : !hasAtLeastOneDoneSet
+                      ? "Mark at least one set as done to enable"
+                      : "Finish Workout"}
               </Tooltip>
             }
           >
@@ -358,15 +483,15 @@ const WorkoutTrackNew = () => {
                 size="lg"
                 className="finish-btn"
                 onClick={handleFinishWorkout}
-                disabled={exercises.length === 0 || times.duration === 0}
+                disabled={exercises.length === 0 || times.duration === 0 || !hasAtLeastOneDoneSet}
               >
                 Finish Workout
               </Button>
             </span>
           </OverlayTrigger>
         </div>
-      </motion.div>
-    </Container>
+      </motion.div >
+    </Container >
   )
 }
 

@@ -27,13 +27,13 @@ export const createWorkoutEntry = async (req, res) => {
   try {
     // TODO: add actual fields and validation
     const { name, primary, secondary, equipment } = req.body
-    const newWorkoutEntry = await WorkoutEntry.create({
-      name,
-      primary,
-      secondary,
-      equipment,
-    })
-    res.status(201).json(newWorkoutEntry)
+    //const newWorkoutEntry = await WorkoutEntry.create({
+    //  name,
+    //  primary,
+    //  secondary,
+    //  equipment,
+    //})
+    res.status(201).json(req.body)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
@@ -41,7 +41,7 @@ export const createWorkoutEntry = async (req, res) => {
 
 export const createUserWorkoutEntry = async (req, res) => {
   try {
-    
+
   } catch (error) {
     res.status(500).json({ message: error.message })
   }

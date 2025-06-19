@@ -25,10 +25,10 @@ const SetEntry = sequelize.define(
       type: DataTypes.INTEGER, // Integer type
       allowNull: false, // This field cannot be null
     },
-    performed_at: {
-      type: DataTypes.DATE, // Date type
-      defaultValue: DataTypes.NOW, // Defaults to the current date and time
-    },
+    //performed_at: {
+    //  type: DataTypes.DATE, // Date type
+    //  defaultValue: DataTypes.NOW, // Defaults to the current date and time
+    //},
   },
   {
     timestamps: false,

@@ -75,15 +75,42 @@ export const createWorkout = async (workout, setError, setLoading) => {
 }
 
 // Get workout exercises by workout ID (with full exercise data)
-export const getWorkoutExercisesByWorkoutId = async (workoutId) => {
+export const getWorkoutExercisesByWorkoutId = async (
+  workoutId,
+  setWorkoutExercises,
+  setError,
+  setLoading
+) => {
   try {
-    const response = await axiosInstance.get(
-      `/workout-exercises/workout/${workoutId}`
-    )
-    return response.data
+    const response = await axiosInstance.get(`/workout-exercises/workout/${workoutId}`)
+    setWorkoutExercises(response.data)
   } catch (err) {
-    console.error("Error fetching workout exercises:", err)
-    return []
+    setError(err.message)
+  } finally {
+    setLoading(false)
   }
 }
+export const createTrackedWorkout = async (
+  trackedWorkoutData,
+  setError,
+  setLoading
+) => {
+  try {
+    setLoading(true)
+    const response = await axiosInstance.post("/workout-exercises/workout", trackedWorkoutData);
 
+    if (!response.ok) {
+      throw new Error('Failed to save workout');
+    }
+
+    const result = await response.json();
+    console.log('Workout saved:', result);
+    alert('Workout saved successfully!');
+    // Optionally navigate away or reset state here
+
+  } catch (err) {
+    setError(err.message)
+  } finally {
+    setLoading(false)
+  }
+}
