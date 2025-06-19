@@ -8,12 +8,15 @@ import {
   Col,
   Image,
   Form,
+  Tab,
+  Tabs
 } from "react-bootstrap"
 import logo from "@/assets/icon/gainsvault.png"
 import { getUserById, editUser } from "../utils/user"
 import GainsChart from "./GainsChart"
 import MuscleRadarChart from "./MuscleRadarChart"
 import WeightTracker from "./WeightTracker"
+import WorkoutEntries from "./WorkoutEntries"
 
 const ProfilePage = () => {
   const userId = localStorage.getItem("userId")
@@ -207,21 +210,29 @@ const ProfilePage = () => {
         </Card.Body>
       </Card>
       <Card className="bg-dark border border-warning text-light mt-4 p-3">
-        <h1 className="text-center">Progress Stats</h1>
-        <Row>
-          <Col md={6} style={{ height: "500px" }}>
-            <WeightTracker userId={userId} />
-          </Col>
-          <Col md={6}>
-            <GainsChart />
-          </Col>
-        </Row>
-        <Col
-          md={12}
-          className="d-flex justify-content-center align-items-center text-center col mb-3"
-        >
-          <MuscleRadarChart width={500} height={500} />
-        </Col>
+        <Tabs defaultActiveKey="stats" id="profile-tabs" className="mb-3" justify variant="pills">
+          <Tab eventKey="stats" title="Progress Stats">
+            <h1 className="text-center">Progress Stats</h1>
+            <Row>
+              <Col md={6} style={{ height: "500px" }}>
+                <WeightTracker userId={userId} />
+              </Col>
+              <Col md={6}>
+                <GainsChart />
+              </Col>
+            </Row>
+            <Col
+              md={12}
+              className="d-flex justify-content-center align-items-center text-center col mb-3"
+            >
+              <MuscleRadarChart width={500} height={500} />
+            </Col>
+          </Tab>
+
+          <Tab eventKey="entries" title="Workout Entries">
+            <WorkoutEntries userId={userId} />
+          </Tab>
+        </Tabs>
       </Card>
     </Container>
   )

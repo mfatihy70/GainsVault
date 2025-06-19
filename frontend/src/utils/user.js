@@ -107,3 +107,19 @@ export const deleteWeight = async (
     setLoading(false)
   }
 }
+
+export const getUserWorkoutEntries = async (
+  userId,
+  setWorkouts,
+  setError,
+  setLoading
+) => {
+  try {
+    const response = await axiosInstance.get(`/users/${userId}/workout`)
+    setWorkouts(response.data)
+  } catch (err) {
+    setError(err.message)
+  } finally {
+    setLoading(false)
+  }
+}

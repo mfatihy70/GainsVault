@@ -4,3 +4,32 @@
   padding: 2rem;
   text-align: center;
 }
+.custom-accordion .accordion-button {
+  background-color: #212529 !important;
+  /* Bootstrap dark */
+  color: #ffc107 !important;
+  border: none;
+  box-shadow: none;
+}
+
+.custom-accordion .accordion-button:not(.collapsed) {
+  background-color: #343a40 !important;
+  /* Slightly lighter dark */
+  color: #ffc107 !important;
+}
+
+.custom-accordion .accordion-item {
+  background-color: #212529 !important;
+  /* Match dark theme */
+  border-color: #ffc107 !important;
+}
+
+.table-warning {
+  background-color: #ffc107 !important;
+}
+
+/* Change accordion arrow (chevron) color to yellow */
+.accordion-button::after,
+.accordion-button:not(.collapsed)::after {
+  filter: brightness(0) saturate(100%) invert(77%) sepia(86%) saturate(480%) hue-rotate(2deg) brightness(102%) contrast(103%);
+}
