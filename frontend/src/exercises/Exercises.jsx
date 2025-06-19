@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import {
   Container,
   Row,
@@ -9,9 +9,9 @@ import {
   Form,
   InputGroup,
   Button,
-} from "react-bootstrap"
-import { getExercises } from "../utils/exercise"
-import { motion } from "framer-motion"
+} from "react-bootstrap";
+import { getExercises } from "../utils/exercise";
+import { motion } from "framer-motion";
 
 const muscles = [
   "chest",
@@ -27,24 +27,73 @@ const muscles = [
   "glutes",
   "calves",
   "lower back",
-]
-const equipmentList = ["barbell", "dumbbell", "cable", "machine", "bodyweight"]
-const difficulties = ["beginner", "intermediate", "advanced"]
+];
+const equipmentList = ["barbell", "dumbbell", "cable", "machine", "bodyweight"];
+const difficulties = ["beginner", "intermediate", "advanced"];
 
-const ExercisePage = () => {
-  const [exercises, setExercises] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [search, setSearch] = useState("")
-  const [primary, setPrimary] = useState("")
-  const [secondary, setSecondary] = useState("")
-  const [equipment, setEquipment] = useState("")
-  const [difficulty, setDifficulty] = useState("")
+const Exercises = () => {
+  const [exercises, setExercises] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [search, setSearch] = useState("");
+  const [primary, setPrimary] = useState("");
+  const [secondary, setSecondary] = useState("");
+  const [equipment, setEquipment] = useState("");
+  const [difficulty, setDifficulty] = useState("");
+
+  // Modal State für neues Exercise
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    primary: "",
+    secondary: "",
+    equipment: "",
+    difficulty: "",
+  });
 
   useEffect(() => {
-    setLoading(true)
-    getExercises(setExercises, setLoading, setError)
-  }, [])
+    setLoading(true);
+    getExercises((data) => {
+      setExercises(data);
+      setLoading(false);
+      setError(null);
+    }, setLoading, setError);
+  }, []);
+
+  // Nach dem Hinzufügen neu laden
+  const reloadExercises = () => {
+    setLoading(true);
+    getExercises((data) => {
+      setExercises(data);
+      setLoading(false);
+      setError(null);
+    }, setLoading, setError);
+  };
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("http://localhost:5050/api/exercises", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+        alert("Exercise erstellt!");
+        setShowModal(false);
+        setFormData({ name: "", primary: "", secondary: "", equipment: "", difficulty: "" });
+        reloadExercises();
+      } else {
+        alert("Fehler beim Erstellen des Exercises.");
+      }
+    } catch (err) {
+      alert("Serverfehler.");
+    }
+  };
 
   const filteredExercises = exercises.filter(
     (ex) =>
@@ -53,7 +102,7 @@ const ExercisePage = () => {
       (!secondary || ex.secondary === secondary) &&
       (!equipment || ex.equipment === equipment) &&
       (!difficulty || ex.difficulty === difficulty)
-  )
+  );
 
   const selectOptions = (arr, label) => [
     <option key="" value="">
@@ -64,7 +113,7 @@ const ExercisePage = () => {
         {v.charAt(0).toUpperCase() + v.slice(1)}
       </option>
     )),
-  ]
+  ];
 
   return (
     <Container fluid className="d-flex flex-column min-vh-100 my-5">
@@ -72,10 +121,50 @@ const ExercisePage = () => {
       <div className="text-center my-4">
         <h1 className="text-warning">Exercises</h1>
         <p>
-          Browse through a list of exercises with details on muscles and
-          equipment.
+          Durchsuche eine Liste von Übungen mit Details zu Muskeln und Equipment.
         </p>
+        <Button variant="warning" onClick={() => setShowModal(true)}>
+          ➕ Exercise hinzufügen
+        </Button>
       </div>
+
+      {/* Modal für neues Exercise */}
+      {showModal && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
+          backgroundColor: "rgba(0,0,0,0.5)", display: "flex",
+          justifyContent: "center", alignItems: "center", zIndex: 9999
+        }}>
+          <div style={{ backgroundColor: "#222", padding: "2rem", borderRadius: "8px", minWidth: 350 }}>
+            <h3 className="text-warning">Neues Exercise</h3>
+            <form onSubmit={handleSubmit}>
+              <input name="name" placeholder="Name" value={formData.name} onChange={handleInputChange} required className="form-control mb-2" />
+              <select name="primary" value={formData.primary} onChange={handleInputChange} required className="form-control mb-2">
+                <option value="">Primärer Muskel</option>
+                {muscles.map((m) => <option key={m} value={m}>{m.charAt(0).toUpperCase() + m.slice(1)}</option>)}
+              </select>
+              <select name="secondary" value={formData.secondary} onChange={handleInputChange} className="form-control mb-2">
+                <option value="">Sekundärer Muskel (optional)</option>
+                {muscles.map((m) => <option key={m} value={m}>{m.charAt(0).toUpperCase() + m.slice(1)}</option>)}
+              </select>
+              <select name="equipment" value={formData.equipment} onChange={handleInputChange} className="form-control mb-2">
+                <option value="">Equipment (optional)</option>
+                {equipmentList.map((e) => <option key={e} value={e}>{e.charAt(0).toUpperCase() + e.slice(1)}</option>)}
+              </select>
+              <select name="difficulty" value={formData.difficulty} onChange={handleInputChange} className="form-control mb-2" required>
+                <option value="">Schwierigkeit</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+              <div className="d-flex gap-2 mt-2">
+                <button type="submit" className="btn btn-warning">Erstellen</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Abbrechen</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Filter Controls */}
       <Form className="mb-4">
@@ -84,7 +173,7 @@ const ExercisePage = () => {
             <InputGroup>
               <Form.Control
                 type="text"
-                placeholder="Search by name"
+                placeholder="Suche nach Name"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -95,7 +184,7 @@ const ExercisePage = () => {
               value={primary}
               className="bg-dark text-light border border-warning"
               onChange={(e) => setPrimary(e.target.value)}
-              children={selectOptions(muscles, "Primary Muscle")}
+              children={selectOptions(muscles, "Primärer Muskel")}
             />
           </Col>
           <Col md={2}>
@@ -103,7 +192,7 @@ const ExercisePage = () => {
               value={secondary}
               className="bg-dark text-light border border-warning"
               onChange={(e) => setSecondary(e.target.value)}
-              children={selectOptions(muscles, "Secondary Muscle")}
+              children={selectOptions(muscles, "Sekundärer Muskel")}
             />
           </Col>
           <Col md={2}>
@@ -119,7 +208,7 @@ const ExercisePage = () => {
               value={difficulty}
               className="bg-dark text-light border border-warning"
               onChange={(e) => setDifficulty(e.target.value)}
-              children={selectOptions(difficulties, "Difficulty")}
+              children={selectOptions(difficulties, "Schwierigkeit")}
             />
           </Col>
           <Col md={1} className="d-flex align-items-center">
@@ -127,14 +216,14 @@ const ExercisePage = () => {
               variant="outline-warning"
               className="w-100"
               onClick={() => {
-                setSearch("")
-                setPrimary("")
-                setSecondary("")
-                setEquipment("")
-                setDifficulty("")
+                setSearch("");
+                setPrimary("");
+                setSecondary("");
+                setEquipment("");
+                setDifficulty("");
               }}
             >
-              Clear
+              Zurücksetzen
             </Button>
           </Col>
         </Row>
@@ -160,12 +249,12 @@ const ExercisePage = () => {
               {filteredExercises.length === 0 ? (
                 <Col>
                   <Alert variant="warning" className="text-center mt-4">
-                    No exercises found.
+                    Keine Exercises gefunden.
                   </Alert>
                 </Col>
               ) : (
                 filteredExercises.map((exercise, idx) => (
-                  <Col md={4} key={exercise.id || idx} className="mb-4">
+                  <Col md={4} key={exercise.id || exercise._id || idx} className="mb-4">
                     <motion.div
                       whileHover={{
                         y: -10,
@@ -197,10 +286,10 @@ const ExercisePage = () => {
                         )}
                         <h4 className="mb-2">{exercise.name}</h4>
                         <p className="mb-2">
-                          <strong>Primary Muscles:</strong> {exercise.primary}
+                          <strong>Primäre Muskeln:</strong> {exercise.primary}
                         </p>
                         <p className="mb-2">
-                          <strong>Secondary Muscles:</strong>{" "}
+                          <strong>Sekundäre Muskeln:</strong>{" "}
                           {exercise.secondary ? exercise.secondary : "-"}
                         </p>
                         <p className="mb-4">
@@ -241,7 +330,7 @@ const ExercisePage = () => {
         </Row>
       )}
     </Container>
-  )
-}
+  );
+};
 
-export default ExercisePage
+export default Exercises;
