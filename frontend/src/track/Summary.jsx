@@ -38,33 +38,6 @@ const WorkoutSummary = () => {
     console.log("Is Custom Workout:", isCustomWorkout)
     // Submit logic here
 
-    //const trackedWorkoutData = {
-    //  userId: userId,
-    //  workoutId: workoutId,
-    //  name: workout?.name || "Custom Workout",
-    //  performedAt: new Date(),
-    //  start: new Date(startTime),
-    //  end: new Date(endTime),
-    //  //duration: duration, // in seconds
-    //  exercises: [
-    //    {
-    //      exerciseId: 12,
-    //      performedAt: new Date(),
-    //      sets: [
-    //        { kg: 60, reps: 8, performedAt: new Date() },
-    //        { kg: 60, reps: 6, performedAt: new Date() }
-    //      ]
-    //    },
-    //    {
-    //      exerciseId: 14,
-    //      performedAt: new Date(),
-    //      sets: [
-    //        { kg: 25, reps: 12, performedAt: new Date() }
-    //      ]
-    //    }
-    //  ]
-    //};
-
     const trackedWorkoutData = {
       userId: userId,
       workoutId: workoutId,

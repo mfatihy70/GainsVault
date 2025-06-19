@@ -1,6 +1,10 @@
 import User from "../models/user.model.js"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
+import WorkoutEntry from "../models/entries/workout.model.js"
+import ExerciseEntry from "../models/entries/exercise.model.js"
+import SetEntry from "../models/entries/set.model.js"
+import Exercise from "../models/core/exercise.model.js"
 
 // Fetch all users
 export const getUsers = async (req, res) => {
@@ -175,3 +179,70 @@ export const deleteWeight = async (req, res, next) => {
     next(error)
   }
 }
+
+export const getUserWorkoutEntries = async (req, res, next) => {
+  try {
+    const userId = req.params.id
+
+    const userWorkouts = await WorkoutEntry.findAll({
+      where: { user_id: userId },
+      order: [['start', 'DESC']],
+      include: [
+        {
+          model: ExerciseEntry,
+          include: [
+            {
+              model: SetEntry,
+              order: [['set_order', 'ASC']], // optional: sort sets by order
+            },
+            {
+              model: Exercise, // optional: include exercise name, type, etc.
+            }
+          ],
+        }
+      ],
+    });
+    console.log("User Workouts:", userWorkouts)
+    res.status(200).json(userWorkouts)
+  } catch (error) {
+    console.error("Error fetching user workouts:", error)
+    res.status(500).json({ message: "Internal server error" })
+  }
+}
+
+export const getUserWorkoutEntryById = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const workoutEntryId = req.params.workoutId;
+    console.log("Fetching workout for user:", userId, "Workout ID:", workoutEntryId);
+    const workout = await WorkoutEntry.findOne({
+      where: {
+        id: workoutEntryId,
+        user_id: userId, // ensure the workout belongs to the user
+      },
+      include: [
+        {
+          model: ExerciseEntry,
+          include: [
+            {
+              model: SetEntry,
+              order: [['set_order', 'ASC']],
+            },
+            {
+              model: Exercise,
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!workout) {
+      return res.status(404).json({ message: "Workout not found" });
+    }
+
+    res.status(200).json(workout);
+  } catch (error) {
+    console.error("Error fetching workout by ID:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
