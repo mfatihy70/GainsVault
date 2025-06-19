@@ -97,13 +97,7 @@ export const createTrackedWorkout = async (
 ) => {
   try {
     setLoading(true)
-    const response = await axiosInstance.post("/workout-exercises/workout", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(trackedWorkoutData),
-    });
+    const response = await axiosInstance.post("/workout-exercises/workout", trackedWorkoutData);
 
     if (!response.ok) {
       throw new Error('Failed to save workout');

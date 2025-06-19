@@ -24,9 +24,21 @@ const WorkoutEntry = sequelize.define(
       type: DataTypes.STRING(50),
       allowNull: true,
     },
-    performed_at: {
+    //performed_at: {
+    //  type: DataTypes.DATE,
+    //  defaultValue: DataTypes.NOW,
+    //},
+    default: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false, // Default to false for user-defined workouts
+    },
+    start: {
       type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      allowNull: false,
+    },
+    end: {
+      type: DataTypes.DATE,
+      allowNull: false,
     },
   },
   {

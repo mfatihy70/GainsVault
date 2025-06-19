@@ -29,10 +29,10 @@ const ExerciseEntry = sequelize.define(
         key: "id", // References the id column in exercises
       },
     },
-    performed_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
+    //performed_at: {
+    //  type: DataTypes.DATE,
+    //  defaultValue: DataTypes.NOW,
+    //},
   },
   {
     timestamps: false,

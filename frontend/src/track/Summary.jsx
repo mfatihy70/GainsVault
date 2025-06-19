@@ -72,6 +72,7 @@ const WorkoutSummary = () => {
       performedAt: new Date(),
       start: new Date(startTime),
       end: new Date(endTime),
+      default: !isCustomWorkout, // true if it's a default workout
       exercises: finishedExercises.map((exercise) => ({
         exerciseId: exercise.id,
         performedAt: new Date(),
