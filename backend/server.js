@@ -15,8 +15,8 @@ connectDB().then(async () => {
   await import("./models/sync.js")
 
   /* Sync the models - Uncomment when you want to create tables or alter them*/
-  await sequelize.sync({ alter: true })
-  console.log("✅ All models synced with database")
+  // await sequelize.sync({ alter: true })
+  // console.log("✅ All models synced with database")
 
   // Import and mount routes AFTER sync
   const { default: usersRouter } = await import("./routes/user.routes.js")
@@ -34,9 +34,15 @@ connectDB().then(async () => {
   )
 
   // Import entries routes
-  const { default: entriesSetRouter } = await import("./routes/entries/set.routes.js")
-  const { default: entriesWorkoutRouter } = await import("./routes/entries/workout.routes.js")
-  const { default: entriesExerciseRouter } = await import("./routes/entries/exercise.routes.js")
+  const { default: entriesSetRouter } = await import(
+    "./routes/entries/set.routes.js"
+  )
+  const { default: entriesWorkoutRouter } = await import(
+    "./routes/entries/workout.routes.js"
+  )
+  const { default: entriesExerciseRouter } = await import(
+    "./routes/entries/exercise.routes.js"
+  )
 
   // Mount all routes
   app.use("/api/users", usersRouter)

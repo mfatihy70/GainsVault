@@ -4,27 +4,10 @@ import Workout from "../../models/core/workout.model.js"
 // Fetch all splits
 export const getSplits = async (req, res) => {
   try {
-    console.log("Received request for splits")
-    const { days, difficulty } = req.query
-    const whereClause = {}
-
-    if (days && days !== "") {
-      whereClause.days = days
-    }
-    if (difficulty && difficulty !== "") {
-      whereClause.difficulty = difficulty
-    }
-
-    console.log("Filtering splits with:", whereClause)
-
     const splits = await Split.findAll({
-      where: whereClause,
-      order: [["name", "ASC"]],
+      order: [["id", "ASC"]],
       raw: true,
     })
-
-    console.log(`Found ${splits.length} splits`)
-
     res.json(splits)
   } catch (error) {
     res.status(500).json({ message: error.message })
@@ -92,7 +75,6 @@ export const getWorkoutsForSplit = async (req, res) => {
     const splitId = req.params.id
     const workouts = await Workout.findAll({
       where: { split_id: splitId },
-      order: [["order", "ASC"]],
       raw: true,
     })
     res.json(workouts)

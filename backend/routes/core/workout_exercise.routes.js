@@ -2,6 +2,7 @@ import express from "express"
 import {
   getWorkoutExercises,
   getWorkoutExerciseById,
+  getExercisesForWorkout,
   createWorkoutExercise,
   updateWorkoutExercise,
   deleteWorkoutExercise,
@@ -10,9 +11,9 @@ import {
 const router = express.Router()
 
 // Fetch all exercises for a specific workout
-router.get("/workout/:workoutId", getWorkoutExercises)
 
 router.get("/", getWorkoutExercises)
+router.get("/workout/:workoutId", getExercisesForWorkout)
 router.get("/:id", getWorkoutExerciseById)
 router.post("/", createWorkoutExercise)
 router.put("/:id", updateWorkoutExercise)

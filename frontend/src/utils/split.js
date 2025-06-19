@@ -11,6 +11,7 @@ export const getSplits = async (setSplits, setError, setLoading) => {
     setLoading(false)
   }
 }
+
 export const getSplitById = async (id, setSplit, setError, setLoading) => {
   try {
     const response = await axiosInstance.get(`/splits/${id}`)

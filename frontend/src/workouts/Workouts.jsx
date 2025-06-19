@@ -10,6 +10,8 @@ import {
   Table,
 } from "react-bootstrap"
 import { motion } from "framer-motion"
+import { getWorkouts, getWorkoutExercisesByWorkoutId } from "../utils/workout"
+import { getSplits } from "../utils/split"
 
 const WorkoutsPage = () => {
   const [selectedMuscle, setSelectedMuscle] = useState("all")
@@ -22,6 +24,8 @@ const WorkoutsPage = () => {
   const [search, setSearch] = useState("")
   const [difficulty, setDifficulty] = useState("")
   const [splits, setSplits] = useState([])
+  const [splitMap, setSplitMap] = useState({})
+  const [selectedSplit, setSelectedSplit] = useState("") // NEW: for split filter
 
   const handleCloseModal = () => setShowModal(false)
   const handleShowModal = async (workout, e) => {
@@ -29,60 +33,27 @@ const WorkoutsPage = () => {
     setSelectedWorkout(workout)
     setShowModal(true)
 
-    // Fetch exercises for the selected workout
-    const exercises = await fetchWorkoutExercises(workout.id)
+    // Fetch exercises for the selected workout using the extracted function
+    const exercises = await getWorkoutExercisesByWorkoutId(workout.id)
     setSelectedWorkoutExercises(exercises)
   }
-
-  const fetchWorkoutExercises = async (workoutId) => {
-    try {
-      const response = await fetch(
-        `http://localhost:5050/api/workout-exercises/workout/${workoutId}`
-      )
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      const data = await response.json()
-      return data
-    } catch (error) {
-      console.error("Error fetching workout exercises:", error)
-      return []
-    }
-  }
-
+  // Use the provided getSplits function to fetch splits on mount
   useEffect(() => {
-    const fetchWorkouts = async () => {
-      try {
-        const response = await fetch("http://localhost:5050/api/workouts")
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        const data = await response.json()
-        setWorkouts(data)
-      } catch (error) {
-        setError(error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchWorkouts()
+    getSplits(setSplits, setError, setLoading)
   }, [])
 
-  // Fetch splits for mapping split_id to split name
+  // Build splitMap whenever splits change
   useEffect(() => {
-    const fetchSplits = async () => {
-      try {
-        const response = await fetch("http://localhost:5050/api/splits")
-        if (!response.ok)
-          throw new Error(`HTTP error! status: ${response.status}`)
-        const data = await response.json()
-        setSplits(data)
-      } catch (error) {
-        // Optionally handle split fetch error
-      }
-    }
-    fetchSplits()
+    const map = {}
+    splits.forEach((split) => {
+      map[split.id] = split.name
+    })
+    setSplitMap(map)
+  }, [splits])
+
+  useEffect(() => {
+    // Use the extracted getWorkouts function
+    getWorkouts(setWorkouts, setError, setLoading)
   }, [])
 
   const muscleGroups = [
@@ -98,12 +69,13 @@ const WorkoutsPage = () => {
   const filteredWorkouts = workouts.filter(
     (w) =>
       w.name.toLowerCase().includes(search.toLowerCase()) &&
-      (!difficulty || w.difficulty === difficulty)
+      (!difficulty || w.difficulty === difficulty) &&
+      (!selectedSplit || String(w.split_id) === String(selectedSplit))
   )
 
   // Helper to get split name by id
   const getSplitName = (splitId) => {
-    const split = splits.find((s) => s.id === splitId)
+    const split = splits.find((s) => s.id == splitId) // Use loose equality to match number/string
     return split ? split.name : `Split ${splitId}`
   }
 
@@ -147,16 +119,17 @@ const WorkoutsPage = () => {
               </Form.Group>
             </Col>
             <Col md={4} className="mb-2">
-              <Form.Group controlId="muscleGroupFilter">
-                <Form.Label>Target Muscle</Form.Label>
+              <Form.Group controlId="splitFilter">
+                <Form.Label>Split</Form.Label>
                 <Form.Select
-                  value={selectedMuscle}
-                  onChange={(e) => setSelectedMuscle(e.target.value)}
+                  value={selectedSplit}
+                  onChange={(e) => setSelectedSplit(e.target.value)}
                   className="bg-dark text-light border border-warning"
                 >
-                  {muscleGroups.map((muscle) => (
-                    <option key={muscle.value} value={muscle.value}>
-                      {muscle.label}
+                  <option value="">All</option>
+                  {splits.map((split) => (
+                    <option key={split.id} value={split.id}>
+                      {split.name}
                     </option>
                   ))}
                 </Form.Select>
@@ -180,12 +153,23 @@ const WorkoutsPage = () => {
                   transition={{ duration: 0.2 }}
                 >
                   <Card className="h-100 bg-dark text-light border border-warning shadow-sm">
+                    {/* Show workout image if available */}
+                    {workout.image && (
+                      <Card.Img
+                        variant="top"
+                        src={workout.image}
+                        alt={workout.name}
+                        style={{ objectFit: "cover", height: "180px" }}
+                      />
+                    )}
                     <Card.Body className="px-4">
                       <Card.Title className="text-warning">
                         {workout.name}
                       </Card.Title>
                       <Card.Subtitle className="m-2">
-                        Split: {getSplitName(workout.split_id)}
+                        <strong>Split: </strong>
+                        {splitMap[workout.split_id] ||
+                          `Split ${workout.split_id}`}
                       </Card.Subtitle>
                       <Button
                         variant="warning"
@@ -203,7 +187,13 @@ const WorkoutsPage = () => {
       </motion.div>
 
       {/* Workout Detail Modal */}
-      <Modal show={showModal} onHide={handleCloseModal} centered>
+      <Modal
+        show={showModal}
+        onHide={handleCloseModal}
+        centered
+        size="lg"
+        dialogClassName="workout-modal-xl"
+      >
         <Modal.Header closeButton className="bg-dark text-light border-warning">
           <Modal.Title className="text-warning">
             {selectedWorkout?.name}
@@ -223,6 +213,7 @@ const WorkoutsPage = () => {
                 hover
                 variant="dark"
                 className="border-warning"
+                responsive
               >
                 <thead>
                   <tr>
@@ -273,5 +264,15 @@ const WorkoutsPage = () => {
     </Container>
   )
 }
+
+// Add this style globally or in your CSS file if not already present
+// You can also use a <style> tag here for quick testing:
+<style>
+{`
+.workout-modal-xl .modal-dialog {
+  max-width: 1100px !important;
+}
+`}
+</style>
 
 export default WorkoutsPage

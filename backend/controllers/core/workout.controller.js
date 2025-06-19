@@ -3,7 +3,9 @@ import Workout from "../../models/core/workout.model.js"
 // Fetch all workouts
 export const getWorkouts = async (req, res) => {
   try {
-    const workouts = await Workout.findAll()
+    const workouts = await Workout.findAll({
+      order: [["id", "ASC"]],
+    })
     res.json(workouts)
   } catch (error) {
     res.status(500).json({ message: error.message })

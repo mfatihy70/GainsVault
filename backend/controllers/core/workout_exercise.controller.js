@@ -4,24 +4,7 @@ import Exercise from "../../models/core/exercise.model.js"
 // Fetch all exercises for a specific workout
 export const getWorkoutExercises = async (req, res) => {
   try {
-    const workoutExercises = await WorkoutExercise.findAll({
-      where: { workout_id: req.params.workoutId },
-      include: [
-        {
-          model: Exercise,
-          attributes: [
-            "id",
-            "name",
-            "primary",
-            "secondary",
-            "equipment",
-            "image",
-            "difficulty",
-          ],
-        },
-      ],
-      order: [["order", "ASC"]],
-    })
+    const workoutExercises = await WorkoutExercise.findAll()
     res.json(workoutExercises)
   } catch (error) {
     res.status(500).json({ message: error.message })
@@ -81,6 +64,20 @@ export const deleteWorkoutExercise = async (req, res) => {
     if (!deletedWorkoutExercise)
       return res.status(404).json({ message: "Workout exercise not found" })
     res.json({ message: "Workout exercise deleted successfully" })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+// Fetch all exercises for a specific workout, with exercise info
+export const getExercisesForWorkout = async (req, res) => {
+  try {
+    const workoutExercises = await WorkoutExercise.findAll({
+      where: { workout_id: req.params.workoutId },
+      include: [{ model: Exercise }],
+    })
+
+    res.json(workoutExercises)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }

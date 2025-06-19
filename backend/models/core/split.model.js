@@ -20,6 +20,10 @@ const Split = sequelize.define(
       type: DataTypes.ENUM("beginner", "intermediate", "advanced"),
       allowNull: false,
     },
+    image: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
   },
   {
     timestamps: false,

@@ -11,6 +11,7 @@ export const getWorkouts = async (setWorkouts, setError, setLoading) => {
     setLoading(false)
   }
 }
+
 export const getWorkoutById = async (id, setWorkout, setError, setLoading) => {
   try {
     const response = await axiosInstance.get(`/workouts/${id}`)
@@ -45,17 +46,18 @@ export const getWorkoutsForSplit = async (
   }
 }
 
-/**
- * Fetch workouts for a specific split by splitId.
- * Returns an array of workouts belonging to the split.
- */
-export const fetchWorkoutsForSplit = async (splitId) => {
+export const getWorkoutExercises = async (
+  setWorkoutExercises,
+  setError,
+  setLoading
+) => {
   try {
-    const response = await axiosInstance.get("/workouts")
-    // Filter workouts by split_id
-    return response.data.filter((workout) => workout.split_id === splitId)
+    const response = await axiosInstance.get(`/workout-exercises`)
+    setWorkoutExercises(response.data)
   } catch (err) {
-    throw new Error(err.message)
+    setError(err.message)
+  } finally {
+    setLoading(false)
   }
 }
 
@@ -72,20 +74,16 @@ export const createWorkout = async (workout, setError, setLoading) => {
   }
 }
 
-// ============================================
-/// Workout Exercises
-// ============================================
-export const getWorkoutExercises = async (
-  setWorkoutExercises,
-  setError,
-  setLoading
-) => {
+// Get workout exercises by workout ID (with full exercise data)
+export const getWorkoutExercisesByWorkoutId = async (workoutId) => {
   try {
-    const response = await axiosInstance.get(`/workout-exercises`)
-    setWorkoutExercises(response.data)
+    const response = await axiosInstance.get(
+      `/workout-exercises/workout/${workoutId}`
+    )
+    return response.data
   } catch (err) {
-    setError(err.message)
-  } finally {
-    setLoading(false)
+    console.error("Error fetching workout exercises:", err)
+    return []
   }
 }
+

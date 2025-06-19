@@ -149,6 +149,15 @@ const SplitPage = () => {
                   transition={{ duration: 0.3 }}
                 >
                   <Card className="h-100 bg-dark border border-warning text-light">
+                    {/* Show split image if available */}
+                    {split.image && (
+                      <Card.Img
+                        variant="top"
+                        src={split.image}
+                        alt={split.name}
+                        style={{ objectFit: "cover", height: "270px" }}
+                      />
+                    )}
                     <Card.Body>
                       <Card.Title>{split.name}</Card.Title>
                       <div className="mb-2">{split.description}</div>
@@ -163,7 +172,7 @@ const SplitPage = () => {
                         </span>
                       </Card.Text>
                       <Button
-                        variant="primary"
+                        variant="warning"
                         onClick={() => setSelectedSplit(split)}
                         className="w-100"
                       >
@@ -226,6 +235,14 @@ const SplitPage = () => {
         <Modal.Footer className="bg-dark text-light">
           <Button variant="secondary" onClick={() => setSelectedSplit(null)}>
             Close
+          </Button>
+          <Button
+            variant="warning"
+            onClick={() => {
+              window.location.href = "/workouts"
+            }}
+          >
+            Go to Workouts
           </Button>
         </Modal.Footer>
       </Modal>

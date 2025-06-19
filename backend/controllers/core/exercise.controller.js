@@ -3,7 +3,7 @@ import Exercise from "../../models/core/exercise.model.js"
 // Fetch all exercises
 export const getExercises = async (req, res) => {
   try {
-    const exercises = await Exercise.findAll()
+    const exercises = await Exercise.findAll({ order: [["id", "ASC"]] })
     res.json(exercises)
   } catch (error) {
     res.status(500).json({ message: error.message })
@@ -88,7 +88,8 @@ export const updateMultipleExercises = async (req, res) => {
             returning: true,
           }
         )
-        if (!rowsUpdated) throw new Error(`Exercise with ID ${exercise.id} not found`)
+        if (!rowsUpdated)
+          throw new Error(`Exercise with ID ${exercise.id} not found`)
         return updatedExercise
       })
     )

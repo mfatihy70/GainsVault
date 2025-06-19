@@ -17,13 +17,13 @@ const Workout = sequelize.define(
       type: DataTypes.STRING(50),
       allowNull: false,
     },
-    order: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
     default: {
       type: DataTypes.BOOLEAN,
       defaultValue: false, // Default value is false
+    },
+    image: {
+      type: DataTypes.STRING(255),
+      allowNull: true, // Image is optional
     },
   },
   {

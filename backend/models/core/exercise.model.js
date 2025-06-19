@@ -14,7 +14,7 @@ const muscles = [
   "hamstrings",
   "glutes",
   "calves",
-  "lower_back",
+  "lower back",
 ]
 
 const equipment = ["barbell", "dumbbell", "cable", "machine", "bodyweight"]

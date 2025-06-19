@@ -26,7 +26,7 @@ const muscles = [
   "hamstrings",
   "glutes",
   "calves",
-  "lower_back",
+  "lower back",
 ]
 const equipmentList = ["barbell", "dumbbell", "cable", "machine", "bodyweight"]
 const difficulties = ["beginner", "intermediate", "advanced"]
@@ -197,12 +197,11 @@ const ExercisePage = () => {
                         )}
                         <h4 className="mb-2">{exercise.name}</h4>
                         <p className="mb-2">
-                          <strong>Primary Muscles:</strong>{" "}
-                          {exercise.primaryMuscles}
+                          <strong>Primary Muscles:</strong> {exercise.primary}
                         </p>
                         <p className="mb-2">
                           <strong>Secondary Muscles:</strong>{" "}
-                          {exercise.secondaryMuscles}
+                          {exercise.secondary ? exercise.secondary : "-"}
                         </p>
                         <p className="mb-4">
                           <strong>Equipment:</strong> {exercise.equipment}

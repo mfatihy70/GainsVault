@@ -21,10 +21,6 @@ const WorkoutExercise = sequelize.define(
         key: "id", // References the id column in the exercises table
       },
     },
-    order: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
   },
   {
     timestamps: false,
