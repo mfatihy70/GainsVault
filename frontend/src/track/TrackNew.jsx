@@ -16,7 +16,7 @@ import {
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { getWorkoutById, getWorkoutExercises } from "../utils/workout"
+import { getWorkoutExercisesByWorkoutId, getWorkoutById} from "../utils/workout"
 import "../styles/track.css"
 import SearchableDropdown from "./SearchableDropdown"
 import { getExercises } from "../utils/exercise"
@@ -139,7 +139,7 @@ const WorkoutTrackNew = () => {
       setLoading(false)
     } else if (!isCustomWorkout) {
       // Fresh fetch from backend
-      getWorkoutExercises(
+      getWorkoutExercisesByWorkoutId(
         workoutId,
         (fetchedWorkoutExercises) => {
           const enrichedExercises = fetchedWorkoutExercises.map((we) => ({

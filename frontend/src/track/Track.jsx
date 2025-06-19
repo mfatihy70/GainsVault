@@ -11,7 +11,7 @@ import {
 } from "react-bootstrap"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
-import { getWorkoutExercises, getWorkoutsForSplit } from "../utils/workout"
+import { getWorkoutExercisesByWorkoutId, getWorkoutsForSplit } from "../utils/workout"
 import { getSplitById, getSplits } from "../utils/split"
 import { useNavigate } from "react-router-dom"
 
@@ -45,7 +45,7 @@ const WorkoutTrack = () => {
     setSelectedWorkoutId(null)
     setExercises([])
     setSelectedWorkoutId(workoutId)
-    getWorkoutExercises(
+    getWorkoutExercisesByWorkoutId(
       workoutId,
       (fetchedWorkoutExercises) => {
         const enrichedExercises = fetchedWorkoutExercises.map((we) => ({
@@ -122,18 +122,20 @@ const WorkoutTrack = () => {
                     className="position-relative"
                     style={{ height: "200px", overflow: "hidden" }}
                   >
-                    <Card.Img
-                      variant="top"
-                      src="https://images.unsplash.com/photo-1596357395217-80de13130e92?q=80&w=2071&auto=format&fit=crop"
-                      alt={workout.name}
-                      style={{
-                        height: "100%",
-                        width: "100%",
-                        objectFit: "cover",
-                        transition: "transform 0.3s ease",
-                      }}
-                      className="hover-zoom"
-                    />
+                    {workout.image && (
+                      <Card.Img
+                        variant="top"
+                        src={workout.image}
+                        alt={workout.name}
+                        style={{
+                          height: "100%",
+                          width: "100%",
+                          objectFit: "cover",
+                          transition: "transform 0.3s ease",
+                        }}
+                        className="hover-zoom"
+                      />
+                    )}
                   </div>
                   <Card.Body className="px-4">
                     <Card.Title className="text-warning">
