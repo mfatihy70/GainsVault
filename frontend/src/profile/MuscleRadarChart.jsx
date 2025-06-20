@@ -80,7 +80,8 @@ const MuscleRadarChart = ({ width = 400, height = 400 }) => {
   }
 
   return (
-    <div style={{ width: `${width}px`, height: `${height}px` }}>
+    <div style={{ width: `${width}`, height: `${height}` }}>
+      <h2 className="text-center mb-4">Muscle Group Engagement</h2>
       <Radar data={data} options={options} width={width} height={height} />
     </div>
   )

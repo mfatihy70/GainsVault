@@ -24,13 +24,7 @@ const WorkoutEntries = ({ userId }) => {
 
   useEffect(() => {
     const fetchWorkouts = async () => {
-      try {
-        await getUserWorkoutEntries(userId, setWorkouts, setError, setLoading)
-      } catch (err) {
-        setError("Failed to load workout entries.")
-      } finally {
-        setLoading(false)
-      }
+      await getUserWorkoutEntries(userId, setWorkouts, setError, setLoading)
     }
 
     fetchWorkouts()
@@ -133,6 +127,9 @@ const WorkoutEntries = ({ userId }) => {
             : workout
         )
       );
+
+      // Refresh workouts to ensure consistency
+      await getUserWorkoutEntries(userId, setWorkouts, setError, ()=>{});
 
       setEditingSetId(null);
       setEditedSet({});

@@ -213,15 +213,22 @@ const ProfilePage = () => {
         </Card.Body>
       </Card>
       <Card className="bg-dark border border-warning text-light mt-4 p-3">
-        <Tabs defaultActiveKey="stats" id="profile-tabs" className="mb-3" justify variant="pills">
+        <Tabs defaultActiveKey="stats" id="profile-tabs" className="mb-3 border-bottom border-primary" justify variant="pills">
           <Tab eventKey="stats" title="Progress Stats">
-            <h1 className="text-center">Progress Stats</h1>
             <Col
               md={12}
               className="d-flex justify-content-center align-items-center text-center col mb-3"
             >
-              <GainsChart workouts={workoutEntries} />
+              <GainsChart workouts={workoutEntries} width={"800px"} height={"100%"} />
             </Col>
+            <hr />
+            <Col
+              md={12}
+              className="d-flex justify-content-center align-items-center text-center col mb-3"
+            >
+              <MuscleRadarChart width={"500px"} height={"100%"} />
+            </Col>
+            <hr />
             <Col
               md={12}
               className="d-flex justify-content-center align-items-center text-center col mb-3"

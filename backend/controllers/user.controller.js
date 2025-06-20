@@ -193,10 +193,11 @@ export const getUserWorkoutEntries = async (req, res, next) => {
           include: [
             {
               model: SetEntry,
-              order: [['set_order', 'ASC']], // optional: sort sets by order
+              order: [['set_order', 'ASC']], // sort sets by order
+              separate: true, // make sure sets are fetched separately
             },
             {
-              model: Exercise, // optional: include exercise name, type, etc.
+              model: Exercise, // include exercise name, type, etc.
             }
           ],
         }

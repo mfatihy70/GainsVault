@@ -114,6 +114,8 @@ export const getUserWorkoutEntries = async (
   setError,
   setLoading
 ) => {
+  setError(null)
+  setLoading(true)
   try {
     const response = await axiosInstance.get(`/users/${userId}/workout`)
     setWorkouts(response.data)
