@@ -15,6 +15,7 @@ import logo from "@/assets/icon/gainsvault.png"
 import { getUserById, editUser } from "../utils/user"
 import GainsChart from "./GainsChart"
 import MuscleRadarChart from "./MuscleRadarChart"
+import WorkoutProgressChart from "./WorkoutProgressChart";
 import WeightTracker from "./WeightTracker"
 import WorkoutEntries from "./WorkoutEntries"
 import { getUserWorkoutEntries } from "../utils/user"
@@ -233,7 +234,7 @@ const ProfilePage = () => {
               md={12}
               className="d-flex justify-content-center align-items-center text-center col mb-3"
             >
-              <MuscleRadarChart width={500} height={500} />
+              <WorkoutProgressChart workouts={workoutEntries} width={"800px"} height={"100%"} />
             </Col>
           </Tab>
           <Tab eventKey="weight" title="Weight">

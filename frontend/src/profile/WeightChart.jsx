@@ -47,6 +47,7 @@ const WeightChart = ({ weights }) => {
   // Chart options
   const options = {
     responsive: true,
+    animation: false,
     plugins: {
       title: {
         display: true,
