@@ -12,6 +12,7 @@ import {
   TimeScale,
 } from "chart.js"
 import "chartjs-adapter-date-fns"
+import { subWeeks, subMonths, subYears, isAfter } from "date-fns"
 
 ChartJS.register(
   CategoryScale,
@@ -36,6 +37,7 @@ const WorkoutProgressChart = ({ workouts, width = "500px", height = "100%" }) =>
   }, [workouts])
 
   const [selectedExercise, setSelectedExercise] = useState("")
+  const [timeframe, setTimeframe] = useState("month") // default to month filter
 
   // Set default selected exercise to first in list once exerciseNames changes
   useEffect(() => {
@@ -46,32 +48,46 @@ const WorkoutProgressChart = ({ workouts, width = "500px", height = "100%" }) =>
     }
   }, [exerciseNames])
 
+  // Calculate cutoff date based on timeframe
+  const cutoffDate = useMemo(() => {
+    const now = new Date()
+    switch (timeframe) {
+      case "week":
+        return subWeeks(now, 1)
+      case "month":
+        return subMonths(now, 1)
+      case "year":
+        return subYears(now, 1)
+      default:
+        return new Date(0) // no filter, show all
+    }
+  }, [timeframe])
+
+  // Compute PR (max weight in single set) per workout day, filtered by exercise and timeframe
   const chartDataPoints = useMemo(() => {
     return workouts
-      .map((workout) => {
-        let total = 0
-        workout.exercise_entries.forEach((entry) => {
-          const name = entry.exercise?.name || "Unnamed"
-          if (name !== selectedExercise) return
-          entry.set_entries.forEach((set) => {
+      .filter(workout => isAfter(new Date(workout.start), cutoffDate))
+      .map(workout => {
+        let maxWeight = 0
+        workout.exercise_entries.forEach(entry => {
+          if (entry.exercise?.name !== selectedExercise) return
+          entry.set_entries.forEach(set => {
             const kg = Number(set.kg || 0)
-            const reps = Number(set.reps || 0)
-            total += kg * reps
+            maxWeight = Math.max(maxWeight, kg)
           })
         })
-
-        return total > 0
-          ? { x: new Date(workout.start), y: total }
+        return maxWeight > 0
+          ? { x: new Date(workout.start), y: maxWeight }
           : null
       })
-      .filter(Boolean) // remove nulls
-  }, [workouts, selectedExercise])
+      .filter(Boolean)
+  }, [workouts, selectedExercise, cutoffDate])
 
   const data = {
     datasets: [
       {
         label: selectedExercise
-          ? `Total Weight (${selectedExercise})`
+          ? `PR Weight (${selectedExercise})`
           : "No exercise selected",
         data: chartDataPoints,
         borderColor: "#ffc107",
@@ -91,7 +107,7 @@ const WorkoutProgressChart = ({ workouts, width = "500px", height = "100%" }) =>
       },
       title: {
         display: true,
-        text: "Workout Progress Over Time",
+        text: "Workout PR Progress Over Time",
         color: "#ffc107",
       },
     },
@@ -104,7 +120,7 @@ const WorkoutProgressChart = ({ workouts, width = "500px", height = "100%" }) =>
         ticks: {
           color: "#ffc107",
           source: "data",
-          autoSkip: false,
+          autoSkip: true,
         },
         grid: {
           color: "#444",
@@ -126,7 +142,7 @@ const WorkoutProgressChart = ({ workouts, width = "500px", height = "100%" }) =>
         },
         title: {
           display: true,
-          text: "Total Weight (kg)",
+          text: "PR Weight (kg)",
           color: "#ffc107",
         },
       },
@@ -134,35 +150,57 @@ const WorkoutProgressChart = ({ workouts, width = "500px", height = "100%" }) =>
   }
 
   return (
-    <div style={{ width: `${width}`, height: `${height}` }}>
-      <h2 className="text-warning">Workout Progress Chart (PR)</h2>
+    <div style={{ width: width, height: height }}>
+      <h2 className="text-warning">Workout PR Progress Chart</h2>
       <p className="text-secondary">
-        This graph shows your total weight lifted per workout day, helping you track progress and spot trends over time for specific
-        exercises.
+        This graph displays your personal record (PR) — the maximum weight lifted in a single set — for the selected exercise on each workout day.
+        Use the timeframe filter to view your progress over the past week, month, year, or all time.
       </p>
-      <div className="mb-3">
-        <label htmlFor="exercise-filter" className="form-label text-warning">
-          Filter by Exercise:
-        </label>
-        <select
-          id="exercise-filter"
-          className="form-select bg-dark text-light border-warning"
-          value={selectedExercise}
-          onChange={(e) => setSelectedExercise(e.target.value)}
-          disabled={exerciseNames.length === 0}
-        >
-          {exerciseNames.length === 0 ? (
-            <option value="" disabled>
-              No exercises available
-            </option>
-          ) : (
-            exerciseNames.map((name) => (
-              <option key={name} value={name}>
-                {name}
+
+      <div className="d-flex flex-wrap gap-3 justify-content-center align-items-center mb-3">
+        {/* Exercise Filter */}
+        <div>
+          <label htmlFor="exercise-filter" className="form-label fw-bold">
+            Exercise:
+          </label>
+          <select
+            id="exercise-filter"
+            className="form-select bg-dark text-light border-warning"
+            value={selectedExercise}
+            onChange={(e) => setSelectedExercise(e.target.value)}
+            disabled={exerciseNames.length === 0}
+          >
+            {exerciseNames.length === 0 ? (
+              <option value="" disabled>
+                No exercises available
               </option>
-            ))
-          )}
-        </select>
+            ) : (
+              exerciseNames.map(name => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))
+            )}
+          </select>
+        </div>
+
+        {/* Timeframe Filter */}
+        <div>
+          <label htmlFor="timeframe-filter" className="form-label fw-bold">
+            Timeframe:
+          </label>
+          <select
+            id="timeframe-filter"
+            className="form-select bg-dark text-light border-warning"
+            value={timeframe}
+            onChange={(e) => setTimeframe(e.target.value)}
+          >
+            <option value="week">Last Week</option>
+            <option value="month">Last Month</option>
+            <option value="year">Last Year</option>
+            <option value="all">All Time</option>
+          </select>
+        </div>
       </div>
       <Line data={data} options={options} />
     </div>
