@@ -51,3 +51,14 @@ export const deleteExercise = async (id, setError, setLoading) => {
         setLoading(false)
     }
 }
+
+export const getMuscleGroups = async (setMuscleGroups, setLoading, setError) => {
+    try {
+        const response = await axiosInstance.get("/exercises/muscles")
+        setMuscleGroups(response.data)
+    } catch (err) {
+        setError(err.message)
+    } finally {
+        setLoading(false)
+    }
+}

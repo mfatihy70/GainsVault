@@ -226,7 +226,7 @@ const ProfilePage = () => {
               md={12}
               className="d-flex justify-content-center align-items-center text-center col mb-3"
             >
-              <MuscleRadarChart width={"500px"} height={"100%"} />
+              <MuscleRadarChart workouts={workoutEntries} width={"600px"} height={"100%"} />
             </Col>
             <hr />
             <Col
