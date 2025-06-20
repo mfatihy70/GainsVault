@@ -17,6 +17,7 @@ import GainsChart from "./GainsChart"
 import MuscleRadarChart from "./MuscleRadarChart"
 import WeightTracker from "./WeightTracker"
 import WorkoutEntries from "./WorkoutEntries"
+import { getUserWorkoutEntries } from "../utils/user"
 
 const ProfilePage = () => {
   const userId = localStorage.getItem("userId")
@@ -26,9 +27,11 @@ const ProfilePage = () => {
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
+  const [workoutEntries, setWorkoutEntries] = useState([])
 
   useEffect(() => {
     getUserById(userId, setUser, setError, setLoading)
+    getUserWorkoutEntries(userId, setWorkoutEntries, setError, setLoading)
   }, [userId])
 
   const handleChange = (e) => {
@@ -213,14 +216,12 @@ const ProfilePage = () => {
         <Tabs defaultActiveKey="stats" id="profile-tabs" className="mb-3" justify variant="pills">
           <Tab eventKey="stats" title="Progress Stats">
             <h1 className="text-center">Progress Stats</h1>
-            <Row>
-              <Col md={6} style={{ height: "500px" }}>
-                <WeightTracker userId={userId} />
-              </Col>
-              <Col md={6}>
-                <GainsChart />
-              </Col>
-            </Row>
+            <Col
+              md={12}
+              className="d-flex justify-content-center align-items-center text-center col mb-3"
+            >
+              <GainsChart workouts={workoutEntries} />
+            </Col>
             <Col
               md={12}
               className="d-flex justify-content-center align-items-center text-center col mb-3"
@@ -228,7 +229,9 @@ const ProfilePage = () => {
               <MuscleRadarChart width={500} height={500} />
             </Col>
           </Tab>
-
+          <Tab eventKey="weight" title="Weight">
+            <WeightTracker userId={userId} />
+          </Tab>
           <Tab eventKey="entries" title="Workout Entries">
             <WorkoutEntries userId={userId} />
           </Tab>
