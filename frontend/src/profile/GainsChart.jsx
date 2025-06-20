@@ -24,8 +24,19 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 const getColor = (value) => (value < 0 ? "#ef5350" : "#66bb6a")
 
 const GainsChart = ({ workouts, width = 400, height = 400 }) => {
+  const [mode, setMode] = useState("monthly")
+  const [selectedExercise, setSelectedExercise] = useState("All")
 
-  const [mode, setMode] = useState("monthly") // "monthly" | "latest"
+  const exerciseOptions = useMemo(() => {
+    const exercises = new Set()
+    workouts.forEach(workout => {
+      workout.exercise_entries.forEach(entry => {
+        if (entry.exercise?.name) exercises.add(entry.exercise.name)
+      })
+    })
+    return ["All", ...Array.from(exercises)]
+  }, [workouts])
+
   const { labels, lastPr, currPr, gainLossRate } = useMemo(() => {
     const exerciseMap = {}
 
@@ -79,7 +90,7 @@ const GainsChart = ({ workouts, width = 400, height = 400 }) => {
     )
 
     return { labels, lastPr, currPr, gainLossRate }
-  }, [workouts, mode])
+  }, [workouts, mode, selectedExercise])
 
   const data = {
     labels,
@@ -147,16 +158,40 @@ const GainsChart = ({ workouts, width = 400, height = 400 }) => {
 
   return (
     <div style={{ width: `${width}`, height: `${height}` }}>
-      <div className="d-flex justify-content-center align-items-center mb-2">
-        <label className="me-2 fw-bold text-light">Compare:</label>
-        <select
-          className="form-select w-auto bg-dark text-light border-warning"
-          value={mode}
-          onChange={(e) => setMode(e.target.value)}
-        >
-          <option value="monthly">Current vs Last Month</option>
-          <option value="latest">Latest vs Previous Exercise</option>
-        </select>
+      <h2>Gains Chart</h2>
+      <p className="text-secondary mb-4">
+        The Gains Chart compares your personal records (PRs) across exercises, showing performance changes over time.
+        Choose between comparing the current month vs. last month, or your latest PRs.
+        Instantly see gains or losses with color-coded bars for easy progress tracking.
+      </p>
+
+      {/* Time Range Selection */}
+      <div className="d-flex flex-wrap gap-3 justify-content-center align-items-center mb-3">
+        <div>
+          <label className="me-2 fw-bold text-light">Compare:</label>
+          <select
+            className="form-select w-auto bg-dark text-light border-warning"
+            value={mode}
+            onChange={(e) => setMode(e.target.value)}
+          >
+            <option value="monthly">Current vs Last Month</option>
+            <option value="latest">Latest vs Previous</option>
+          </select>
+        </div>
+
+        {/* Exercise Filter */}
+        <div>
+          <label className="me-2 fw-bold text-light">Exercise:</label>
+          <select
+            className="form-select w-auto bg-dark text-light border-warning"
+            value={selectedExercise}
+            onChange={(e) => setSelectedExercise(e.target.value)}
+          >
+            {exerciseOptions.map((name) => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
+        </div>
       </div>
       <Bar data={data} options={options} plugins={[ChartDataLabels]} />
     </div>

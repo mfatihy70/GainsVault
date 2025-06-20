@@ -129,7 +129,19 @@ const MuscleRadarChart = ({ workouts = [], width = 400, height = 400 }) => {
       r: {
         beginAtZero: true,
         max: 10,
-        ticks: { stepSize: 2 },
+        ticks: {
+          stepSize: 2,
+          color: "#000", // white tick labels
+        },
+        grid: {
+          color: "#888", // white circular grid lines
+        },
+        angleLines: {
+          color: "#888", // white radial lines from center
+        },
+        pointLabels: {
+          color: "#fdd835", // white labels around the radar
+        },
       },
     },
   }
