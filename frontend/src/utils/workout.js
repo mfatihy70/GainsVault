@@ -90,3 +90,9 @@ export const getWorkoutExercisesByWorkoutId = async (
     setLoading(false)
   }
 }
+
+export const getSplitFromWorkoutId = async (workoutId) => {
+  const res = await fetch(`/api/workouts/${workoutId}/split`)
+  if (!res.ok) throw new Error("Failed to fetch split")
+  return await res.json()
+}

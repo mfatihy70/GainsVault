@@ -12,6 +12,7 @@ import {
   Badge
 } from "react-bootstrap"
 import { updateUserWorkoutEntry, deleteUserWorkoutEntry, getUserWorkoutEntries } from "../utils/user"
+import { getSplitFromWorkoutId } from "../utils/workout"
 
 const WorkoutEntries = ({ userId }) => {
   const [workouts, setWorkouts] = useState([])
@@ -23,16 +24,39 @@ const WorkoutEntries = ({ userId }) => {
   const [editedSet, setEditedSet] = useState({})
   const [editedStart, setEditedStart] = useState("")
   const [editedEnd, setEditedEnd] = useState("")
+  const [splitNames, setSplitNames] = useState({})
+
 
   // New state to track notes editing per exercise entry id
   const [editingNotesId, setEditingNotesId] = useState(null)
   const [editedNotes, setEditedNotes] = useState("")
 
   useEffect(() => {
-    const fetchWorkouts = async () => {
-      await getUserWorkoutEntries(userId, setWorkouts, setError, setLoading)
-    }
-    fetchWorkouts()
+    getUserWorkoutEntries(userId, async (entries) => {
+      setWorkouts(entries)
+      setLoading(false)
+      setError(null)
+
+      // Now fetch split names for each workout concurrently
+      const splitFetches = entries.map(async (workout) => {
+        if (workout.default) {
+          try {
+            const split = await getSplitFromWorkoutId(workout.id)
+            return { id: workout.id, name: split.name }
+          } catch (e) {
+            return { id: workout.id, name: "Unknown" }
+          }
+        }
+        return null
+      })
+
+      const splitResults = await Promise.all(splitFetches)
+      const splits = {}
+      splitResults.forEach((result) => {
+        if (result) splits[result.id] = result.name
+      })
+      setSplitNames(splits)
+    }, setError, setLoading)
   }, [userId])
 
   const handleWorkoutEntryDelete = async (workoutId) => {
@@ -240,6 +264,13 @@ const WorkoutEntries = ({ userId }) => {
 
                   {/* Custom indicator Badge*/}
                   {!workout.default && (<Badge className="text-light small badge">Custom</Badge>)}
+
+                  {/* New Split Name Badge */}
+                  {splitNames[workout.id] && (
+                    <Badge bg="warning" text="dark" className="small">
+                      {splitNames[workout.id]}
+                    </Badge>
+                  )}
 
                   {/* Workout Start and End Times */}
                   <div className="ms-auto me-4">

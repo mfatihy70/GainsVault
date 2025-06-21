@@ -1,4 +1,5 @@
 import Workout from "../../models/core/workout.model.js"
+import Split from "../../models/core/split.model.js"
 
 // Fetch all workouts
 export const getWorkouts = async (req, res) => {
@@ -63,6 +64,29 @@ export const deleteWorkout = async (req, res) => {
     if (!deletedWorkout)
       return res.status(404).json({ message: "Workout not found" })
     res.json({ message: "Workout deleted successfully" })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+// =================================
+///     Split related functions
+// =================================
+
+export const getSplitFromWorkoutId = async (req, res) => {
+  try {
+    const workout = await Workout.findByPk(req.params.workoutId, {
+      include: {
+        model: Split,
+        as: "split",
+      },
+    })
+
+    if (!workout || !workout.split) {
+      return res.status(404).json({ message: "Split not found for this workout" })
+    }
+
+    res.json(workout.split)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
