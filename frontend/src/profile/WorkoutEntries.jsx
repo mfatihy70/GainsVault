@@ -236,6 +236,13 @@ const WorkoutEntries = ({ userId }) => {
 
   return (
     <Container fluid className="mt-3">
+      <div className="mb-4">
+        <h2 className="text-warning">Workout History</h2>
+        <p className="text-secondary">
+          This page displays a complete log of your past workouts. You can review, edit, or delete individual sessions, update set details, and manage notes for each exercise.
+        </p>
+      </div>
+
       <Accordion defaultActiveKey="0" className="custom-accordion">
         {workouts.map((workout, idx) => (
           <Accordion.Item
