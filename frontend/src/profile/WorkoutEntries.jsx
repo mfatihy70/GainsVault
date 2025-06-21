@@ -7,7 +7,9 @@ import {
   Table,
   Container,
   Button,
-  Form
+  Form,
+  Stack,
+  Badge
 } from "react-bootstrap"
 import { updateUserWorkoutEntry, deleteUserWorkoutEntry, getUserWorkoutEntries } from "../utils/user"
 
@@ -219,7 +221,8 @@ const WorkoutEntries = ({ userId }) => {
           >
             <Accordion.Header className="custom-accordion-header">
               <div className="d-flex justify-content-between align-items-center w-100">
-                <div className="d-flex flex-column text-warning fw-semibold">
+                <Stack direction="horizontal" gap={2} className="w-100 mb-1 text-warning fw-semibold ">
+                  {/* Workout Name */}
                   <div>
                     {editId === workout.id ? (
                       <Form.Control
@@ -235,40 +238,45 @@ const WorkoutEntries = ({ userId }) => {
                     )}
                   </div>
 
-                  {editId === workout.id ? (
-                    <div className="d-flex gap-2 align-items-center" onClick={(e) => e.stopPropagation()}>
-                      <Form.Control
-                        size="sm"
-                        type="datetime-local"
-                        value={editedStart}
-                        onChange={(e) => setEditedStart(e.target.value)}
-                      />
-                      <Form.Control
-                        size="sm"
-                        type="datetime-local"
-                        value={editedEnd}
-                        onChange={(e) => setEditedEnd(e.target.value)}
-                      />
-                    </div>
-                  ) : (
-                    <div>
-                      {new Date(workout.start).toLocaleString()} →{" "}
-                      {new Date(workout.end).toLocaleTimeString()} [
-                      {
-                        (() => {
-                          const durationMs = new Date(workout.end) - new Date(workout.start);
-                          const totalSeconds = Math.floor(durationMs / 1000);
-                          const hours = Math.floor(totalSeconds / 3600);
-                          const minutes = Math.floor((totalSeconds % 3600) / 60);
-                          const seconds = totalSeconds % 60;
-                          return `${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds}s`;
-                        })()
-                      }
-                      ]
-                    </div>
+                  {/* Custom indicator Badge*/}
+                  {!workout.default && (<Badge className="text-light small badge">Custom</Badge>)}
 
-                  )}
-                </div>
+                  {/* Workout Start and End Times */}
+                  <div className="ms-auto me-4">
+                    {editId === workout.id ? (
+                      <div className="d-flex gap-2 align-items-center" onClick={(e) => e.stopPropagation()}>
+                        <Form.Control
+                          size="sm"
+                          type="datetime-local"
+                          value={editedStart}
+                          onChange={(e) => setEditedStart(e.target.value)}
+                        />
+                        <Form.Control
+                          size="sm"
+                          type="datetime-local"
+                          value={editedEnd}
+                          onChange={(e) => setEditedEnd(e.target.value)}
+                        />
+                      </div>
+                    ) : (
+                      <div>
+                        {new Date(workout.start).toLocaleString()} →{" "}
+                        {new Date(workout.end).toLocaleTimeString()} [
+                        {
+                          (() => {
+                            const durationMs = new Date(workout.end) - new Date(workout.start);
+                            const totalSeconds = Math.floor(durationMs / 1000);
+                            const hours = Math.floor(totalSeconds / 3600);
+                            const minutes = Math.floor((totalSeconds % 3600) / 60);
+                            const seconds = totalSeconds % 60;
+                            return `${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds}s`;
+                          })()
+                        }
+                        ]
+                      </div>
+                    )}
+                  </div>
+                </Stack>
                 <div className="d-flex gap-2 me-4" onClick={(e) => e.stopPropagation()}>
                   {editId === workout.id ? (
                     <>
@@ -473,7 +481,7 @@ const WorkoutEntries = ({ userId }) => {
           </Accordion.Item>
         ))}
       </Accordion>
-    </Container>
+    </Container >
   )
 }
 
