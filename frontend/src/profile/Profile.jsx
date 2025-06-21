@@ -17,7 +17,7 @@ import GainsChart from "./GainsChart"
 import MuscleRadarChart from "./MuscleRadarChart"
 import WorkoutProgressChart from "./WorkoutProgressChart";
 import WeightTracker from "./WeightTracker"
-import WorkoutEntries from "./WorkoutEntries"
+import History from "./History" // workout history component
 import { getUserWorkoutEntries } from "../utils/user"
 
 const ProfilePage = () => {
@@ -240,8 +240,8 @@ const ProfilePage = () => {
           <Tab eventKey="weight" title="Weight">
             <WeightTracker userId={userId} />
           </Tab>
-          <Tab eventKey="entries" title="Workout Entries">
-            <WorkoutEntries userId={userId} />
+          <Tab eventKey="entries" title="History">
+            <History userId={userId} />
           </Tab>
         </Tabs>
       </Card>
