@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useMemo, useState } from "react"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -6,178 +6,194 @@ import {
   BarElement,
   Title,
   Tooltip,
-  Legend,
+  Legend
 } from "chart.js"
 import { Bar } from "react-chartjs-2"
+import ChartDataLabels from "chartjs-plugin-datalabels"
+import {
+  startOfMonth,
+  subMonths,
+  isSameMonth,
+  isSameYear,
+  isWithinInterval,
+  parseISO
+} from "date-fns"
 
-// Register the required chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
-let workouts = [
-  "Bench Press",
-  "Squats",
-  "Bizep Curls",
-  "Shoulder Press",
-  "Deadlifts",
-  "Leg Press",
-]
+const getColor = (value) => (value < 0 ? "#ef5350" : "#66bb6a")
 
-import ChartDataLabels from "chartjs-plugin-datalabels"
+const GainsChart = ({ workouts, width = 400, height = 400 }) => {
+  const [mode, setMode] = useState("monthly")
+  const [selectedExercise, setSelectedExercise] = useState("All")
 
-const gainLossRate = workouts.map(() => Math.floor(Math.random() * 100) - 50)
-const lastPr = workouts.map(() => Math.floor(Math.random() * 100) + 50) // Random data for the sake of example
-const currPr = workouts.map((_, index) => lastPr[index] + gainLossRate[index]) // Random data for the sake of example
-
-const topLabel = {
-  id: "topLabel",
-  afterDatasetsDraw(chart, AbortSignal, pluginOptions) {
-    const {
-      ctx,
-      legend,
-      scales: { x, y },
-    } = chart
-    chart.data.datasets[0].data.forEach((value, index) => {
-      const datasetArray = []
-      chart.data.datasets.forEach((dataset, i) => {
-        datasetArray.push(dataset.data[index])
+  const exerciseOptions = useMemo(() => {
+    const exercises = new Set()
+    workouts.forEach(workout => {
+      workout.exercise_entries.forEach(entry => {
+        if (entry.exercise?.name) exercises.add(entry.exercise.name)
       })
-
-      let sum = lastPr[index] + gainLossRate[index]
-      ctx.font = "bold 12px sans-serif"
-      ctx.fillStyle = "rgba(255, 255, 255, 0.7)"
-      ctx.textAlign = "center"
-
-      // Show only gain or loss rate
-      if (legend.legendItems[0].hidden) {
-        sum = gainLossRate[index]
-      }
-      // Show only personal record
-      else if (legend.legendItems[1].hidden) {
-        sum = lastPr[index]
-      } else {
-        sum = ""
-      }
-      //ctx.fillText(sum, x.getPixelForValue(index), chart.getDatasetMeta(1).data[index].y - 20);
     })
-  },
-}
+    return ["All", ...Array.from(exercises)]
+  }, [workouts])
 
-// Function to assign color based on value
-const getColor = (value) => {
-  if (value < 0) return "#ef5350" // red for high
-  return "#66bb6a" // green for low
-}
+  const { labels, lastPr, currPr, gainLossRate } = useMemo(() => {
+    const exerciseMap = {}
 
-const GainsChart = () => {
+    const now = new Date()
+    const currentMonth = startOfMonth(now)
+    const previousMonth = startOfMonth(subMonths(now, 1))
+
+    workouts.forEach((workout) => {
+      const date = new Date(workout.start)
+
+      workout.exercise_entries.forEach((entry) => {
+        const name = entry.exercise?.name || "Unnamed"
+        if (selectedExercise !== "All" && selectedExercise !== name) return
+
+        const maxWeight = Math.max(...entry.set_entries.map((s) => s.kg || 0))
+        if (!exerciseMap[name]) exerciseMap[name] = { history: [] }
+
+        exerciseMap[name].history.push({ date, maxWeight })
+      })
+    })
+
+    const labels = Object.keys(exerciseMap)
+    const currPr = []
+    const lastPr = []
+
+    labels.forEach((label) => {
+      const history = exerciseMap[label].history
+
+      if (mode === "monthly") {
+        const curr = history.filter(h =>
+          isSameMonth(h.date, currentMonth) && isSameYear(h.date, currentMonth)
+        ).map(h => h.maxWeight)
+
+        const last = history.filter(h =>
+          isSameMonth(h.date, previousMonth) && isSameYear(h.date, previousMonth)
+        ).map(h => h.maxWeight)
+
+        currPr.push(curr.length ? Math.max(...curr) : null)
+        lastPr.push(last.length ? Math.max(...last) : null)
+      }
+
+      if (mode === "latest") {
+        const sorted = [...history].sort((a, b) => b.date - a.date)
+        currPr.push(sorted[0]?.maxWeight ?? null)
+        lastPr.push(sorted[1]?.maxWeight ?? null)
+      }
+    })
+
+    const gainLossRate = currPr.map((val, i) =>
+      val != null && lastPr[i] != null ? val - lastPr[i] : null
+    )
+
+    return { labels, lastPr, currPr, gainLossRate }
+  }, [workouts, mode, selectedExercise])
+
   const data = {
-    labels: workouts,
+    labels,
     datasets: [
       {
-        label: "Last Month",
+        label: mode === "monthly" ? "Last Month" : "Previous PR",
         data: lastPr,
-        backgroundColor: "#00bcd4",
+        backgroundColor: "#00bcd4"
+      },
+      {
+        label: mode === "monthly" ? "Current Month" : "Latest PR",
+        data: currPr,
+        backgroundColor: "#ff9800"
       },
       {
         label: "PR Gain/Loss",
-        data: gainLossRate, // Random data for the sake of example
-        backgroundColor: gainLossRate.map(getColor),
-      },
-      {
-        stack: "Stack 0",
-        label: "Current Month",
-        data: currPr, // Random data for the sake of example
-        backgroundColor: "#ff9800",
-      },
-    ],
+        data: gainLossRate,
+        backgroundColor: gainLossRate.map(getColor)
+      }
+    ]
   }
 
   const options = {
     responsive: true,
     plugins: {
-      title: { display: true, text: "PR Gain/Loss over current Month" },
+      title: { display: true, text: "PR Gain/Loss Over Time" },
       tooltip: {
         callbacks: {
           label: (tooltipItem) => {
-            // Gain/Loss label
-            if (tooltipItem.datasetIndex === 1) {
-              const gain = gainLossRate[tooltipItem.dataIndex]
-              if (gain < 0) {
-                return `Loss: ${Math.abs(tooltipItem.raw)} kg` // Show the absolute value for losses
-              }
-              return `Gain: ${tooltipItem.raw} kg` // Show the value for gains
+            const index = tooltipItem.dataIndex
+            const gain = gainLossRate[index]
+            if (tooltipItem.dataset.label === "PR Gain/Loss") {
+              return gain < 0
+                ? `Loss: ${Math.abs(gain)} kg`
+                : `Gain: ${gain} kg`
             }
-            // Last Month PR label
-            if (tooltipItem.datasetIndex === 0) {
-              const last_pr = lastPr[tooltipItem.dataIndex]
-              return `Last Month PR: ${last_pr} kg`
+            if (tooltipItem.dataset.label === "Last Month" || tooltipItem.dataset.label === "Previous PR" || tooltipItem.dataset.label === "Range A") {
+              return `Previous: ${lastPr[index]} kg`
             }
-            // Current Month PR label
-            if (tooltipItem.datasetIndex === 2) {
-              const last_pr = lastPr[tooltipItem.dataIndex]
-              return `Current Month PR: ${last_pr} kg`
+            if (tooltipItem.dataset.label === "Current Month" || tooltipItem.dataset.label === "Latest PR" || tooltipItem.dataset.label === "Range B") {
+              return `Current: ${currPr[index]} kg`
             }
-          },
-        },
+          }
+        }
       },
       datalabels: {
         color: "#fff",
-        font: {
-          weight: "bold",
-          size: 12,
-        },
-        anchor: (context) => {
-          const value = context.dataset.data[context.dataIndex]
-          return value < 10 ? "end" : "center" // outside for small bars
-        },
-        align: (context) => {
-          const value = context.dataset.data[context.dataIndex]
-          return value < 10 ? "top" : "center"
-        },
-        offset: (context) => {
-          const value = context.dataset.data[context.dataIndex]
-          return value < 10 ? 4 : 0
-        },
-        formatter: (value, context) => {
-          //if (context.datasetIndex === 1) {
-          //    const gain = gainLossRate[context.dataIndex];
-          //    return gain > 0 ? `+${gain}` : `${gain}`;
-          //}
-          //if (context.datasetIndex === 0) {
-          //    //const pr = lastPr[context.dataIndex] + gainLossRate[context.dataIndex];
-          //    const pr = lastPr[context.dataIndex];
-          //    return `${pr}`;
-          //}
-        },
-        clip: false, // ensure labels outside the canvas still render
-      },
+        font: { weight: "bold", size: 12 },
+        anchor: "center",
+        align: "center"
+      }
     },
-
     scales: {
       x: {
-        stacked: true,
-        tooltip: { enabled: true },
-        title: { display: true, text: "Exercise" },
+        stacked: false,
+        title: { display: true, text: "Exercise" }
       },
       y: {
-        stacked: true,
-        grace: 50,
-        beginAtZero: true, // always starts from 0
-        //min: 0,                 // minimum value of the axis
-        //max: 400,               // maximum value of the axis
-        ticks: {
-          //padding: 10,
-          //stepSize: 10,         // gap between tick marks
-          callback: (value) => `${value} kg`, // optional formatting
-        },
-        tooltip: { enabled: true },
-        title: { display: true, text: "Max Weight (PR)" },
-      },
-    },
+        beginAtZero: true,
+        title: { display: true, text: "Weight (kg)" },
+        ticks: { callback: (value) => `${value} kg` }
+      }
+    }
   }
 
   return (
-    <div style={{ width: "100%", height: "400px" }}>
-      <Bar data={data} options={options} plugins={[topLabel]} />
+    <div style={{ width: `${width}`, height: `${height}` }}>
+      <h2 className="text-warning">Gains Chart</h2>
+      <p className="text-secondary mb-4">
+        The Gains Chart compares your personal records (PRs) across exercises, showing performance changes over time.
+        Choose between comparing the current month vs. last month, or your latest PRs.
+        Instantly see gains or losses with color-coded bars for easy progress tracking.
+      </p>
+
+      <div className="d-flex flex-wrap gap-3 justify-content-center align-items-center mb-3">
+        {/* Time Range Selection */}
+        <div>
+          <label className="me-2 fw-bold text-light">Compare:</label>
+          <select
+            className="form-select w-auto bg-dark text-light border-warning"
+            value={mode}
+            onChange={(e) => setMode(e.target.value)}
+          >
+            <option value="monthly">Current vs Last Month</option>
+            <option value="latest">Latest vs Previous</option>
+          </select>
+        </div>
+
+        {/* Exercise Filter */}
+        <div>
+          <label className="me-2 fw-bold text-light">Exercise:</label>
+          <select
+            className="form-select w-auto bg-dark text-light border-warning"
+            value={selectedExercise}
+            onChange={(e) => setSelectedExercise(e.target.value)}
+          >
+            {exerciseOptions.map((name) => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <Bar data={data} options={options} plugins={[ChartDataLabels]} />
     </div>
   )
 }

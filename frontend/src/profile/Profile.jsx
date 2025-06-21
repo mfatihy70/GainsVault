@@ -8,12 +8,17 @@ import {
   Col,
   Image,
   Form,
+  Tab,
+  Tabs
 } from "react-bootstrap"
 import logo from "@/assets/icon/gainsvault.png"
 import { getUserById, editUser } from "../utils/user"
 import GainsChart from "./GainsChart"
 import MuscleRadarChart from "./MuscleRadarChart"
+import WorkoutProgressChart from "./WorkoutProgressChart";
 import WeightTracker from "./WeightTracker"
+import History from "./History" // workout history component
+import { getUserWorkoutEntries } from "../utils/user"
 
 const ProfilePage = () => {
   const userId = localStorage.getItem("userId")
@@ -23,9 +28,11 @@ const ProfilePage = () => {
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
+  const [workoutEntries, setWorkoutEntries] = useState([])
 
   useEffect(() => {
     getUserById(userId, setUser, setError, setLoading)
+    getUserWorkoutEntries(userId, setWorkoutEntries, setError, setLoading)
   }, [userId])
 
   const handleChange = (e) => {
@@ -207,21 +214,36 @@ const ProfilePage = () => {
         </Card.Body>
       </Card>
       <Card className="bg-dark border border-warning text-light mt-4 p-3">
-        <h1 className="text-center">Progress Stats</h1>
-        <Row>
-          <Col md={6} style={{ height: "500px" }}>
+        <Tabs defaultActiveKey="stats" id="profile-tabs" className="mb-3 border-bottom border-primary" justify variant="pills">
+          <Tab eventKey="stats" title="Statistics">
+            <Col
+              md={12}
+              className="d-flex justify-content-center align-items-center text-center col mb-3"
+            >
+              <GainsChart workouts={workoutEntries} width={"800px"} height={"100%"} />
+            </Col>
+            <hr />
+            <Col
+              md={12}
+              className="d-flex justify-content-center align-items-center text-center col mb-3"
+            >
+              <MuscleRadarChart workouts={workoutEntries} width={"600px"} height={"100%"} />
+            </Col>
+            <hr />
+            <Col
+              md={12}
+              className="d-flex justify-content-center align-items-center text-center col mb-3"
+            >
+              <WorkoutProgressChart workouts={workoutEntries} width={"800px"} height={"100%"} />
+            </Col>
+          </Tab>
+          <Tab eventKey="weight" title="Weight">
             <WeightTracker userId={userId} />
-          </Col>
-          <Col md={6}>
-            <GainsChart />
-          </Col>
-        </Row>
-        <Col
-          md={12}
-          className="d-flex justify-content-center align-items-center text-center col mb-3"
-        >
-          <MuscleRadarChart width={500} height={500} />
-        </Col>
+          </Tab>
+          <Tab eventKey="entries" title="History">
+            <History userId={userId} />
+          </Tab>
+        </Tabs>
       </Card>
     </Container>
   )

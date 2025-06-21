@@ -107,3 +107,75 @@ export const deleteWeight = async (
     setLoading(false)
   }
 }
+
+// =======================================
+///     User Workout Tracking Entries
+// =======================================
+
+export const getUserWorkoutEntries = async (
+  userId,
+  setWorkouts,
+  setError,
+  setLoading
+) => {
+  setError(null)
+  setLoading(true)
+  try {
+    const response = await axiosInstance.get(`/users/${userId}/workout`)
+    setWorkouts(response.data)
+  } catch (err) {
+    setError(err.message)
+  } finally {
+    setLoading(false)
+  }
+}
+
+export const createTrackedWorkout = async (
+  trackedWorkoutData,
+  setError,
+  setLoading
+) => {
+  try {
+    setLoading(true)
+    const response = await axiosInstance.post(`/users/${trackedWorkoutData.userId}/workout`, trackedWorkoutData);
+
+    if (!response.ok) {
+      throw new Error('Failed to save workout');
+    }
+
+    const result = await response.json();
+    console.log('Workout saved:', result);
+    alert('Workout saved successfully!');
+    // Optionally navigate away or reset state here
+
+  } catch (err) {
+    setError(err.message)
+  } finally {
+    setLoading(false)
+  }
+}
+
+export const updateUserWorkoutEntry = async (userId, workoutId, data, setError, setLoading) => {
+  try {
+    setLoading?.(true)
+    await axiosInstance.put(`/users/${userId}/workout/${workoutId}`, data)
+  } catch (err) {
+    setError?.(err.message || "Failed to update workout.")
+    throw err
+  } finally {
+    setLoading?.(false)
+  }
+}
+
+export const deleteUserWorkoutEntry = async (userId, workoutId, setError, setLoading) => {
+  try {
+    setLoading?.(true)
+    await axiosInstance.delete(`/users/${userId}/workout/${workoutId}`)
+  } catch (err) {
+    setError?.(err.response?.data?.message || "Failed to delete workout.")
+    throw err
+  } finally {
+    setLoading?.(false)
+  }
+}
+

@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { Container, Card, Button, Row, Col, Badge, Image } from "react-bootstrap"
 import { formatDateTime, formatDuration } from "../utils/stopwatch"
 import workoutImage from '../assets/workout.png'
-import { createTrackedWorkout } from "../utils/workout"
+import { createTrackedWorkout } from "../utils/user"
 
 const WorkoutSummary = () => {
   const { state } = useLocation()
@@ -38,44 +38,18 @@ const WorkoutSummary = () => {
     console.log("Is Custom Workout:", isCustomWorkout)
     // Submit logic here
 
-    //const trackedWorkoutData = {
-    //  userId: userId,
-    //  workoutId: workoutId,
-    //  name: workout?.name || "Custom Workout",
-    //  performedAt: new Date(),
-    //  start: new Date(startTime),
-    //  end: new Date(endTime),
-    //  //duration: duration, // in seconds
-    //  exercises: [
-    //    {
-    //      exerciseId: 12,
-    //      performedAt: new Date(),
-    //      sets: [
-    //        { kg: 60, reps: 8, performedAt: new Date() },
-    //        { kg: 60, reps: 6, performedAt: new Date() }
-    //      ]
-    //    },
-    //    {
-    //      exerciseId: 14,
-    //      performedAt: new Date(),
-    //      sets: [
-    //        { kg: 25, reps: 12, performedAt: new Date() }
-    //      ]
-    //    }
-    //  ]
-    //};
-
     const trackedWorkoutData = {
       userId: userId,
       workoutId: workoutId,
       name: workout?.name || "Custom Workout",
       performedAt: new Date(),
-      start: new Date(startTime),
-      end: new Date(endTime),
+      start: new Date(startTime).toISOString(),
+      end: new Date(endTime).toISOString(),
       default: !isCustomWorkout, // true if it's a default workout
       exercises: finishedExercises.map((exercise) => ({
         exerciseId: exercise.id,
         performedAt: new Date(),
+        notes: exercise.notes || null,
         sets: exercise.setsData.map((set, index) => ({
           kg: set.weight,
           reps: set.reps,

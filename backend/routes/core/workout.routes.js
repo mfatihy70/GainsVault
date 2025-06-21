@@ -5,6 +5,9 @@ import {
   createWorkout,
   updateWorkout,
   deleteWorkout,
+
+  // Split related
+  getSplitFromWorkoutId,
 } from "../../controllers/core/workout.controller.js"
 
 const router = express.Router()
@@ -15,4 +18,5 @@ router.post("/", createWorkout)
 router.put("/:id", updateWorkout)
 router.delete("/:id", deleteWorkout)
 
+router.get("/:workoutId/split", getSplitFromWorkoutId)
 export default router

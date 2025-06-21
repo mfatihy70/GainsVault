@@ -1,6 +1,12 @@
 import User from "../models/user.model.js"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
+import WorkoutEntry from "../models/entries/workout.model.js"
+import WorkoutExercise from "../models/core/workout_exercise.model.js"
+import SetEntry from "../models/entries/set.model.js"
+import Exercise from "../models/core/exercise.model.js"
+import ExerciseEntry from "../models/entries/exercise.model.js"
+import { sequelize } from "../config/db.js"
 
 // Fetch all users
 export const getUsers = async (req, res) => {
@@ -173,5 +179,249 @@ export const deleteWeight = async (req, res, next) => {
     res.status(200).json({ msg: "Weight deleted successfully" })
   } catch (error) {
     next(error)
+  }
+}
+
+export const getUserWorkoutEntries = async (req, res, next) => {
+  try {
+    const userId = req.params.id
+
+    const userWorkouts = await WorkoutEntry.findAll({
+      where: { user_id: userId },
+      order: [['start', 'DESC']],
+      include: [
+        {
+          model: ExerciseEntry,
+          include: [
+            {
+              model: SetEntry,
+              order: [['set_order', 'ASC']], // sort sets by order
+              separate: true, // make sure sets are fetched separately
+            },
+            {
+              model: Exercise, // include exercise name, type, etc.
+            }
+          ],
+          order: [['id', 'ASC']], // sort exercise entries by ID
+          separate: true, // ensure exercise entries are fetched separately
+        }
+      ],
+    });
+    console.log("User Workouts:", userWorkouts)
+    res.status(200).json(userWorkouts)
+  } catch (error) {
+    console.error("Error fetching user workouts:", error)
+    res.status(500).json({ message: "Internal server error" })
+  }
+}
+
+export const getUserWorkoutEntryById = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const workoutEntryId = req.params.workoutId;
+    console.log("Fetching workout for user:", userId, "Workout ID:", workoutEntryId);
+    const workout = await WorkoutEntry.findOne({
+      where: {
+        id: workoutEntryId,
+        user_id: userId, // ensure the workout belongs to the user
+      },
+      include: [
+        {
+          model: ExerciseEntry,
+          include: [
+            {
+              model: SetEntry,
+              order: [['set_order', 'ASC']], // sort sets by order
+              separate: true, // make sure sets are fetched separa
+            },
+            {
+              model: Exercise,
+            },
+          ],
+          order: [['id', 'ASC']], // sort exercise entries by ID
+          separate: true, // ensure exercise entries are fetched
+        },
+      ],
+    });
+
+    if (!workout) {
+      return res.status(404).json({ message: "Workout not found" });
+    }
+
+    res.status(200).json(workout);
+  } catch (error) {
+    console.error("Error fetching workout by ID:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const createTrackedWorkout = async (req, res) => {
+  try {
+    console.log("Creating Tracked Workout exercises:", req.body)
+    // Hold the tracked workout data
+    const tracked = req.body
+
+    const result = await sequelize.transaction(async (t) => {
+      console.log("Transaction started for creating tracked workout");
+      //return;
+      // 1. Create workout entry
+      const workoutEntry = await WorkoutEntry.create({
+        user_id: tracked.userId,
+        workout_id: tracked.workoutId,
+        name: tracked.name,
+        //  performed_at: tracked.performedAt,
+        default: tracked.default, // user-defined workout => default == false
+        start: tracked.start,
+        end: tracked.end,
+      }, { transaction: t });
+
+      //console.log("Workout entry created:", workoutEntry.id);
+
+      // 2. Loop through exercises
+      for (const exercise of tracked.exercises) {
+        console.log("Processing exercise:", exercise);
+
+        let workoutExerciseId = null;
+
+        // Only find workoutExercise if it's a predefined workout (default == true)
+        if (tracked.default) {
+          // Find performed workoutExercise by exercise ID
+          const workoutExercise = await WorkoutExercise.findOne({
+            where: {
+              workout_id: tracked.workoutId,
+              exercise_id: exercise.exerciseId,
+            },
+            transaction: t,
+          });
+
+          workoutExerciseId = workoutExercise?.id ?? null;
+          console.log("Found workout exercise:", workoutExerciseId ?? "none");
+        }
+
+        // Create a new exercise entry for the current workout
+        const exerciseEntry = await ExerciseEntry.create({
+          workout_entry_id: workoutEntry.id,
+          workout_exercise_id: workoutExerciseId, // if null, it means this is a custom exercise not linked to a predefined workout exercise
+          exercise_id: exercise.exerciseId,
+          notes: exercise.notes || null,
+          //performed_at: exercise.performedAt,
+        }, { transaction: t });
+
+        // 3. Bulk insert set entries
+        const setEntries = exercise.sets.map((set) => ({
+          exercise_entry_id: exerciseEntry.id,
+          set_order: set.set_order,
+          kg: set.kg,
+          reps: set.reps,
+          //performed_at: set.performedAt,
+        }));
+
+        await SetEntry.bulkCreate(setEntries, { transaction: t });
+      }
+      //
+      return workoutEntry;
+    });
+
+    console.log('Workout successfully saved:', result);
+    res.json(req.body)
+  } catch (error) {
+    console.error('Transaction failed. Rolled back.', error);
+    res.status(500).json({ message: error.message })
+  }
+}
+
+export const updateUserWorkoutEntry = async (req, res, next) => {
+  try {
+    const { id: userId, workoutId } = req.params
+    const updateData = req.body
+
+    const workout = await WorkoutEntry.findOne({
+      where: {
+        id: workoutId,
+        user_id: userId,
+      },
+    })
+
+    if (!workout) {
+      return res.status(404).json({ message: "Workout not found or does not belong to user" })
+    }
+
+    // Update fields of the workout entry itself (e.g., name, start, end)
+    await workout.update({
+      name: updateData.name,
+      start: updateData.start,
+      end: updateData.end,
+    })
+
+    // Iterate over exercise entries
+    if (Array.isArray(updateData.exercise_entries)) {
+      for (const exerciseEntry of updateData.exercise_entries) {
+        const existingExerciseEntry = await ExerciseEntry.findOne({
+          where: {
+            id: exerciseEntry.id,
+            workout_entry_id: workoutId,
+          },
+        })
+
+        if (!existingExerciseEntry) continue // skip if not found
+
+        // Optionally update exerciseEntry fields if needed
+        await existingExerciseEntry.update({
+          notes: exerciseEntry.notes,
+        })
+
+        // Iterate over set entries
+        if (Array.isArray(exerciseEntry.set_entries)) {
+          for (const setEntry of exerciseEntry.set_entries) {
+            const existingSet = await SetEntry.findOne({
+              where: {
+                id: setEntry.id,
+                exercise_entry_id: exerciseEntry.id,
+              },
+            })
+
+            if (existingSet) {
+              await existingSet.update({
+                kg: setEntry.kg,
+                reps: setEntry.reps,
+                performed_at: setEntry.performed_at,
+              })
+            }
+          }
+        }
+      }
+    }
+
+    res.status(200).json({ message: "Workout updated successfully" })
+  } catch (error) {
+    console.error("Error updating workout entry:", error)
+    res.status(400).json({ message: error.message || "Update failed" })
+  }
+}
+
+export const deleteUserWorkoutEntry = async (req, res, next) => {
+  try {
+    const userId = req.params.id
+    const workoutEntryId = req.params.workoutId
+
+    console.log("Deleting workoutEntry for user:", userId, "Workout ID:", workoutEntryId)
+
+    const workout = await WorkoutEntry.findOne({
+      where: {
+        id: workoutEntryId,
+        user_id: userId, // Ensure workout belongs to the user
+      },
+    })
+
+    if (!workout) {
+      return res.status(404).json({ message: "Workout not found" })
+    }
+
+    await workout.destroy()
+
+    res.status(200).json({ message: "Workout deleted successfully" })
+  } catch (error) {
+    console.error("Error deleting workout entry:", error)
+    res.status(500).json({ message: "Internal server error" })
   }
 }

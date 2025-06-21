@@ -7,9 +7,14 @@ import {
   updateExercise,
   updateMultipleExercises,
   deleteExercise,
+
+  // Muslce groups
+  getMuscleGroups
 } from "../../controllers/core/exercise.controller.js"
 
 const router = express.Router()
+
+router.get("/muscles", getMuscleGroups)
 
 router.get("/", getExercises)
 router.get("/:id", getExerciseById)

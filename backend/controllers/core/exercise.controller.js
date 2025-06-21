@@ -1,4 +1,5 @@
 import Exercise from "../../models/core/exercise.model.js"
+import { Op } from "sequelize"
 
 // Fetch all exercises
 export const getExercises = async (req, res) => {
@@ -108,6 +109,30 @@ export const deleteExercise = async (req, res) => {
     if (!deletedExercise)
       return res.status(404).json({ message: "Exercise not found" })
     res.json({ message: "Exercise deleted successfully" })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+export const getMuscleGroups = async (req, res) => {
+  try {
+    const exercises = await Exercise.findAll({
+      attributes: ["primary", "secondary"],
+      where: {
+        [Op.or]: [
+          { primary: { [Op.ne]: null } },
+          { secondary: { [Op.ne]: null } },
+        ],
+      },
+    })
+
+    const muscleGroups = new Set()
+    exercises.forEach((exercise) => {
+      if (exercise.primary) muscleGroups.add(exercise.primary)
+      if (exercise.secondary) muscleGroups.add(exercise.secondary)
+    })
+
+    res.json(Array.from(muscleGroups).sort())
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
