@@ -53,7 +53,7 @@ const WeightTracker = ({ userId, width = "100%", height = "100%" }) => {
         flexDirection: "column",
       }}
     >
-      <h3>Track Your Weight</h3>
+      <h3 className="text-warning">Track Your Weight</h3>
       <p className="text-secondary">Current Weigth: {userWeight || ""}kg</p>
       <WeigthChart weights={weights} />
       <InputGroup className="mb-3">

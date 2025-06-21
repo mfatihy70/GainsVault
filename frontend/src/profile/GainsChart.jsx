@@ -158,7 +158,7 @@ const GainsChart = ({ workouts, width = 400, height = 400 }) => {
 
   return (
     <div style={{ width: `${width}`, height: `${height}` }}>
-      <h2>Gains Chart</h2>
+      <h2 className="text-warning">Gains Chart</h2>
       <p className="text-secondary mb-4">
         The Gains Chart compares your personal records (PRs) across exercises, showing performance changes over time.
         Choose between comparing the current month vs. last month, or your latest PRs.
