@@ -41,7 +41,7 @@ const WorkoutEntries = ({ userId }) => {
       const splitFetches = entries.map(async (workout) => {
         if (workout.default) {
           try {
-            const split = await getSplitFromWorkoutId(workout.id)
+            const split = await getSplitFromWorkoutId(workout.workout_id)
             return { id: workout.id, name: split.name }
           } catch (e) {
             return { id: workout.id, name: "Unknown" }
@@ -280,7 +280,7 @@ const WorkoutEntries = ({ userId }) => {
                   )}
 
                   {/* Workout Start and End Times */}
-                  <div className="ms-auto me-4">
+                  <div className="ms-auto me-4 text-end">
                     {editId === workout.id ? (
                       <div className="d-flex gap-2 align-items-center" onClick={(e) => e.stopPropagation()}>
                         <Form.Control
@@ -298,22 +298,26 @@ const WorkoutEntries = ({ userId }) => {
                       </div>
                     ) : (
                       <div>
-                        {new Date(workout.start).toLocaleString()} →{" "}
-                        {new Date(workout.end).toLocaleTimeString()} [
-                        {
-                          (() => {
-                            const durationMs = new Date(workout.end) - new Date(workout.start);
-                            const totalSeconds = Math.floor(durationMs / 1000);
-                            const hours = Math.floor(totalSeconds / 3600);
-                            const minutes = Math.floor((totalSeconds % 3600) / 60);
-                            const seconds = totalSeconds % 60;
-                            return `${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds}s`;
-                          })()
-                        }
-                        ]
+                        <div>
+                          {new Date(workout.start).toLocaleString()} → {new Date(workout.end).toLocaleString()}
+                        </div>
+                          <Badge bg="secondary" className="small">
+                          {
+                            (() => {
+                              const durationMs = new Date(workout.end) - new Date(workout.start);
+                              const totalSeconds = Math.floor(durationMs / 1000);
+                              const hours = Math.floor(totalSeconds / 3600);
+                              const minutes = Math.floor((totalSeconds % 3600) / 60);
+                              const seconds = totalSeconds % 60;
+                              return `${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds}s`;
+                            })()
+                          }
+                        </Badge>
                       </div>
                     )}
                   </div>
+
+
                 </Stack>
                 <div className="d-flex gap-2 me-4" onClick={(e) => e.stopPropagation()}>
                   {editId === workout.id ? (
