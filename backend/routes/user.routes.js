@@ -11,6 +11,7 @@ import {
   getWeights,
   deleteWeight,
   // Workout tracking
+  createTrackedWorkout,
   getUserWorkoutEntries,
   getUserWorkoutEntryById,
   deleteUserWorkoutEntry,
@@ -34,6 +35,7 @@ router.delete("/:id/weight/:index", deleteWeight)
 // Workout tracking routes
 router.get("/:id/workout", getUserWorkoutEntries)
 router.get("/:id/workout/:workoutId", getUserWorkoutEntryById)
+router.post("/:id/workout", createTrackedWorkout)
 router.delete("/:id/workout/:workoutId", deleteUserWorkoutEntry)
 router.put("/:id/workout/:workoutId", updateUserWorkoutEntry)
 

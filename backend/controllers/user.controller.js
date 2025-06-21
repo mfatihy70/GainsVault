@@ -2,9 +2,11 @@ import User from "../models/user.model.js"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import WorkoutEntry from "../models/entries/workout.model.js"
-import ExerciseEntry from "../models/entries/exercise.model.js"
+import WorkoutExercise from "../models/core/workout_exercise.model.js"
 import SetEntry from "../models/entries/set.model.js"
 import Exercise from "../models/core/exercise.model.js"
+import ExerciseEntry from "../models/entries/exercise.model.js"
+import { sequelize } from "../config/db.js"
 
 // Fetch all users
 export const getUsers = async (req, res) => {
@@ -252,6 +254,81 @@ export const getUserWorkoutEntryById = async (req, res, next) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const createTrackedWorkout = async (req, res) => {
+  try {
+    console.log("Creating Tracked Workout exercises:", req.body)
+    // Hold the tracked workout data
+    const tracked = req.body
+
+    const result = await sequelize.transaction(async (t) => {
+      console.log("Transaction started for creating tracked workout");
+      //return;
+      // 1. Create workout entry
+      const workoutEntry = await WorkoutEntry.create({
+        user_id: tracked.userId,
+        workout_id: tracked.workoutId,
+        name: tracked.name,
+        //  performed_at: tracked.performedAt,
+        default: tracked.default, // user-defined workout => default == false
+        start: tracked.start,
+        end: tracked.end,
+      }, { transaction: t });
+
+      //console.log("Workout entry created:", workoutEntry.id);
+
+      // 2. Loop through exercises
+      for (const exercise of tracked.exercises) {
+        console.log("Processing exercise:", exercise);
+
+        let workoutExerciseId = null;
+
+        // Only find workoutExercise if it's a predefined workout (default == true)
+        if (tracked.default) {
+          // Find performed workoutExercise by exercise ID
+          const workoutExercise = await WorkoutExercise.findOne({
+            where: {
+              workout_id: tracked.workoutId,
+              exercise_id: exercise.exerciseId,
+            },
+            transaction: t,
+          });
+
+          workoutExerciseId = workoutExercise?.id ?? null;
+          console.log("Found workout exercise:", workoutExerciseId ?? "none");
+        }
+
+        // Create a new exercise entry for the current workout
+        const exerciseEntry = await ExerciseEntry.create({
+          workout_entry_id: workoutEntry.id,
+          workout_exercise_id: workoutExerciseId, // if null, it means this is a custom exercise not linked to a predefined workout exercise
+          exercise_id: exercise.exerciseId,
+          notes: exercise.notes || null,
+          //performed_at: exercise.performedAt,
+        }, { transaction: t });
+
+        // 3. Bulk insert set entries
+        const setEntries = exercise.sets.map((set) => ({
+          exercise_entry_id: exerciseEntry.id,
+          set_order: set.set_order,
+          kg: set.kg,
+          reps: set.reps,
+          //performed_at: set.performedAt,
+        }));
+
+        await SetEntry.bulkCreate(setEntries, { transaction: t });
+      }
+      //
+      return workoutEntry;
+    });
+
+    console.log('Workout successfully saved:', result);
+    res.json(req.body)
+  } catch (error) {
+    console.error('Transaction failed. Rolled back.', error);
+    res.status(500).json({ message: error.message })
+  }
+}
 
 export const updateUserWorkoutEntry = async (req, res, next) => {
   try {

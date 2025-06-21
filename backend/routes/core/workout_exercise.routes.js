@@ -6,13 +6,9 @@ import {
   createWorkoutExercise,
   updateWorkoutExercise,
   deleteWorkoutExercise,
-  createTrackedWorkout
 } from "../../controllers/core/workout_exercise.controller.js"
 
 const router = express.Router()
-
-
-router.post("/workout", createTrackedWorkout)
 
 router.get("/", getWorkoutExercises)
 router.get("/workout/:workoutId", getExercisesForWorkout)

@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { Container, Card, Button, Row, Col, Badge, Image } from "react-bootstrap"
 import { formatDateTime, formatDuration } from "../utils/stopwatch"
 import workoutImage from '../assets/workout.png'
-import { createTrackedWorkout } from "../utils/workout"
+import { createTrackedWorkout } from "../utils/user"
 
 const WorkoutSummary = () => {
   const { state } = useLocation()
