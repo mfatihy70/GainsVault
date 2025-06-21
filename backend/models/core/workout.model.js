@@ -4,6 +4,16 @@ import { sequelize } from "../../config/db.js"
 const Workout = sequelize.define(
   "workouts",
   {
+    // Foreign key referencing the users table
+    user_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: "users", // References the users table
+        key: "id", // References the id column in the users table
+      },
+      onDelete: "CASCADE", // Deletes associated workouts when a user is deleted
+      allowNull: true, // Allow null for default workouts
+    },
     // Foreign key referencing the splits table
     split_id: {
       type: DataTypes.INTEGER, // Integer type
@@ -16,10 +26,6 @@ const Workout = sequelize.define(
     name: {
       type: DataTypes.STRING(50),
       allowNull: false,
-    },
-    default: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false, // Default value is false
     },
     image: {
       type: DataTypes.STRING(255),

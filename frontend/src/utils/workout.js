@@ -1,25 +1,22 @@
 import axiosInstance from "./axios"
 
-export const getWorkouts = async (setWorkouts, setError, setLoading) => {
-  setLoading(true)
+export const getWorkouts = async () => {
   try {
     const response = await axiosInstance.get("/workouts")
-    setWorkouts(response.data)
+    return response.data
   } catch (err) {
-    setError(err.message)
-  } finally {
-    setLoading(false)
+    console.error("Error fetching workouts:", err)
+    throw err
   }
 }
 
-export const getWorkoutById = async (id, setWorkout, setError, setLoading) => {
+export const getWorkoutById = async (id) => {
   try {
     const response = await axiosInstance.get(`/workouts/${id}`)
-    setWorkout(response.data)
+    return response.data
   } catch (err) {
-    setError(err.message)
-  } finally {
-    setLoading(false)
+    console.error(`Error fetching workout ${id}:`, err)
+    throw err
   }
 }
 
@@ -61,33 +58,46 @@ export const getWorkoutExercises = async (
   }
 }
 
-export const createWorkout = async (workout, setError, setLoading) => {
+export const createWorkout = async (workoutData) => {
   try {
-    await axiosInstance.post("/workouts", {
-      ...workout,
-      default: false, // explicitly ensure it's user-defined
-    })
+    const response = await axiosInstance.post("/workouts", workoutData)
+    return response.data
   } catch (err) {
-    setError(err.message)
-  } finally {
-    setLoading(false)
+    console.error("Error creating workout:", err)
+    throw err
+  }
+}
+
+export const updateWorkout = async (id, workoutData) => {
+  try {
+    const response = await axiosInstance.put(`/workouts/${id}`, workoutData)
+    return response.data
+  } catch (err) {
+    console.error(`Error updating workout ${id}:`, err)
+    throw err
+  }
+}
+
+export const deleteWorkout = async (id) => {
+  try {
+    const response = await axiosInstance.delete(`/workouts/${id}`)
+    return response.data
+  } catch (err) {
+    console.error(`Error deleting workout ${id}:`, err)
+    throw err
   }
 }
 
 // Get workout exercises by workout ID (with full exercise data)
 export const getWorkoutExercisesByWorkoutId = async (
-  workoutId,
-  setWorkoutExercises,
-  setError,
-  setLoading
+  workoutId
 ) => {
   try {
     const response = await axiosInstance.get(`/workout-exercises/workout/${workoutId}`)
-    setWorkoutExercises(response.data)
+    return response.data
   } catch (err) {
-    setError(err.message)
-  } finally {
-    setLoading(false)
+    console.error(`Error fetching exercises for workout ${workoutId}:`, err)
+    throw err
   }
 }
 

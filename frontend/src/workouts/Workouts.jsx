@@ -12,6 +12,8 @@ import {
 import { motion } from "framer-motion"
 import { getWorkouts, getWorkoutExercisesByWorkoutId } from "../utils/workout"
 import { getSplits } from "../utils/split"
+import { isLoggedIn } from "../utils/login"
+import CreateWorkoutModal from "./CreateWorkoutModal"
 
 const WorkoutsPage = () => {
   const [selectedMuscle, setSelectedMuscle] = useState("all")
@@ -26,20 +28,35 @@ const WorkoutsPage = () => {
   const [splits, setSplits] = useState([])
   const [splitMap, setSplitMap] = useState({})
   const [selectedSplit, setSelectedSplit] = useState("") // for split filter
+  const [showCreateModal, setShowCreateModal] = useState(false)
 
   const handleCloseModal = () => setShowModal(false)
   const handleShowModal = async (workout, e) => {
     if (e) e.preventDefault()
     setSelectedWorkout(workout)
-    setShowModal(true)
-
-    // Fetch exercises for the selected workout using the extracted function
-    const exercises = await getWorkoutExercisesByWorkoutId(workout.id)
-    setSelectedWorkoutExercises(exercises)
+    
+    try {
+      const exercises = await getWorkoutExercisesByWorkoutId(workout.id)
+      setSelectedWorkoutExercises(exercises)
+      setShowModal(true)
+    } catch (error) {
+      setError(error)
+    }
   }
   // Use the provided getSplits function to fetch splits on mount
   useEffect(() => {
-    getSplits(setSplits, setError, setLoading)
+    const fetchSplits = async () => {
+      try {
+        setLoading(true)
+        const splitsData = await getSplits()
+        setSplits(splitsData)
+      } catch (err) {
+        setError(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchSplits()
   }, [])
 
   // Build splitMap whenever splits change
@@ -51,9 +68,20 @@ const WorkoutsPage = () => {
     setSplitMap(map)
   }, [splits])
 
+  const fetchWorkouts = async () => {
+    try {
+      setLoading(true)
+      const workoutsData = await getWorkouts()
+      setWorkouts(workoutsData)
+    } catch (err) {
+      setError(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    // Use the extracted getWorkouts function
-    getWorkouts(setWorkouts, setError, setLoading)
+    fetchWorkouts()
   }, [])
 
   // On mount, check for split query param and set selectedSplit
@@ -93,7 +121,14 @@ const WorkoutsPage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-center mb-4 text-warning">Workouts</h1>
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h1 className="text-center text-warning mb-0">Workouts</h1>
+          {isLoggedIn() && (
+            <Button variant="warning" onClick={() => setShowCreateModal(true)}>
+              Create Custom Workout
+            </Button>
+          )}
+        </div>
 
         {/* Filters in one row */}
         <Form className="mb-4">
@@ -268,6 +303,12 @@ const WorkoutsPage = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      <CreateWorkoutModal
+        show={showCreateModal}
+        handleClose={() => setShowCreateModal(false)}
+        onWorkoutCreated={fetchWorkouts}
+      />
     </Container>
   )
 }

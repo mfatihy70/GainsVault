@@ -1,24 +1,21 @@
 import axiosInstance from "./axios"
 
-export const getSplits = async (setSplits, setError, setLoading) => {
-  setLoading(true)
+export const getSplits = async () => {
   try {
     const response = await axiosInstance.get("/splits")
-    setSplits(response.data)
+    return response.data
   } catch (err) {
-    setError(err.message)
-  } finally {
-    setLoading(false)
+    console.error("Error fetching splits:", err)
+    throw err
   }
 }
 
-export const getSplitById = async (id, setSplit, setError, setLoading) => {
+export const getSplitById = async (id) => {
   try {
     const response = await axiosInstance.get(`/splits/${id}`)
-    setSplit(response.data)
+    return response.data
   } catch (err) {
-    setError(err.message)
-  } finally {
-    setLoading(false)
+    console.error(`Error fetching split ${id}:`, err)
+    throw err
   }
 }

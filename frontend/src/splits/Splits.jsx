@@ -39,7 +39,15 @@ const SplitPage = () => {
 
   useEffect(() => {
     const fetchSplits = async () => {
-      await getSplits(setSplits, setError, setLoading)
+      try {
+        setLoading(true)
+        const data = await getSplits()
+        setSplits(data)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
     }
     fetchSplits()
   }, [])

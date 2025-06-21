@@ -42,8 +42,18 @@ const ExercisePage = () => {
   const [difficulty, setDifficulty] = useState("")
 
   useEffect(() => {
-    setLoading(true)
-    getExercises(setExercises, setLoading, setError)
+    const fetchExercises = async () => {
+      try {
+        setLoading(true)
+        const data = await getExercises()
+        setExercises(data)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchExercises()
   }, [])
 
   const filteredExercises = exercises.filter(
