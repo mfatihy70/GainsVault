@@ -215,7 +215,7 @@ const ProfilePage = () => {
       </Card>
       <Card className="bg-dark border border-warning text-light mt-4 p-3">
         <Tabs defaultActiveKey="stats" id="profile-tabs" className="mb-3 border-bottom border-primary" justify variant="pills">
-          <Tab eventKey="stats" title="Progress Stats">
+          <Tab eventKey="stats" title="Statistics">
             <Col
               md={12}
               className="d-flex justify-content-center align-items-center text-center col mb-3"

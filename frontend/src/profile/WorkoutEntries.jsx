@@ -19,14 +19,17 @@ const WorkoutEntries = ({ userId }) => {
   const [editedName, setEditedName] = useState("")
   const [editingSetId, setEditingSetId] = useState(null)
   const [editedSet, setEditedSet] = useState({})
-  const [editedStart, setEditedStart] = useState("");
-  const [editedEnd, setEditedEnd] = useState("");
+  const [editedStart, setEditedStart] = useState("")
+  const [editedEnd, setEditedEnd] = useState("")
+
+  // New state to track notes editing per exercise entry id
+  const [editingNotesId, setEditingNotesId] = useState(null)
+  const [editedNotes, setEditedNotes] = useState("")
 
   useEffect(() => {
     const fetchWorkouts = async () => {
       await getUserWorkoutEntries(userId, setWorkouts, setError, setLoading)
     }
-
     fetchWorkouts()
   }, [userId])
 
@@ -42,8 +45,24 @@ const WorkoutEntries = ({ userId }) => {
   const handleStartEditWorkout = (workout) => {
     setEditId(workout.id);
     setEditedName(workout.name || "");
-    setEditedStart(workout.start.slice(0, 16)); // format: "YYYY-MM-DDTHH:mm"
-    setEditedEnd(workout.end.slice(0, 16));
+    const toLocalInputValue = (utcDateStr) => {
+      const date = new Date(utcDateStr);
+
+      // pad helper
+      const pad = (num) => num.toString().padStart(2, "0");
+
+      const year = date.getFullYear();
+      const month = pad(date.getMonth() + 1); // Months are 0-based
+      const day = pad(date.getDate());
+      const hours = pad(date.getHours());
+      const minutes = pad(date.getMinutes());
+
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    };
+
+
+    setEditedStart(toLocalInputValue(workout.start));
+    setEditedEnd(toLocalInputValue(workout.end));
   };
   const handleSaveWorkoutEdit = async () => {
     try {
@@ -61,14 +80,16 @@ const WorkoutEntries = ({ userId }) => {
         prev.map((w) => (w.id === editId ? updatedData : w))
       );
 
+      getUserWorkoutEntries(userId, setWorkouts, setError, () => { });
+
       setEditId(null);
       setEditedName("");
       setEditedStart("");
       setEditedEnd("");
     } catch (err) {
-      setError("Failed to save workout edit.");
+      setError("Failed to save workout edit.")
     }
-  };
+  }
 
   const handleSetEditClick = (set) => {
     setEditingSetId(set.id)
@@ -129,7 +150,7 @@ const WorkoutEntries = ({ userId }) => {
       );
 
       // Refresh workouts to ensure consistency
-      await getUserWorkoutEntries(userId, setWorkouts, setError, ()=>{});
+      await getUserWorkoutEntries(userId, setWorkouts, setError, () => { });
 
       setEditingSetId(null);
       setEditedSet({});
@@ -138,7 +159,50 @@ const WorkoutEntries = ({ userId }) => {
     }
   }
 
+  // New: Handle start editing notes for a given exercise entry
+  const handleStartEditNotes = (entry) => {
+    setEditingNotesId(entry.id)
+    setEditedNotes(entry.notes || "")
+  }
 
+  // New: Handle cancel notes edit
+  const handleCancelNotesEdit = () => {
+    setEditingNotesId(null)
+    setEditedNotes("")
+  }
+
+  // New: Handle save notes edit
+  const handleSaveNotesEdit = async (entry) => {
+    try {
+      const workoutToUpdate = workouts.find(w => w.id === entry.workout_entry_id)
+      if (!workoutToUpdate) throw new Error("Workout not found")
+
+      // Update notes for the specific exercise entry
+      const updatedExerciseEntries = workoutToUpdate.exercise_entries.map((e) =>
+        e.id === entry.id ? { ...e, notes: editedNotes } : e
+      )
+      const updateData = {
+        ...workoutToUpdate,
+        exercise_entries: updatedExerciseEntries,
+      }
+
+      await updateUserWorkoutEntry(userId, workoutToUpdate.id, updateData)
+
+      setWorkouts((prev) =>
+        prev.map((w) =>
+          w.id === workoutToUpdate.id ? { ...w, exercise_entries: updatedExerciseEntries } : w
+        )
+      )
+
+      // Refresh workouts to ensure consistency
+      await getUserWorkoutEntries(userId, setWorkouts, setError, () => { });
+
+      setEditingNotesId(null)
+      setEditedNotes("")
+    } catch (err) {
+      setError("Failed to save notes.")
+    }
+  }
 
   if (loading) return <Spinner animation="border" variant="warning" />
   if (error) return <Alert variant="danger">{error}</Alert>
@@ -356,6 +420,52 @@ const WorkoutEntries = ({ userId }) => {
                     ) : (
                       <p>No sets recorded.</p>
                     )}
+
+                    {/* Notes Section */}
+                    <div className="mt-3">
+                      <strong>Notes:</strong>
+                      {editingNotesId === entry.id ? (
+                        <>
+                          <Form.Control
+                            as="textarea"
+                            rows={3}
+                            value={editedNotes}
+                            onChange={(e) => setEditedNotes(e.target.value)}
+                            className="mt-2"
+                          />
+                          <div className="mt-2">
+                            <Button
+                              variant="success"
+                              size="sm"
+                              onClick={() => handleSaveNotesEdit(entry)}
+                              className="me-2"
+                            >
+                              Save
+                            </Button>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={handleCancelNotesEdit}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="d-flex justify-content-between align-items-center mt-2">
+                          <div style={{ whiteSpace: "pre-wrap" }}>
+                            {entry.notes || <em>No notes</em>}
+                          </div>
+                          <Button
+                            variant="warning"
+                            size="sm"
+                            onClick={() => handleStartEditNotes(entry)}
+                          >
+                            Edit Notes
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </Card.Body>
                 </Card>
               ))}

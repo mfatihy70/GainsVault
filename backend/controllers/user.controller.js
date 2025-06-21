@@ -200,6 +200,8 @@ export const getUserWorkoutEntries = async (req, res, next) => {
               model: Exercise, // include exercise name, type, etc.
             }
           ],
+          order: [['id', 'ASC']], // sort exercise entries by ID
+          separate: true, // ensure exercise entries are fetched separately
         }
       ],
     });
@@ -227,12 +229,15 @@ export const getUserWorkoutEntryById = async (req, res, next) => {
           include: [
             {
               model: SetEntry,
-              order: [['set_order', 'ASC']],
+              order: [['set_order', 'ASC']], // sort sets by order
+              separate: true, // make sure sets are fetched separa
             },
             {
               model: Exercise,
             },
           ],
+          order: [['id', 'ASC']], // sort exercise entries by ID
+          separate: true, // ensure exercise entries are fetched
         },
       ],
     });
@@ -284,7 +289,9 @@ export const updateUserWorkoutEntry = async (req, res, next) => {
         if (!existingExerciseEntry) continue // skip if not found
 
         // Optionally update exerciseEntry fields if needed
-        // await existingExerciseEntry.update({ ... })
+        await existingExerciseEntry.update({
+          notes: exerciseEntry.notes,
+        })
 
         // Iterate over set entries
         if (Array.isArray(exerciseEntry.set_entries)) {

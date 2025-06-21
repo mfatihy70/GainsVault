@@ -165,8 +165,8 @@ const GainsChart = ({ workouts, width = 400, height = 400 }) => {
         Instantly see gains or losses with color-coded bars for easy progress tracking.
       </p>
 
-      {/* Time Range Selection */}
       <div className="d-flex flex-wrap gap-3 justify-content-center align-items-center mb-3">
+        {/* Time Range Selection */}
         <div>
           <label className="me-2 fw-bold text-light">Compare:</label>
           <select

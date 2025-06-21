@@ -49,6 +49,7 @@ const WorkoutSummary = () => {
       exercises: finishedExercises.map((exercise) => ({
         exerciseId: exercise.id,
         performedAt: new Date(),
+        notes: exercise.notes || null,
         sets: exercise.setsData.map((set, index) => ({
           kg: set.weight,
           reps: set.reps,

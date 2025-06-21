@@ -62,6 +62,7 @@ export const createTrackedWorkout = async (req, res) => {
           workout_entry_id: workoutEntry.id,
           workout_exercise_id: workoutExerciseId, // if null, it means this is a custom exercise not linked to a predefined workout exercise
           exercise_id: exercise.exerciseId,
+          notes: exercise.notes || null,
           //performed_at: exercise.performedAt,
         }, { transaction: t });
 
