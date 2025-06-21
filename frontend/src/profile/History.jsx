@@ -374,7 +374,6 @@ const WorkoutEntries = ({ userId }) => {
                             <th>Set</th>
                             <th>Reps</th>
                             <th>Weight (kg)</th>
-                            <th>Time</th>
                             <th>Actions</th>
                           </tr>
                         </thead>
@@ -410,27 +409,6 @@ const WorkoutEntries = ({ userId }) => {
                                     />
                                   ) : (
                                     set.kg
-                                  )}
-                                </td>
-                                <td>
-                                  {isEditing ? (
-                                    <Form.Control
-                                      size="sm"
-                                      type="time"
-                                      value={editedSet.performed_at?.slice(11, 16) || ""}
-                                      onChange={(e) =>
-                                        setEditedSet({
-                                          ...editedSet,
-                                          performed_at: new Date(
-                                            `${new Date(set.performed_at).toISOString().slice(0, 10)}T${e.target.value}`
-                                          ).toISOString()
-                                        })
-                                      }
-                                    />
-                                  ) : (
-                                    set.performed_at
-                                      ? new Date(set.performed_at).toLocaleTimeString()
-                                      : "—"
                                   )}
                                 </td>
                                 <td>
