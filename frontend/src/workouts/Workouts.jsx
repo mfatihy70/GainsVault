@@ -12,9 +12,9 @@ import {
 import { motion } from "framer-motion"
 import { getWorkouts, getWorkoutExercisesByWorkoutId } from "../utils/workout"
 import { getSplits } from "../utils/split"
+import CreateWorkoutModal from "./CreateWorkoutModal"
 
 const WorkoutsPage = () => {
-  const [selectedMuscle, setSelectedMuscle] = useState("all")
   const [workouts, setWorkouts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -25,24 +25,28 @@ const WorkoutsPage = () => {
   const [difficulty, setDifficulty] = useState("")
   const [splits, setSplits] = useState([])
   const [splitMap, setSplitMap] = useState({})
-  const [selectedSplit, setSelectedSplit] = useState("") // for split filter
+  const [selectedSplit, setSelectedSplit] = useState("")
+  const [showCreateModal, setShowCreateModal] = useState(false)
 
   const handleCloseModal = () => setShowModal(false)
+
   const handleShowModal = async (workout, e) => {
     if (e) e.preventDefault()
     setSelectedWorkout(workout)
     setShowModal(true)
-
-    // Fetch exercises for the selected workout using the extracted function
-    const exercises = await getWorkoutExercisesByWorkoutId(workout.id)
-    setSelectedWorkoutExercises(exercises)
+    // Pass all required parameters
+    await getWorkoutExercisesByWorkoutId(
+      workout.id,
+      setSelectedWorkoutExercises,
+      setError,
+      setLoading
+    )
   }
-  // Use the provided getSplits function to fetch splits on mount
+
   useEffect(() => {
     getSplits(setSplits, setError, setLoading)
   }, [])
 
-  // Build splitMap whenever splits change
   useEffect(() => {
     const map = {}
     splits.forEach((split) => {
@@ -52,26 +56,14 @@ const WorkoutsPage = () => {
   }, [splits])
 
   useEffect(() => {
-    // Use the extracted getWorkouts function
     getWorkouts(setWorkouts, setError, setLoading)
   }, [])
 
-  // On mount, check for split query param and set selectedSplit
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const splitParam = params.get("split")
     if (splitParam) setSelectedSplit(splitParam)
   }, [])
-
-  const muscleGroups = [
-    { value: "all", label: "All Muscles" },
-    { value: "Chest", label: "Chest" },
-    { value: "Back", label: "Back" },
-    { value: "Legs", label: "Legs" },
-    { value: "Shoulders", label: "Shoulders" },
-    { value: "Arms", label: "Arms" },
-    { value: "Core", label: "Core" },
-  ]
 
   const filteredWorkouts = workouts.filter(
     (w) =>
@@ -80,14 +72,35 @@ const WorkoutsPage = () => {
       (!selectedSplit || String(w.split_id) === String(selectedSplit))
   )
 
-  // Helper to get split name by id
   const getSplitName = (splitId) => {
-    const split = splits.find((s) => s.id == splitId) // Use loose equality to match number/string
+    const split = splits.find((s) => s.id == splitId)
     return split ? split.name : `Split ${splitId}`
+  }
+
+  const handleWorkoutCreated = () => {
+    getWorkouts(setWorkouts, setError, setLoading)
   }
 
   return (
     <Container className="py-5 bg-dark text-light">
+      {/* Header Buttons */}
+      <div className="d-flex justify-content-end mb-3 gap-2">
+        <Button
+          variant="warning"
+          className="fw-semibold"
+          onClick={() => setShowCreateModal(true)}
+        >
+          + Create Workout
+        </Button>
+      </div>
+
+      {/* Modals */}
+      <CreateWorkoutModal
+        show={showCreateModal}
+        handleClose={() => setShowCreateModal(false)}
+        onWorkoutCreated={handleWorkoutCreated}
+      />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -95,7 +108,7 @@ const WorkoutsPage = () => {
       >
         <h1 className="text-center mb-4 text-warning">Workouts</h1>
 
-        {/* Filters in one row */}
+        {/* Filters */}
         <Form className="mb-4">
           <Row className="align-items-end">
             <Col md={4} className="mb-2">
@@ -145,7 +158,7 @@ const WorkoutsPage = () => {
           </Row>
         </Form>
 
-        {/* Cards */}
+        {/* Workout Cards */}
         <Row>
           {loading && <p>Loading workouts...</p>}
           {error && <p>Error loading workouts: {error.message}</p>}
@@ -160,7 +173,6 @@ const WorkoutsPage = () => {
                   transition={{ duration: 0.2 }}
                 >
                   <Card className="h-100 bg-dark text-light border border-warning shadow-sm">
-                    {/* Show workout image if available */}
                     {workout.image && (
                       <Card.Img
                         variant="top"
@@ -169,6 +181,15 @@ const WorkoutsPage = () => {
                         style={{ objectFit: "cover", height: "180px" }}
                       />
                     )}
+                    {/* If your backend uses imageUrl instead of image, use this: */}
+                    {/* {workout.imageUrl && (
+                      <Card.Img
+                        variant="top"
+                        src={workout.imageUrl}
+                        alt={workout.name}
+                        style={{ objectFit: "cover", height: "180px" }}
+                      />
+                    )} */}
                     <Card.Body className="px-4">
                       <Card.Title className="text-warning">
                         {workout.name}
@@ -193,7 +214,7 @@ const WorkoutsPage = () => {
         </Row>
       </motion.div>
 
-      {/* Workout Detail Modal */}
+      {/* Workout Details Modal */}
       <Modal
         show={showModal}
         onHide={handleCloseModal}
@@ -212,7 +233,6 @@ const WorkoutsPage = () => {
               <p>
                 <strong>Split:</strong> {getSplitName(selectedWorkout.split_id)}
               </p>
-
               <h4>Exercises:</h4>
               <Table
                 striped
@@ -271,15 +291,5 @@ const WorkoutsPage = () => {
     </Container>
   )
 }
-
-// Add this style globally or in your CSS file if not already present
-// You can also use a <style> tag here for quick testing:
-;<style>
-  {`
-.workout-modal-xl .modal-dialog {
-  max-width: 1100px !important;
-}
-`}
-</style>
 
 export default WorkoutsPage
