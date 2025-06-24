@@ -29,7 +29,14 @@ export const getWorkoutById = async (req, res) => {
 export const createWorkout = async (req, res) => {
   try {
     // Always set split_id to 13, and accept user_id from request
-    const { name, order, user_id, image, default: isDefault, exercises } = req.body
+    const {
+      name,
+      order,
+      user_id,
+      image,
+      default: isDefault,
+      exercises,
+    } = req.body
     const newWorkout = await Workout.create({
       split_id: 13,
       user_id,

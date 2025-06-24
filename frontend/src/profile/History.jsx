@@ -9,9 +9,13 @@ import {
   Button,
   Form,
   Stack,
-  Badge
+  Badge,
 } from "react-bootstrap"
-import { updateUserWorkoutEntry, deleteUserWorkoutEntry, getUserWorkoutEntries } from "../utils/user"
+import {
+  updateUserWorkoutEntry,
+  deleteUserWorkoutEntry,
+  getUserWorkoutEntries,
+} from "../utils/user"
 import { getSplitFromWorkoutId } from "../utils/workout"
 
 const WorkoutEntries = ({ userId }) => {
@@ -26,37 +30,41 @@ const WorkoutEntries = ({ userId }) => {
   const [editedEnd, setEditedEnd] = useState("")
   const [splitNames, setSplitNames] = useState({})
 
-
   // New state to track notes editing per exercise entry id
   const [editingNotesId, setEditingNotesId] = useState(null)
   const [editedNotes, setEditedNotes] = useState("")
 
   useEffect(() => {
-    getUserWorkoutEntries(userId, async (entries) => {
-      setWorkouts(entries)
-      setLoading(false)
-      setError(null)
+    getUserWorkoutEntries(
+      userId,
+      async (entries) => {
+        setWorkouts(entries)
+        setLoading(false)
+        setError(null)
 
-      // Now fetch split names for each workout concurrently
-      const splitFetches = entries.map(async (workout) => {
-        if (workout.default) {
-          try {
-            const split = await getSplitFromWorkoutId(workout.workout_id)
-            return { id: workout.id, name: split.name }
-          } catch (e) {
-            return { id: workout.id, name: "Unknown" }
+        // Now fetch split names for each workout concurrently
+        const splitFetches = entries.map(async (workout) => {
+          if (workout.default) {
+            try {
+              const split = await getSplitFromWorkoutId(workout.workout_id)
+              return { id: workout.id, name: split.name }
+            } catch (e) {
+              return { id: workout.id, name: "Unknown" }
+            }
           }
-        }
-        return null
-      })
+          return null
+        })
 
-      const splitResults = await Promise.all(splitFetches)
-      const splits = {}
-      splitResults.forEach((result) => {
-        if (result) splits[result.id] = result.name
-      })
-      setSplitNames(splits)
-    }, setError, setLoading)
+        const splitResults = await Promise.all(splitFetches)
+        const splits = {}
+        splitResults.forEach((result) => {
+          if (result) splits[result.id] = result.name
+        })
+        setSplitNames(splits)
+      },
+      setError,
+      setLoading
+    )
   }, [userId])
 
   const handleWorkoutEntryDelete = async (workoutId) => {
@@ -69,49 +77,48 @@ const WorkoutEntries = ({ userId }) => {
   }
 
   const handleStartEditWorkout = (workout) => {
-    setEditId(workout.id);
-    setEditedName(workout.name || "");
+    setEditId(workout.id)
+    setEditedName(workout.name || "")
     const toLocalInputValue = (utcDateStr) => {
-      const date = new Date(utcDateStr);
+      const date = new Date(utcDateStr)
 
       // pad helper
-      const pad = (num) => num.toString().padStart(2, "0");
+      const pad = (num) => num.toString().padStart(2, "0")
 
-      const year = date.getFullYear();
-      const month = pad(date.getMonth() + 1); // Months are 0-based
-      const day = pad(date.getDate());
-      const hours = pad(date.getHours());
-      const minutes = pad(date.getMinutes());
+      const year = date.getFullYear()
+      const month = pad(date.getMonth() + 1) // Months are 0-based
+      const day = pad(date.getDate())
+      const hours = pad(date.getHours())
+      const minutes = pad(date.getMinutes())
 
-      return `${year}-${month}-${day}T${hours}:${minutes}`;
-    };
+      return `${year}-${month}-${day}T${hours}:${minutes}`
+    }
 
-
-    setEditedStart(toLocalInputValue(workout.start));
-    setEditedEnd(toLocalInputValue(workout.end));
-  };
+    setEditedStart(toLocalInputValue(workout.start))
+    setEditedEnd(toLocalInputValue(workout.end))
+  }
   const handleSaveWorkoutEdit = async () => {
     try {
-      const updatedWorkout = workouts.find((w) => w.id === editId);
+      const updatedWorkout = workouts.find((w) => w.id === editId)
       const updatedData = {
         ...updatedWorkout,
         name: editedName,
         start: new Date(editedStart).toISOString(),
         end: new Date(editedEnd).toISOString(),
-      };
+      }
 
-      await updateUserWorkoutEntry(userId, editId, updatedData);
+      await updateUserWorkoutEntry(userId, editId, updatedData)
 
       setWorkouts((prev) =>
         prev.map((w) => (w.id === editId ? updatedData : w))
-      );
+      )
 
-      getUserWorkoutEntries(userId, setWorkouts, setError, () => { });
+      getUserWorkoutEntries(userId, setWorkouts, setError, () => {})
 
-      setEditId(null);
-      setEditedName("");
-      setEditedStart("");
-      setEditedEnd("");
+      setEditId(null)
+      setEditedName("")
+      setEditedStart("")
+      setEditedEnd("")
     } catch (err) {
       setError("Failed to save workout edit.")
     }
@@ -122,7 +129,7 @@ const WorkoutEntries = ({ userId }) => {
     setEditedSet({
       reps: set.reps,
       kg: set.kg,
-      performed_at: set.performed_at
+      performed_at: set.performed_at,
     })
   }
 
@@ -134,37 +141,39 @@ const WorkoutEntries = ({ userId }) => {
   const handleSaveSetEdit = async (setId) => {
     try {
       // Find the workout and exercise entry that contains this set
-      let workoutId;
-      let workoutToUpdate;
+      let workoutId
+      let workoutToUpdate
 
       workouts.forEach((workout) => {
         workout.exercise_entries.forEach((entry) => {
           if (entry.set_entries.some((set) => set.id === setId)) {
-            workoutId = workout.id;
-            workoutToUpdate = workout;
+            workoutId = workout.id
+            workoutToUpdate = workout
           }
-        });
-      });
+        })
+      })
 
       if (!workoutToUpdate) {
-        throw new Error("Workout not found for set");
+        throw new Error("Workout not found for set")
       }
 
       // Build updated workout data with the edited set updated
-      const updatedExerciseEntries = workoutToUpdate.exercise_entries.map((entry) => {
-        const updatedSetEntries = entry.set_entries.map((set) =>
-          set.id === setId ? { ...set, ...editedSet } : set
-        );
-        return { ...entry, set_entries: updatedSetEntries };
-      });
+      const updatedExerciseEntries = workoutToUpdate.exercise_entries.map(
+        (entry) => {
+          const updatedSetEntries = entry.set_entries.map((set) =>
+            set.id === setId ? { ...set, ...editedSet } : set
+          )
+          return { ...entry, set_entries: updatedSetEntries }
+        }
+      )
 
       const updateData = {
         ...workoutToUpdate,
         exercise_entries: updatedExerciseEntries,
-      };
+      }
 
       // Call API to update workout
-      await updateUserWorkoutEntry(userId, workoutId, updateData);
+      await updateUserWorkoutEntry(userId, workoutId, updateData)
 
       // Update state locally for immediate UI feedback
       setWorkouts((prev) =>
@@ -173,15 +182,15 @@ const WorkoutEntries = ({ userId }) => {
             ? { ...workout, exercise_entries: updatedExerciseEntries }
             : workout
         )
-      );
+      )
 
       // Refresh workouts to ensure consistency
-      await getUserWorkoutEntries(userId, setWorkouts, setError, () => { });
+      await getUserWorkoutEntries(userId, setWorkouts, setError, () => {})
 
-      setEditingSetId(null);
-      setEditedSet({});
+      setEditingSetId(null)
+      setEditedSet({})
     } catch (err) {
-      setError("Failed to save set edit.");
+      setError("Failed to save set edit.")
     }
   }
 
@@ -200,7 +209,9 @@ const WorkoutEntries = ({ userId }) => {
   // New: Handle save notes edit
   const handleSaveNotesEdit = async (entry) => {
     try {
-      const workoutToUpdate = workouts.find(w => w.id === entry.workout_entry_id)
+      const workoutToUpdate = workouts.find(
+        (w) => w.id === entry.workout_entry_id
+      )
       if (!workoutToUpdate) throw new Error("Workout not found")
 
       // Update notes for the specific exercise entry
@@ -216,12 +227,14 @@ const WorkoutEntries = ({ userId }) => {
 
       setWorkouts((prev) =>
         prev.map((w) =>
-          w.id === workoutToUpdate.id ? { ...w, exercise_entries: updatedExerciseEntries } : w
+          w.id === workoutToUpdate.id
+            ? { ...w, exercise_entries: updatedExerciseEntries }
+            : w
         )
       )
 
       // Refresh workouts to ensure consistency
-      await getUserWorkoutEntries(userId, setWorkouts, setError, () => { });
+      await getUserWorkoutEntries(userId, setWorkouts, setError, () => {})
 
       setEditingNotesId(null)
       setEditedNotes("")
@@ -232,14 +245,17 @@ const WorkoutEntries = ({ userId }) => {
 
   if (loading) return <Spinner animation="border" variant="warning" />
   if (error) return <Alert variant="danger">{error}</Alert>
-  if (workouts.length === 0) return <p className="text-light">No workout entries found.</p>
+  if (workouts.length === 0)
+    return <p className="text-light">No workout entries found.</p>
 
   return (
     <Container fluid className="mt-3">
       <div className="mb-4">
         <h2 className="text-warning">Workout History</h2>
         <p className="text-secondary">
-          This page displays a complete log of your past workouts. You can review, edit, or delete individual sessions, update set details, and manage notes for each exercise.
+          This page displays a complete log of your past workouts. You can
+          review, edit, or delete individual sessions, update set details, and
+          manage notes for each exercise.
         </p>
       </div>
 
@@ -252,7 +268,11 @@ const WorkoutEntries = ({ userId }) => {
           >
             <Accordion.Header className="custom-accordion-header">
               <div className="d-flex justify-content-between align-items-center w-100">
-                <Stack direction="horizontal" gap={2} className="w-100 mb-1 text-warning fw-semibold ">
+                <Stack
+                  direction="horizontal"
+                  gap={2}
+                  className="w-100 mb-1 text-warning fw-semibold "
+                >
                   {/* Workout Name */}
                   <div>
                     {editId === workout.id ? (
@@ -270,7 +290,9 @@ const WorkoutEntries = ({ userId }) => {
                   </div>
 
                   {/* Custom indicator Badge*/}
-                  {!workout.default && (<Badge className="text-light small badge">Custom</Badge>)}
+                  {!workout.default && (
+                    <Badge className="text-light small badge">Custom</Badge>
+                  )}
 
                   {/* New Split Name Badge */}
                   {splitNames[workout.id] && (
@@ -282,7 +304,10 @@ const WorkoutEntries = ({ userId }) => {
                   {/* Workout Start and End Times */}
                   <div className="ms-auto me-4 text-end">
                     {editId === workout.id ? (
-                      <div className="d-flex gap-2 align-items-center" onClick={(e) => e.stopPropagation()}>
+                      <div
+                        className="d-flex gap-2 align-items-center"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <Form.Control
                           size="sm"
                           type="datetime-local"
@@ -299,70 +324,77 @@ const WorkoutEntries = ({ userId }) => {
                     ) : (
                       <div>
                         <div>
-                          {new Date(workout.start).toLocaleString()} → {new Date(workout.end).toLocaleString()}
+                          {new Date(workout.start).toLocaleString()} →{" "}
+                          {new Date(workout.end).toLocaleString()}
                         </div>
-                          <Badge bg="secondary" className="small">
-                          {
-                            (() => {
-                              const durationMs = new Date(workout.end) - new Date(workout.start);
-                              const totalSeconds = Math.floor(durationMs / 1000);
-                              const hours = Math.floor(totalSeconds / 3600);
-                              const minutes = Math.floor((totalSeconds % 3600) / 60);
-                              const seconds = totalSeconds % 60;
-                              return `${hours > 0 ? `${hours}h ` : ""}${minutes > 0 ? `${minutes}m ` : ""}${seconds}s`;
-                            })()
-                          }
+                        <Badge bg="secondary" className="small">
+                          {(() => {
+                            const durationMs =
+                              new Date(workout.end) - new Date(workout.start)
+                            const totalSeconds = Math.floor(durationMs / 1000)
+                            const hours = Math.floor(totalSeconds / 3600)
+                            const minutes = Math.floor(
+                              (totalSeconds % 3600) / 60
+                            )
+                            const seconds = totalSeconds % 60
+                            return `${hours > 0 ? `${hours}h ` : ""}${
+                              minutes > 0 ? `${minutes}m ` : ""
+                            }${seconds}s`
+                          })()}
                         </Badge>
                       </div>
                     )}
                   </div>
-
-
                 </Stack>
-                <div className="d-flex gap-2 me-4" onClick={(e) => e.stopPropagation()}>
-                  {editId === workout.id ? (
-                    <>
-                      <Button
-                        variant="success"
-                        size="sm"
-                        onClick={handleSaveWorkoutEdit}
-                      >
-                        Save
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => setEditId(null)}
-                      >
-                        Cancel
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        variant="warning"
-                        size="sm"
-                        onClick={() => handleStartEditWorkout(workout)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => handleWorkoutEntryDelete(workout.id)}
-                      >
-                        <i className="bi bi-trash-fill"></i>
-                      </Button>
-                    </>
-                  )}
-                </div>
-
               </div>
             </Accordion.Header>
-
+            {/* Move action buttons OUTSIDE the Accordion.Header */}
+            <div
+              className="d-flex gap-2 me-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {editId === workout.id ? (
+                <>
+                  <Button
+                    variant="success"
+                    size="sm"
+                    onClick={handleSaveWorkoutEdit}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setEditId(null)}
+                  >
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="warning"
+                    size="sm"
+                    onClick={() => handleStartEditWorkout(workout)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleWorkoutEntryDelete(workout.id)}
+                  >
+                    <i className="bi bi-trash-fill"></i>
+                  </Button>
+                </>
+              )}
+            </div>
             <Accordion.Body className="bg-dark text-light">
               {workout.exercise_entries.map((entry) => (
-                <Card className="bg-dark border border-warning text-light mb-3" key={entry.id}>
+                <Card
+                  className="bg-dark border border-warning text-light mb-3"
+                  key={entry.id}
+                >
                   <Card.Header className="bg-dark text-warning">
                     {entry.exercise?.name || "Unnamed Exercise"}
                   </Card.Header>
@@ -390,7 +422,10 @@ const WorkoutEntries = ({ userId }) => {
                                       type="number"
                                       value={editedSet.reps}
                                       onChange={(e) =>
-                                        setEditedSet({ ...editedSet, reps: e.target.value })
+                                        setEditedSet({
+                                          ...editedSet,
+                                          reps: e.target.value,
+                                        })
                                       }
                                     />
                                   ) : (
@@ -404,7 +439,10 @@ const WorkoutEntries = ({ userId }) => {
                                       type="number"
                                       value={editedSet.kg}
                                       onChange={(e) =>
-                                        setEditedSet({ ...editedSet, kg: e.target.value })
+                                        setEditedSet({
+                                          ...editedSet,
+                                          kg: e.target.value,
+                                        })
                                       }
                                     />
                                   ) : (
@@ -417,7 +455,9 @@ const WorkoutEntries = ({ userId }) => {
                                       <Button
                                         variant="success"
                                         size="sm"
-                                        onClick={() => handleSaveSetEdit(set.id)}
+                                        onClick={() =>
+                                          handleSaveSetEdit(set.id)
+                                        }
                                         className="me-1"
                                       >
                                         <i className="bi bi-check-lg"></i>
@@ -501,7 +541,7 @@ const WorkoutEntries = ({ userId }) => {
           </Accordion.Item>
         ))}
       </Accordion>
-    </Container >
+    </Container>
   )
 }
 
