@@ -13,6 +13,7 @@ import { motion } from "framer-motion"
 import { getWorkouts, getWorkoutExercisesByWorkoutId } from "../utils/workout"
 import { getSplits } from "../utils/split"
 import CreateWorkoutModal from "./CreateWorkoutModal"
+import axiosInstance from "../utils/axios"
 
 const WorkoutsPage = () => {
   const [workouts, setWorkouts] = useState([])
@@ -27,6 +28,7 @@ const WorkoutsPage = () => {
   const [splitMap, setSplitMap] = useState({})
   const [selectedSplit, setSelectedSplit] = useState("")
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [userMap, setUserMap] = useState({})
 
   const handleCloseModal = () => setShowModal(false)
 
@@ -65,6 +67,29 @@ const WorkoutsPage = () => {
     if (splitParam) setSelectedSplit(splitParam)
   }, [])
 
+  // Fetch user info for all unique user_ids in workouts
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const uniqueUserIds = [
+        ...new Set(workouts.map((w) => w.user_id).filter(Boolean)),
+      ]
+      if (uniqueUserIds.length === 0) return
+      const userMapTemp = {}
+      await Promise.all(
+        uniqueUserIds.map(async (userId) => {
+          try {
+            const res = await axiosInstance.get(`/users/${userId}`)
+            userMapTemp[userId] = res.data.name || res.data.username || "User"
+          } catch {
+            userMapTemp[userId] = "User"
+          }
+        })
+      )
+      setUserMap(userMapTemp)
+    }
+    fetchUsers()
+  }, [workouts])
+
   const filteredWorkouts = workouts.filter(
     (w) =>
       w.name.toLowerCase().includes(search.toLowerCase()) &&
@@ -93,21 +118,18 @@ const WorkoutsPage = () => {
           + Create Workout
         </Button>
       </div>
-
       {/* Modals */}
       <CreateWorkoutModal
         show={showCreateModal}
         handleClose={() => setShowCreateModal(false)}
         onWorkoutCreated={handleWorkoutCreated}
       />
-
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
         <h1 className="text-center mb-4 text-warning">Workouts</h1>
-
         {/* Filters */}
         <Form className="mb-4">
           <Row className="align-items-end">
@@ -157,8 +179,6 @@ const WorkoutsPage = () => {
             </Col>
           </Row>
         </Form>
-
-        {/* Workout Cards */}
         <Row>
           {loading && <p>Loading workouts...</p>}
           {error && <p>Error loading workouts: {error.message}</p>}
@@ -181,15 +201,6 @@ const WorkoutsPage = () => {
                         style={{ objectFit: "cover", height: "180px" }}
                       />
                     )}
-                    {/* If your backend uses imageUrl instead of image, use this: */}
-                    {/* {workout.imageUrl && (
-                      <Card.Img
-                        variant="top"
-                        src={workout.imageUrl}
-                        alt={workout.name}
-                        style={{ objectFit: "cover", height: "180px" }}
-                      />
-                    )} */}
                     <Card.Body className="px-4">
                       <Card.Title className="text-warning">
                         {workout.name}
@@ -199,6 +210,16 @@ const WorkoutsPage = () => {
                         {splitMap[workout.split_id] ||
                           `Split ${workout.split_id}`}
                       </Card.Subtitle>
+                      <Card.Text>
+                        {workout.user_id ? (
+                          <>
+                            <strong>Created by: </strong>
+                            {userMap[workout.user_id] || "User"}
+                          </>
+                        ) : (
+                          <>Default</>
+                        )}
+                      </Card.Text>
                       <Button
                         variant="warning"
                         className="w-100 fw-semibold"
@@ -213,8 +234,6 @@ const WorkoutsPage = () => {
             ))}
         </Row>
       </motion.div>
-
-      {/* Workout Details Modal */}
       <Modal
         show={showModal}
         onHide={handleCloseModal}

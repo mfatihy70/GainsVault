@@ -28,13 +28,17 @@ const CreateCustomWorkoutModal = ({ show, handleClose, onWorkoutCreated }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    // Get userId from localStorage
+    const userId = localStorage.getItem("userId")
     const newWorkout = {
       name,
       image: imageUrl,
-      exercises: selectedExercises, // Backend should support this format
+      exercises: selectedExercises,
+      user_id: userId, // Pass user_id to backend
     }
     try {
       await createWorkout(newWorkout, setModalError, setModalLoading)
+      alert("Workout has been added successfully!")
       onWorkoutCreated()
       handleClose()
     } catch (err) {

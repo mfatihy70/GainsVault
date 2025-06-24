@@ -82,7 +82,9 @@ export const getWorkoutExercisesByWorkoutId = async (
   setLoading
 ) => {
   try {
-    const response = await axiosInstance.get(`/workout-exercises/workout/${workoutId}`)
+    const response = await axiosInstance.get(
+      `/workout-exercises/workout/${workoutId}`
+    )
     setWorkoutExercises(response.data)
   } catch (err) {
     setError(err.message)
