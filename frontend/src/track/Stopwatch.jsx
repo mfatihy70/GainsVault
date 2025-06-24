@@ -126,9 +126,9 @@ export function Stopwatch({
   }
 
   return (
-    <Container className="text-center">
+    <Container className="text-center p-0">
       <Row className="justify-content-center">
-        <Col md={6}>
+        <Col md={12}>
           <Card className="bg-dark text-light selectable p-4 shadow rounded-3">
             <div className="row align-items-center">
               <Col className="me-auto">

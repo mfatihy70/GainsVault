@@ -108,10 +108,7 @@ export const deleteWeight = async (
   }
 }
 
-// =======================================
-///     User Workout Tracking Entries
-// =======================================
-
+// User Workout Tracking Entries
 export const getUserWorkoutEntries = async (
   userId,
   setWorkouts,

@@ -249,7 +249,7 @@ const WorkoutEntries = ({ userId }) => {
     return <p className="text-light">No workout entries found.</p>
 
   return (
-    <Container fluid className="mt-3">
+    <Container fluid className="mt-3" style={{ maxWidth: 900 }}>
       <div className="mb-4">
         <h2 className="text-warning">Workout History</h2>
         <p className="text-secondary">
@@ -350,7 +350,8 @@ const WorkoutEntries = ({ userId }) => {
             </Accordion.Header>
             {/* Move action buttons OUTSIDE the Accordion.Header */}
             <div
-              className="d-flex gap-2 me-4"
+              className="d-flex gap-2 me-4 mb-2 mt-2"
+              style={{ marginLeft: "1rem" }}
               onClick={(e) => e.stopPropagation()}
             >
               {editId === workout.id ? (
@@ -358,6 +359,7 @@ const WorkoutEntries = ({ userId }) => {
                   <Button
                     variant="success"
                     size="sm"
+                    style={{ minWidth: 70 }}
                     onClick={handleSaveWorkoutEdit}
                   >
                     Save
@@ -365,6 +367,7 @@ const WorkoutEntries = ({ userId }) => {
                   <Button
                     variant="secondary"
                     size="sm"
+                    style={{ minWidth: 70 }}
                     onClick={() => setEditId(null)}
                   >
                     Cancel
@@ -375,6 +378,7 @@ const WorkoutEntries = ({ userId }) => {
                   <Button
                     variant="warning"
                     size="sm"
+                    style={{ minWidth: 70 }}
                     onClick={() => handleStartEditWorkout(workout)}
                   >
                     Edit
@@ -382,6 +386,7 @@ const WorkoutEntries = ({ userId }) => {
                   <Button
                     variant="danger"
                     size="sm"
+                    style={{ minWidth: 70 }}
                     onClick={() => handleWorkoutEntryDelete(workout.id)}
                   >
                     <i className="bi bi-trash-fill"></i>

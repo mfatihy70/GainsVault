@@ -129,7 +129,6 @@ export const trackWeight = async (req, res, next) => {
       date: new Date().toISOString(),
     }
 
-    console.log("New Weight object:", newWeight)
     // add new weight to the existing array
     await user.update({
       weight: [...(user.weight || []), newWeight],
@@ -207,7 +206,6 @@ export const getUserWorkoutEntries = async (req, res, next) => {
         }
       ],
     });
-    console.log("User Workouts:", userWorkouts)
     res.status(200).json(userWorkouts)
   } catch (error) {
     console.error("Error fetching user workouts:", error)
@@ -257,13 +255,10 @@ export const getUserWorkoutEntryById = async (req, res, next) => {
 
 export const createTrackedWorkout = async (req, res) => {
   try {
-    console.log("Creating Tracked Workout exercises:", req.body)
     // Hold the tracked workout data
     const tracked = req.body
 
     const result = await sequelize.transaction(async (t) => {
-      console.log("Transaction started for creating tracked workout");
-      //return;
       // 1. Create workout entry
       const workoutEntry = await WorkoutEntry.create({
         user_id: tracked.userId,
@@ -275,11 +270,8 @@ export const createTrackedWorkout = async (req, res) => {
         end: tracked.end,
       }, { transaction: t });
 
-      //console.log("Workout entry created:", workoutEntry.id);
-
       // 2. Loop through exercises
       for (const exercise of tracked.exercises) {
-        console.log("Processing exercise:", exercise);
 
         let workoutExerciseId = null;
 
@@ -295,7 +287,6 @@ export const createTrackedWorkout = async (req, res) => {
           });
 
           workoutExerciseId = workoutExercise?.id ?? null;
-          console.log("Found workout exercise:", workoutExerciseId ?? "none");
         }
 
         // Create a new exercise entry for the current workout
@@ -403,8 +394,6 @@ export const deleteUserWorkoutEntry = async (req, res, next) => {
   try {
     const userId = req.params.id
     const workoutEntryId = req.params.workoutId
-
-    console.log("Deleting workoutEntry for user:", userId, "Workout ID:", workoutEntryId)
 
     const workout = await WorkoutEntry.findOne({
       where: {
