@@ -31,7 +31,7 @@ const muscles = [
 const equipmentList = ["barbell", "dumbbell", "cable", "machine", "bodyweight"]
 const difficulties = ["beginner", "intermediate", "advanced"]
 
-const ExercisePage = () => {
+const Exercises = () => {
   const [exercises, setExercises] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -41,10 +41,84 @@ const ExercisePage = () => {
   const [equipment, setEquipment] = useState("")
   const [difficulty, setDifficulty] = useState("")
 
+  // Modal State for new Exercise
+  const [showModal, setShowModal] = useState(false)
+  const [formData, setFormData] = useState({
+    name: "",
+    primary: "",
+    secondary: "",
+    equipment: "",
+    difficulty: "",
+  })
+  // Track touched fields for validation
+  const [touched, setTouched] = useState({})
+  const [submitAttempted, setSubmitAttempted] = useState(false)
+
   useEffect(() => {
     setLoading(true)
-    getExercises(setExercises, setLoading, setError)
+    getExercises(
+      (data) => {
+        setExercises(data)
+        setLoading(false)
+        setError(null)
+      },
+      setLoading,
+      setError
+    )
   }, [])
+
+  // Reload after adding
+  const reloadExercises = () => {
+    setLoading(true)
+    getExercises(
+      (data) => {
+        setExercises(data)
+        setLoading(false)
+        setError(null)
+      },
+      setLoading,
+      setError
+    )
+  }
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+    setTouched({ ...touched, [e.target.name]: true })
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setSubmitAttempted(true)
+    // Validation
+    if (!formData.name || !formData.primary || !formData.difficulty) {
+      return
+    }
+    try {
+      const res = await fetch("http://localhost:5050/api/exercises", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+      if (res.ok) {
+        alert("Exercise created!")
+        setShowModal(false)
+        setFormData({
+          name: "",
+          primary: "",
+          secondary: "",
+          equipment: "",
+          difficulty: "",
+        })
+        setTouched({})
+        setSubmitAttempted(false)
+        reloadExercises()
+      } else {
+        alert("Error creating exercise.")
+      }
+    } catch (err) {
+      alert("Server error.")
+    }
+  }
 
   const filteredExercises = exercises.filter(
     (ex) =>
@@ -66,16 +140,143 @@ const ExercisePage = () => {
     )),
   ]
 
+  // Helper for validation
+  const showWarning = (field) =>
+    (submitAttempted || touched[field]) && !formData[field]
+
   return (
     <Container fluid className="d-flex flex-column min-vh-100 my-5">
       {/* Exercises Header */}
       <div className="text-center my-4">
         <h1 className="text-warning">Exercises</h1>
         <p>
-          Browse through a list of exercises with details on muscles and
-          equipment.
+          Browse a list of exercises with details about muscles and equipment.
         </p>
+        <Button variant="warning" onClick={() => setShowModal(true)}>
+          + Add Exercise
+        </Button>
       </div>
+
+      {/* Modal for new Exercise */}
+      {showModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#222",
+              padding: "2rem",
+              borderRadius: "8px",
+              minWidth: 350,
+            }}
+          >
+            <h3 className="text-warning">New Exercise</h3>
+            <form onSubmit={handleSubmit}>
+              <input
+                name="name"
+                placeholder="Name"
+                value={formData.name}
+                onChange={handleInputChange}
+                required
+                className={`form-control mb-2 bg-dark text-light border border-warning`}
+                autoComplete="off"
+              />
+              {showWarning("name") && (
+                <div className="text-warning small mb-2">Name is required.</div>
+              )}
+              <select
+                name="primary"
+                value={formData.primary}
+                onChange={handleInputChange}
+                required
+                className="form-control mb-2 bg-dark text-light border border-warning"
+              >
+                <option value="">Primary Muscle</option>
+                {muscles.map((m) => (
+                  <option key={m} value={m}>
+                    {m.charAt(0).toUpperCase() + m.slice(1)}
+                  </option>
+                ))}
+              </select>
+              {showWarning("primary") && (
+                <div className="text-warning small mb-2">
+                  Primary muscle is required.
+                </div>
+              )}
+              <select
+                name="secondary"
+                value={formData.secondary}
+                onChange={handleInputChange}
+                className="form-control mb-2 bg-dark text-light border border-warning"
+              >
+                <option value="">Secondary Muscle (optional)</option>
+                {muscles.map((m) => (
+                  <option key={m} value={m}>
+                    {m.charAt(0).toUpperCase() + m.slice(1)}
+                  </option>
+                ))}
+              </select>
+              <select
+                name="equipment"
+                value={formData.equipment}
+                onChange={handleInputChange}
+                className="form-control mb-2 bg-dark text-light border border-warning"
+              >
+                <option value="">Equipment (optional)</option>
+                {equipmentList.map((e) => (
+                  <option key={e} value={e}>
+                    {e.charAt(0).toUpperCase() + e.slice(1)}
+                  </option>
+                ))}
+              </select>
+              <select
+                name="difficulty"
+                value={formData.difficulty}
+                onChange={handleInputChange}
+                className="form-control mb-2 bg-dark text-light border border-warning"
+                required
+              >
+                <option value="">Difficulty</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+              {showWarning("difficulty") && (
+                <div className="text-warning small mb-2">
+                  Difficulty is required.
+                </div>
+              )}
+              <div className="d-flex gap-2 mt-2">
+                <button type="submit" className="btn btn-warning">
+                  Create
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setShowModal(false)
+                    setTouched({})
+                    setSubmitAttempted(false)
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Filter Controls */}
       <Form className="mb-4">
@@ -134,7 +335,7 @@ const ExercisePage = () => {
                 setDifficulty("")
               }}
             >
-              Clear
+              Reset
             </Button>
           </Col>
         </Row>
@@ -165,7 +366,11 @@ const ExercisePage = () => {
                 </Col>
               ) : (
                 filteredExercises.map((exercise, idx) => (
-                  <Col md={4} key={exercise.id || idx} className="mb-4">
+                  <Col
+                    md={4}
+                    key={exercise.id || exercise._id || idx}
+                    className="mb-4"
+                  >
                     <motion.div
                       whileHover={{
                         y: -10,
@@ -197,10 +402,10 @@ const ExercisePage = () => {
                         )}
                         <h4 className="mb-2">{exercise.name}</h4>
                         <p className="mb-2">
-                          <strong>Primary Muscles:</strong> {exercise.primary}
+                          <strong>Primary Muscle:</strong> {exercise.primary}
                         </p>
                         <p className="mb-2">
-                          <strong>Secondary Muscles:</strong>{" "}
+                          <strong>Secondary Muscle:</strong>{" "}
                           {exercise.secondary ? exercise.secondary : "-"}
                         </p>
                         <p className="mb-4">
@@ -244,4 +449,4 @@ const ExercisePage = () => {
   )
 }
 
-export default ExercisePage
+export default Exercises
