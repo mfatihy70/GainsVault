@@ -6,6 +6,7 @@ import {
   createWorkoutExercise,
   updateWorkoutExercise,
   deleteWorkoutExercise,
+  deleteWorkoutExercisesByWorkoutId,
 } from "../../controllers/core/workout_exercise.controller.js"
 
 const router = express.Router()
@@ -16,5 +17,6 @@ router.get("/:id", getWorkoutExerciseById)
 router.post("/", createWorkoutExercise)
 router.put("/:id", updateWorkoutExercise)
 router.delete("/:id", deleteWorkoutExercise)
+router.delete("/workout/:workoutId", deleteWorkoutExercisesByWorkoutId)
 
 export default router

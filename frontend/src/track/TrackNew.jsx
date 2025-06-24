@@ -16,12 +16,15 @@ import {
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { getWorkoutExercisesByWorkoutId, getWorkoutById} from "../utils/workout"
+import {
+  getWorkoutExercisesByWorkoutId,
+  getWorkoutById,
+} from "../utils/workout"
 import "../styles/track.css"
 import SearchableDropdown from "./SearchableDropdown"
 import { getExercises } from "../utils/exercise"
 import { Stopwatch } from "./Stopwatch"
-import workoutImage from '../assets/workout.png'
+import workoutImage from "../assets/workout.png"
 
 const WorkoutTrackNew = () => {
   const location = useLocation()
@@ -42,11 +45,15 @@ const WorkoutTrackNew = () => {
   const { id: workoutId } = useParams()
   const [exercises, setExercises] = useState(navigationState?.exercises || [])
   const [workout, setWorkout] = useState(navigationState?.workout || null)
-  const [times, setTimes] = useState(navigationState?.times || { startTime: 0, endTime: 0, duration: 0 })
-  const [isCustomWorkout, setIsCustomWorkout] = useState(navigationState?.isCustomWorkout ? true : false)
+  const [times, setTimes] = useState(
+    navigationState?.times || { startTime: 0, endTime: 0, duration: 0 }
+  )
+  const [isCustomWorkout, setIsCustomWorkout] = useState(
+    navigationState?.isCustomWorkout ? true : false
+  )
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [validationErrors, setValidationErrors] = useState({});
+  const [validationErrors, setValidationErrors] = useState({})
 
   const [allExercises, setAllExercises] = useState([])
 
@@ -89,44 +96,42 @@ const WorkoutTrackNew = () => {
     })
   }
   const handleRepsChange = (e, index, setIdx, setKey) => {
-    const val = Number(e.target.value);
-    const updatedExercises = [...exercises];
-    updatedExercises[index].setsData[setIdx].reps = val;
-    setExercises(updatedExercises);
+    const val = Number(e.target.value)
+    const updatedExercises = [...exercises]
+    updatedExercises[index].setsData[setIdx].reps = val
+    setExercises(updatedExercises)
 
     if (val > 0 && validationErrors[setKey]?.reps) {
       setValidationErrors((prev) => {
-        const copy = { ...prev };
+        const copy = { ...prev }
         if (copy[setKey]) {
-          delete copy[setKey].reps;
-          if (Object.keys(copy[setKey]).length === 0) delete copy[setKey];
+          delete copy[setKey].reps
+          if (Object.keys(copy[setKey]).length === 0) delete copy[setKey]
         }
-        return copy;
-      });
+        return copy
+      })
     }
   }
   const handleWeightChange = (e, index, setIdx, setKey) => {
-    const val = Number(e.target.value);
-    const updatedExercises = [...exercises];
-    updatedExercises[index].setsData[setIdx].weight = val;
-    setExercises(updatedExercises);
+    const val = Number(e.target.value)
+    const updatedExercises = [...exercises]
+    updatedExercises[index].setsData[setIdx].weight = val
+    setExercises(updatedExercises)
 
     if (val > 0 && validationErrors[setKey]?.weight) {
       setValidationErrors((prev) => {
-        const copy = { ...prev };
+        const copy = { ...prev }
         if (copy[setKey]) {
-          delete copy[setKey].weight;
-          if (Object.keys(copy[setKey]).length === 0) delete copy[setKey];
+          delete copy[setKey].weight
+          if (Object.keys(copy[setKey]).length === 0) delete copy[setKey]
         }
-        return copy;
-      });
+        return copy
+      })
     }
   }
   const hasAtLeastOneDoneSet = exercises.some((exercise) =>
     exercise.setsData?.some((set) => set.done)
   )
-
-
 
   useEffect(() => {
     setLoading(true)
@@ -159,7 +164,7 @@ const WorkoutTrackNew = () => {
       )
     }
 
-    getExercises(setAllExercises, setError, () => { })
+    getExercises(setAllExercises, setError, () => {})
   }, [navigationState?.exercises, workoutId, isCustomWorkout])
 
   if (loading || !workout) {
@@ -181,13 +186,16 @@ const WorkoutTrackNew = () => {
   }
 
   return (
-    <Container className="py-5 bg-dark text-light">
+    <Container className="py-5 bg-dark text-light" style={{ maxWidth: 900 }}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Card className="mb-4 bg-dark border border-warning">
+        <Card
+          className="mb-4 bg-dark border border-warning"
+          style={{ maxWidth: 700, margin: "0 auto" }}
+        >
           <Card.Body>
             <div className="d-flex align-items-center justify-content-between">
               <Button variant="outline-warning" onClick={handleGoBack}>
@@ -201,7 +209,6 @@ const WorkoutTrackNew = () => {
               </h1>
               {/* Spacer to balance layout */}
               <div style={{ width: "75.5px" }} />{" "}
-              {/* Same width as the button */}
             </div>
             <Form>
               <Form.Check
@@ -212,12 +219,17 @@ const WorkoutTrackNew = () => {
                 onChange={() => setIsCustomWorkout(!isCustomWorkout)}
               />
             </Form>
-            <Stopwatch
-              initialStartTime={times.startTime}
-              initialEndTime={times.endTime}
-              initialIsRunning={false}
-              onTimeUpdate={setTimes}
-            />
+            {/* Make stopwatch same width as exercises list */}
+            <div className="d-flex justify-content-center">
+              <div style={{ width: "100%" }}>
+                <Stopwatch
+                  initialStartTime={times.startTime}
+                  initialEndTime={times.endTime}
+                  initialIsRunning={false}
+                  onTimeUpdate={setTimes}
+                />
+              </div>
+            </div>
             <p className="text-center text-muted">{workout.description}</p>
           </Card.Body>
         </Card>
@@ -236,7 +248,7 @@ const WorkoutTrackNew = () => {
                         width: "100px",
                         height: "100px",
                         objectFit: "cover",
-                        borderRadius: "0.25rem"
+                        borderRadius: "0.25rem",
                       }}
                       rounded
                     />
@@ -268,30 +280,30 @@ const WorkoutTrackNew = () => {
                   )}
                 </Row>
 
-                { /* Sets Section */ }
+                {/* Sets Section */}
                 {exercise.setsData.map((set, setIdx) => {
-                  const setKey = `set-${index}-${setIdx}`;
-                  const isValid = set.weight > 0 && set.reps > 0;
-                  const hasWeightError = validationErrors[setKey]?.weight;
-                  const hasRepsError = validationErrors[setKey]?.reps;
+                  const setKey = `set-${index}-${setIdx}`
+                  const isValid = set.weight > 0 && set.reps > 0
+                  const hasWeightError = validationErrors[setKey]?.weight
+                  const hasRepsError = validationErrors[setKey]?.reps
 
                   // Style for done sets
                   let doneStyle = set.done
                     ? {
-                      //backgroundColor: "#1e1e1e",
-                      border: "2px solid #28a745", // green when done
-                      opacity: 0.85,
-                    }
+                        //backgroundColor: "#1e1e1e",
+                        border: "2px solid #28a745", // green when done
+                        opacity: 0.85,
+                      }
                     : {
-                      //  backgroundColor: "#111", // near-black
-                      border: "2px solid #ffc107", // Bootstrap warning yellow
-                    };
+                        //  backgroundColor: "#111", // near-black
+                        border: "2px solid #ffc107", // Bootstrap warning yellow
+                      }
 
                   if (hasWeightError || hasRepsError) {
                     doneStyle = {
                       ...doneStyle,
                       border: "2px solid #dc3545", // red border for errors
-                    };
+                    }
                   }
 
                   return (
@@ -305,7 +317,6 @@ const WorkoutTrackNew = () => {
                       }}
                       className="d-flex py-3 px-3 align-items-center"
                     >
-
                       {/* Checkbox on left */}
                       <div className="me-3" style={{ minWidth: "110px" }}>
                         {/* Set number */}
@@ -316,28 +327,29 @@ const WorkoutTrackNew = () => {
                           checked={set.done}
                           isInvalid={!!validationErrors[setKey]}
                           onClick={(e) => {
-                            const weightValid = set.weight > 0;
-                            const repsValid = set.reps > 0;
+                            const weightValid = set.weight > 0
+                            const repsValid = set.reps > 0
 
                             if (!weightValid || !repsValid) {
-                              e.preventDefault();
+                              e.preventDefault()
                               setValidationErrors((prev) => ({
                                 ...prev,
                                 [setKey]: {
                                   weight: !weightValid,
                                   reps: !repsValid,
                                 },
-                              }));
+                              }))
                             } else {
                               setValidationErrors((prev) => {
-                                const copy = { ...prev };
-                                delete copy[setKey];
-                                return copy;
-                              });
+                                const copy = { ...prev }
+                                delete copy[setKey]
+                                return copy
+                              })
 
-                              const updatedExercises = [...exercises];
-                              updatedExercises[index].setsData[setIdx].done = e.target.checked;
-                              setExercises(updatedExercises);
+                              const updatedExercises = [...exercises]
+                              updatedExercises[index].setsData[setIdx].done =
+                                e.target.checked
+                              setExercises(updatedExercises)
                             }
                           }}
                         />
@@ -352,31 +364,33 @@ const WorkoutTrackNew = () => {
                                 min={0}
                                 value={set.weight}
                                 isInvalid={hasWeightError}
-                                onChange={(e) => handleWeightChange(e, index, setIdx, setKey)}
+                                onChange={(e) =>
+                                  handleWeightChange(e, index, setIdx, setKey)
+                                }
                                 className="text-center"
                               />
                               <InputGroup.Text className="bg-dark text-warning border-warning">
                                 kg
                               </InputGroup.Text>
                             </InputGroup>
-
                           </Col>
                           {/* Reps input */}
-                          <Col md={6} >
-                            <InputGroup >
+                          <Col md={6}>
+                            <InputGroup>
                               <Form.Control
                                 type="number"
                                 min={0}
                                 value={set.reps}
                                 isInvalid={hasRepsError}
-                                onChange={(e) => handleRepsChange(e, index, setIdx, setKey)}
+                                onChange={(e) =>
+                                  handleRepsChange(e, index, setIdx, setKey)
+                                }
                                 className="text-center"
                               />
                               <InputGroup.Text className="bg-dark text-warning border-warning">
                                 reps
                               </InputGroup.Text>
                             </InputGroup>
-
                           </Col>
                         </Row>
                       </Col>
@@ -387,22 +401,22 @@ const WorkoutTrackNew = () => {
                           variant="outline-danger"
                           size="sm"
                           onClick={() => {
-                            const updatedExercises = [...exercises];
-                            updatedExercises[index].setsData.splice(setIdx, 1);
-                            setExercises(updatedExercises);
+                            const updatedExercises = [...exercises]
+                            updatedExercises[index].setsData.splice(setIdx, 1)
+                            setExercises(updatedExercises)
 
                             setValidationErrors((prev) => {
-                              const copy = { ...prev };
-                              delete copy[setKey];
-                              return copy;
-                            });
+                              const copy = { ...prev }
+                              delete copy[setKey]
+                              return copy
+                            })
                           }}
                         >
                           ✖
                         </Button>
                       </div>
                     </div>
-                  );
+                  )
                 })}
 
                 {/* Add Set Button */}
@@ -461,10 +475,10 @@ const WorkoutTrackNew = () => {
                 {exercises.length === 0
                   ? "Add at least one exercise to enable"
                   : times.duration === 0
-                    ? "Workout duration must be greater than 0"
-                    : !hasAtLeastOneDoneSet
-                      ? "Mark at least one set as done to enable"
-                      : "Finish Workout"}
+                  ? "Workout duration must be greater than 0"
+                  : !hasAtLeastOneDoneSet
+                  ? "Mark at least one set as done to enable"
+                  : "Finish Workout"}
               </Tooltip>
             }
           >
@@ -483,15 +497,19 @@ const WorkoutTrackNew = () => {
                 size="lg"
                 className="finish-btn"
                 onClick={handleFinishWorkout}
-                disabled={exercises.length === 0 || times.duration === 0 || !hasAtLeastOneDoneSet}
+                disabled={
+                  exercises.length === 0 ||
+                  times.duration === 0 ||
+                  !hasAtLeastOneDoneSet
+                }
               >
                 Finish Workout
               </Button>
             </span>
           </OverlayTrigger>
         </div>
-      </motion.div >
-    </Container >
+      </motion.div>
+    </Container>
   )
 }
 

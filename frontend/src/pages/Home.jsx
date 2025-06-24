@@ -29,12 +29,14 @@ const Home = () => {
     },
   ]
 
+  const userId = localStorage.getItem("userId")
+
   const features = [
     {
       title: "Exercise Tracking",
       description: "Log and track your exercises with details",
       icon: "💪",
-      link: "/exercises",
+      link: userId ? "/track" : "/login",
     },
     {
       title: "Workout Splits",

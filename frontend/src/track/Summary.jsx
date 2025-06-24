@@ -1,7 +1,15 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { Container, Card, Button, Row, Col, Badge, Image } from "react-bootstrap"
+import {
+  Container,
+  Card,
+  Button,
+  Row,
+  Col,
+  Badge,
+  Image,
+} from "react-bootstrap"
 import { formatDateTime, formatDuration } from "../utils/stopwatch"
-import workoutImage from '../assets/workout.png'
+import workoutImage from "../assets/workout.png"
 import { createTrackedWorkout } from "../utils/user"
 
 const WorkoutSummary = () => {
@@ -30,14 +38,6 @@ const WorkoutSummary = () => {
     .filter(Boolean) // removes nulls
 
   const handleSubmitWorkout = () => {
-    console.log("Submitting workout data...")
-    console.log("Workout ID:", workoutId)
-    console.log("Workout Data:", workout)
-    console.log("Exercises:", exercises)
-    console.log("Times:", times)
-    console.log("Is Custom Workout:", isCustomWorkout)
-    // Submit logic here
-
     const trackedWorkoutData = {
       userId: userId,
       workoutId: workoutId,
@@ -57,9 +57,13 @@ const WorkoutSummary = () => {
           set_order: index + 1,
         })),
       })),
-    };
-    console.log("Tracked Workout Data:", trackedWorkoutData);
-    createTrackedWorkout(trackedWorkoutData, () => { }, () => { });
+    }
+    createTrackedWorkout(
+      trackedWorkoutData,
+      () => {},
+      () => {}
+    )
+    alert("Workout saved successfully!")
   }
 
   const handleGoBack = () => {
@@ -108,7 +112,10 @@ const WorkoutSummary = () => {
         const finishedSets = ex.setsData
 
         return (
-          <Card key={i} className="mb-4 bg-dark text-light border border-warning">
+          <Card
+            key={i}
+            className="mb-4 bg-dark text-light border border-warning"
+          >
             <Card.Body>
               <Card.Title className="text-warning mb-3 d-flex justify-content-center">
                 <div className="d-flex align-items-center">
@@ -157,14 +164,11 @@ const WorkoutSummary = () => {
                 <strong className="d-block mb-2">Sets Performed:</strong>
                 <div className="d-flex flex-column gap-2">
                   {finishedSets.map((set, idx) => (
-                    <Card
-                      key={idx}
-                      bg="success"
-                      text="dark"
-                      className="p-2"
-                    >
+                    <Card key={idx} bg="success" text="dark" className="p-2">
                       <div className="d-flex justify-content-between gap-3">
-                        <div><strong>Set {idx + 1}</strong></div>
+                        <div>
+                          <strong>Set {idx + 1}</strong>
+                        </div>
                         <div>Weight: {set.weight} kg</div>
                         <div>Reps: {set.reps}</div>
                       </div>
@@ -172,7 +176,6 @@ const WorkoutSummary = () => {
                   ))}
                 </div>
               </div>
-
 
               {/* Notes */}
               {ex.notes && (
@@ -185,7 +188,6 @@ const WorkoutSummary = () => {
           </Card>
         )
       })}
-
 
       {/* Final Action */}
       <div className="text-center mt-4">

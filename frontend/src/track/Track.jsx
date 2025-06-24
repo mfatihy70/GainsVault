@@ -11,7 +11,10 @@ import {
 } from "react-bootstrap"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
-import { getWorkoutExercisesByWorkoutId, getWorkoutsForSplit } from "../utils/workout"
+import {
+  getWorkoutExercisesByWorkoutId,
+  getWorkoutsForSplit,
+} from "../utils/workout"
 import { getSplitById, getSplits } from "../utils/split"
 import { useNavigate } from "react-router-dom"
 
@@ -67,31 +70,31 @@ const WorkoutTrack = () => {
         transition={{ duration: 0.5 }}
       >
         <Col className="d-flex justify-content-center align-items-center align-content-center gap-2 mb-2">
-          <h1 className="text-center text-warning">Workouts</h1>
-
-          {/* Filter by Split */}
-          <Form.Group className="text-center ms-3" controlId="splitFilter">
-            <Form.Select
-              value={selectedSplit?.id}
-              onChange={handleSelectSplit}
-              className="mx-auto bg-dark text-light border border-warning"
-              style={{ maxWidth: "300px" }}
-            >
-              <option value="-1">Select a Split</option>
-              {splits.map((split) => (
-                <option key={split.id} value={split.id}>
-                  {split.name}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
+          <h1 className="text-center text-warning">Workout Tracking</h1>
         </Col>
 
         {/* No Split Selected */}
         {!selectedSplit ? (
           <Container className="text-center py-5 text-light">
-            <Spinner animation="border" variant="warning" />
-            <h3 className="mt-3">Please select a split to view workouts</h3>
+            <h3>Please select a split to view workouts</h3>
+            {/* Show the split dropdown here as well */}
+            <div className="d-flex justify-content-center mt-5">
+              <Form.Group controlId="splitFilter">
+                <Form.Select
+                  value={selectedSplit?.id}
+                  onChange={handleSelectSplit}
+                  className="mx-auto bg-dark text-light border border-warning"
+                  style={{ maxWidth: "300px" }}
+                >
+                  <option value="-1">Select a Split</option>
+                  {splits.map((split) => (
+                    <option key={split.id} value={split.id}>
+                      {split.name}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            </div>
           </Container>
         ) : (
           /* Selected Split Details */
@@ -182,7 +185,8 @@ const WorkoutTrack = () => {
                           ))}
 
                           {/* Loading/Error States */}
-                          {loading && (
+                          {/* Only show spinner if a workout is selected */}
+                          {selectedWorkoutId == workout.id && loading && (
                             <div className="text-center my-5">
                               <Spinner animation="border" variant="warning" />
                             </div>

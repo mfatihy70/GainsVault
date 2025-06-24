@@ -69,6 +69,18 @@ export const deleteWorkoutExercise = async (req, res) => {
   }
 }
 
+// Delete all workout_exercises for a specific workout
+export const deleteWorkoutExercisesByWorkoutId = async (req, res) => {
+  try {
+    const deleted = await WorkoutExercise.destroy({
+      where: { workout_id: req.params.workoutId },
+    })
+    res.json({ message: "Workout exercises deleted", count: deleted })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
 // Fetch all exercises for a specific workout, with exercise info
 export const getExercisesForWorkout = async (req, res) => {
   try {

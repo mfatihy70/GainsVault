@@ -9,15 +9,16 @@ import {
   Image,
   Form,
   Tab,
-  Tabs
+  Tabs,
 } from "react-bootstrap"
 import logo from "@/assets/icon/gainsvault.png"
 import { getUserById, editUser } from "../utils/user"
 import GainsChart from "./GainsChart"
 import MuscleRadarChart from "./MuscleRadarChart"
-import WorkoutProgressChart from "./WorkoutProgressChart";
+import WorkoutProgressChart from "./WorkoutProgressChart"
 import WeightTracker from "./WeightTracker"
 import History from "./History" // workout history component
+import CreatedWorkouts from "./CreatedWorkouts"
 import { getUserWorkoutEntries } from "../utils/user"
 
 const ProfilePage = () => {
@@ -85,10 +86,12 @@ const ProfilePage = () => {
       <Card className="bg-dark border border-warning text-light">
         <Card.Body>
           <Row>
-            <Col md={4} className="d-flex flex-column align-items-center">
-              <Col
-                md={4}
-                className="d-flex justify-content-center"
+            <Col
+              md={4}
+              className="d-flex flex-column align-items-center justify-content-center"
+            >
+              <div
+                className="d-flex justify-content-center align-items-center"
                 style={{ height: "150px", width: "150px" }}
               >
                 <Image
@@ -100,7 +103,7 @@ const ProfilePage = () => {
                   height={150}
                   alt="User Avatar"
                 />
-              </Col>
+              </div>
               {editing ? (
                 <Form.Group className="mb-3 mt-3">
                   <Form.Label>Avatar URL</Form.Label>
@@ -117,7 +120,7 @@ const ProfilePage = () => {
                 </Form.Group>
               ) : (
                 <>
-                  <p className="mb-3 mt-3">Avatar</p>
+                  <p className="mb-3 mt-3">Profile Picture</p>
                 </>
               )}
             </Col>
@@ -201,7 +204,7 @@ const ProfilePage = () => {
                     {new Date(user.createdAt).toLocaleDateString()}
                   </p>
                   <Button
-                    variant="primary"
+                    variant="secondary"
                     className="mt-3"
                     onClick={() => setEditing(true)}
                   >
@@ -214,37 +217,88 @@ const ProfilePage = () => {
         </Card.Body>
       </Card>
       <Card className="bg-dark border border-warning text-light mt-4 p-3">
-        <Tabs defaultActiveKey="stats" id="profile-tabs" className="mb-3 border-bottom border-primary" justify variant="pills">
-          <Tab eventKey="stats" title="Statistics">
+        <Tabs
+          defaultActiveKey="stats"
+          id="profile-tabs"
+          className="mb-3 border-bottom border-warning"
+          justify
+          variant="pills"
+        >
+          <Tab
+            eventKey="stats"
+            title={<span className="fw-bold">Statistics</span>}
+            tabClassName="bg-dark text-warning"
+          >
             <Col
               md={12}
               className="d-flex justify-content-center align-items-center text-center col mb-3"
             >
-              <GainsChart workouts={workoutEntries} width={"800px"} height={"100%"} />
+              <GainsChart
+                workouts={workoutEntries}
+                width={"800px"}
+                height={"100%"}
+              />
             </Col>
             <hr />
             <Col
               md={12}
               className="d-flex justify-content-center align-items-center text-center col mb-3"
             >
-              <MuscleRadarChart workouts={workoutEntries} width={"600px"} height={"100%"} />
+              <MuscleRadarChart
+                workouts={workoutEntries}
+                width={"600px"}
+                height={"100%"}
+              />
             </Col>
             <hr />
             <Col
               md={12}
               className="d-flex justify-content-center align-items-center text-center col mb-3"
             >
-              <WorkoutProgressChart workouts={workoutEntries} width={"800px"} height={"100%"} />
+              <WorkoutProgressChart
+                workouts={workoutEntries}
+                width={"800px"}
+                height={"100%"}
+              />
             </Col>
           </Tab>
-          <Tab eventKey="weight" title="Weight">
+          <Tab
+            eventKey="weight"
+            title={<span className="fw-bold">Weight</span>}
+            tabClassName="bg-dark text-warning"
+          >
             <WeightTracker userId={userId} />
           </Tab>
-          <Tab eventKey="entries" title="History">
+          <Tab
+            eventKey="entries"
+            title={<span className="fw-bold">History</span>}
+            tabClassName="bg-dark text-warning"
+          >
             <History userId={userId} />
+          </Tab>
+          <Tab
+            eventKey="created"
+            title={<span className="fw-bold">Created Workouts</span>}
+            tabClassName="bg-dark text-warning"
+          >
+            <CreatedWorkouts userId={userId} />
           </Tab>
         </Tabs>
       </Card>
+      <style>
+        {`
+          .nav-pills .nav-link.active,
+          .nav-pills .show > .nav-link {
+            background-color: #ffc107 !important;
+            color: #212529 !important;
+            font-weight: bold;
+          }
+          .nav-pills .nav-link {
+            color: #ffc107 !important;
+            background-color: transparent !important;
+          }
+        `}
+      </style>
     </Container>
   )
 }
