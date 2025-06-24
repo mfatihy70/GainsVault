@@ -20,26 +20,13 @@ export const getWorkoutById = async (id) => {
   }
 }
 
-export const getWorkoutsForSplit = async (
-  splitId,
-  setWorkouts,
-  setError,
-  setLoading
-) => {
+export const getWorkoutsForSplit = async (splitId) => {
   try {
-    // Fetch all workouts and filter by splitId (foreign key)
-    getWorkouts(
-      (workouts) => {
-        workouts = workouts.filter((workout) => workout.split_id == splitId)
-        setWorkouts(workouts)
-      },
-      setError,
-      setLoading
-    )
+    const allWorkouts = await getWorkouts()
+    return allWorkouts.filter((workout) => String(workout.split_id) === String(splitId))
   } catch (err) {
-    setError(err.message)
-  } finally {
-    setLoading(false)
+    console.error("Error fetching workouts for split:", err)
+    throw err
   }
 }
 

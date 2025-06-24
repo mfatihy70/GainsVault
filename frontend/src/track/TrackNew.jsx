@@ -129,19 +129,18 @@ const WorkoutTrackNew = () => {
 
 
   useEffect(() => {
-    setLoading(true)
+    const fetchData = async () => {
+      setLoading(true)
+      try {
+        // Workout laden
+        const workoutData = await getWorkoutById(workoutId)
+        setWorkout(workoutData)
 
-    getWorkoutById(workoutId, setWorkout, setError, () => setLoading(false))
-
-    if (navigationState?.exercises?.length) {
-      // Restoring previous exercise state (with user-entered data)
-      setExercises(navigationState.exercises)
-      setLoading(false)
-    } else if (!isCustomWorkout) {
-      // Fresh fetch from backend
-      getWorkoutExercisesByWorkoutId(
-        workoutId,
-        (fetchedWorkoutExercises) => {
+        if (navigationState?.exercises?.length) {
+          setExercises(navigationState.exercises)
+        } else if (!isCustomWorkout) {
+          // Exercises laden
+          const fetchedWorkoutExercises = await getWorkoutExercisesByWorkoutId(workoutId)
           const enrichedExercises = fetchedWorkoutExercises.map((we) => ({
             ...we.exercise,
             workoutExerciseId: we.id,
@@ -152,14 +151,17 @@ const WorkoutTrackNew = () => {
                 : [{ reps: 0, weight: 0, done: false }],
           }))
           setExercises(enrichedExercises)
-          setLoading(false)
-        },
-        setError,
-        () => setLoading(false)
-      )
+        }
+        // All Exercises für das Dropdown laden
+        const allEx = await getExercises()
+        setAllExercises(allEx)
+      } catch (err) {
+        setError(err)
+      } finally {
+        setLoading(false)
+      }
     }
-
-    getExercises(setAllExercises, setError, () => { })
+    fetchData()
   }, [navigationState?.exercises, workoutId, isCustomWorkout])
 
   if (loading || !workout) {

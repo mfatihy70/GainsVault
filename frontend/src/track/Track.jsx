@@ -27,36 +27,53 @@ const WorkoutTrack = () => {
   const [selectedWorkoutId, setSelectedWorkoutId] = useState(null)
 
   useEffect(() => {
-    getSplits(setSplits, setError, setLoading)
+    const fetchSplits = async () => {
+      try {
+        setLoading(true)
+        const splitsData = await getSplits()
+        setSplits(splitsData)
+      } catch (err) {
+        setError(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchSplits()
   }, [])
 
-  const handleSelectSplit = (event) => {
+  const handleSelectSplit = async (event) => {
     const splitId = event.target.value
     setWorkouts([])
     setExercises([])
     setSelectedSplit(null)
     setSelectedWorkoutId(null)
     if (splitId == "-1") return
-    getSplitById(splitId, setSelectedSplit, setError, setLoading)
-    getWorkoutsForSplit(splitId, setWorkouts, setError, setLoading)
+    try {
+      setLoading(true)
+      const split = await getSplitById(splitId)
+      setSelectedSplit(split)
+      const workouts = await getWorkoutsForSplit(splitId)
+      setWorkouts(workouts)
+    } catch (err) {
+      setError(err)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleViewExercises = (workoutId) => {
+  const handleViewExercises = async (workoutId) => {
     setSelectedWorkoutId(null)
     setExercises([])
     setSelectedWorkoutId(workoutId)
-    getWorkoutExercisesByWorkoutId(
-      workoutId,
-      (fetchedWorkoutExercises) => {
-        const enrichedExercises = fetchedWorkoutExercises.map((we) => ({
-          ...we.exercise,
-        }))
-        setExercises(enrichedExercises)
-        setLoading(false)
-      },
-      setError,
-      () => setLoading(false)
-    )
+    try {
+      setLoading(true)
+      const fetchedWorkoutExercises = await getWorkoutExercisesByWorkoutId(workoutId)
+      setExercises(fetchedWorkoutExercises.map(we => we.exercise))
+    } catch (err) {
+      setError(err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

@@ -12,6 +12,7 @@ const CreateWorkoutModal = ({ show, handleClose, onWorkoutCreated }) => {
   const [selectedSplit, setSelectedSplit] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [image, setImage] = useState("")
 
   useEffect(() => {
     if (show) {
@@ -55,6 +56,7 @@ const CreateWorkoutModal = ({ show, handleClose, onWorkoutCreated }) => {
         name,
         split_id: selectedSplit,
         exercise_ids: selectedExercises,
+        image: image.trim() || undefined,
       })
       onWorkoutCreated() // Refresh the workouts list
       handleClose() // Close the modal
@@ -67,10 +69,10 @@ const CreateWorkoutModal = ({ show, handleClose, onWorkoutCreated }) => {
 
   return (
     <Modal show={show} onHide={handleClose} size="lg" centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Create Custom Workout</Modal.Title>
+      <Modal.Header closeButton style={{ background: "#222", color: "#fff", borderBottom: "1px solid #444" }}>
+        <Modal.Title style={{ color: "#fff" }}>Create Custom Workout</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body style={{ background: "#181a1b", color: "#fff" }}>
         {error && <p className="text-danger">Error: {error.message}</p>}
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
@@ -81,6 +83,7 @@ const CreateWorkoutModal = ({ show, handleClose, onWorkoutCreated }) => {
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., Push Day"
               required
+              style={{ background: "#222", color: "#fff", border: "1px solid #444" }}
             />
           </Form.Group>
 
@@ -90,6 +93,7 @@ const CreateWorkoutModal = ({ show, handleClose, onWorkoutCreated }) => {
               value={selectedSplit}
               onChange={(e) => setSelectedSplit(e.target.value)}
               required
+              style={{ background: "#222", color: "#fff", border: "1px solid #444" }}
             >
               <option value="">Select a Split</option>
               {splits.map((split) => (
@@ -100,26 +104,42 @@ const CreateWorkoutModal = ({ show, handleClose, onWorkoutCreated }) => {
             </Form.Select>
           </Form.Group>
 
-          <h5>Select Exercises</h5>
-          {loading ? (
-            <p>Loading exercises...</p>
-          ) : (
-            <Container>
-              <Row>
-                {allExercises.map((exercise) => (
-                  <Col key={exercise.id} md={4}>
-                    <Form.Check
-                      type="checkbox"
-                      id={`exercise-${exercise.id}`}
-                      label={exercise.name}
-                      checked={selectedExercises.includes(exercise.id)}
-                      onChange={() => handleExerciseSelection(exercise.id)}
-                    />
-                  </Col>
-                ))}
-              </Row>
-            </Container>
-          )}
+          <Form.Group className="mb-3">
+            <Form.Label>Select Exercises</Form.Label>
+            <div style={{
+              maxHeight: "250px",
+              overflowY: "auto",
+              border: "1px solid #444",
+              borderRadius: "6px",
+              padding: "8px",
+              background: "#222",
+              color: "#fff"
+            }}>
+              {allExercises.map((exercise) => (
+                <Form.Check
+                  key={exercise.id}
+                  type="checkbox"
+                  id={`exercise-${exercise.id}`}
+                  label={exercise.name}
+                  checked={selectedExercises.includes(exercise.id)}
+                  onChange={() => handleExerciseSelection(exercise.id)}
+                  className="mb-2"
+                  style={{ color: "#fff" }}
+                />
+              ))}
+            </div>
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Image URL (optional)</Form.Label>
+            <Form.Control
+              type="url"
+              value={image}
+              onChange={(e) => setImage(e.target.value)}
+              placeholder="https://example.com/image.jpg"
+              style={{ background: "#222", color: "#fff", border: "1px solid #444" }}
+            />
+          </Form.Group>
 
           <Button variant="primary" type="submit" className="mt-3" disabled={loading}>
             {loading ? "Creating..." : "Create Workout"}
